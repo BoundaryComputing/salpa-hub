@@ -1,0 +1,56 @@
+[package]
+name = "md-membrane-build"
+version = "1.0.0"
+description = "Embed a dry metallopeptide GROMACS topology in a DPPC bilayer (transmembrane) via packmol-memgen + ParmEd, and emit a solvated GROMACS topology for membrane MD. Like md_solvate_gmx, the solute topology is preserved bytewise — never re-derived by tleap — so fragment-fused residues survive."
+author = "BoCoFlow / metalparm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "MdMembraneBuild"
+display_name = "Membrane Build"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "gromacs",
+    "packmol-memgen",
+    "parmed",
+    "membrane",
+    "bilayer",
+    "dppc",
+    "lipid21",
+    "molecular-dynamics",
+    "md-setup",
+    "metallopeptide",
+    "transmembrane",
+    "non-standard-residue",
+]
+
+[node.metadata]
+category = "MD Preparation"
+tooltip = "Embed a dry GROMACS topology in a DPPC bilayer via packmol-memgen + ParmEd; never re-derives the solute (safe for fragment-fused residues)"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = true
+default_timeout = 3600
+estimated_runtime = "a few minutes (packmol-memgen bilayer packing dominates)"
+
+[dependencies]
+python = ">=3.11"
+# packmol-memgen + tleap + ParmEd + Lipid21 all ship with ambertools
+# (in the metalparm_vwf env).
+
+[compatibility]
+platforms = ["linux", "macos"]
+cpu_architectures = ["x86_64", "arm64"]
+
+[citation]
+reference = "Schott-Verdugo & Gohlke, PACKMOL-Memgen: A simple-to-use, generalized workflow for membrane-protein/lipid-bilayer system building"
+authors = "S. Schott-Verdugo, H. Gohlke"
+journal = "J. Chem. Inf. Model."
+year = "2019"
+doi = "10.1021/acs.jcim.9b00269"

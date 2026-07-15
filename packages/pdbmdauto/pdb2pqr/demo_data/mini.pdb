@@ -1,0 +1,21 @@
+HEADER    MINI PEPTIDE FOR TESTING                      01-JAN-26   MINI
+TITLE     ALANINE DIPEPTIDE (ACE-ALA-NME) FOR PDB2PQR TESTING
+REMARK   1 MINIMAL PDB FILE FOR BOCOFLOW PDB2PQR NODE TESTING
+REMARK   2 CONTAINS AN ALANINE DIPEPTIDE WITH 22 ATOMS
+ATOM      1  N   ALA A   1       1.458   0.000   0.000  1.00  0.00           N
+ATOM      2  CA  ALA A   1       2.009   1.420   0.000  1.00  0.00           C
+ATOM      3  C   ALA A   1       1.515   2.083   1.275  1.00  0.00           C
+ATOM      4  O   ALA A   1       0.627   1.578   1.960  1.00  0.00           O
+ATOM      5  CB  ALA A   1       1.521   2.144  -1.250  1.00  0.00           C
+ATOM      6  N   ALA A   2       2.134   3.224   1.566  1.00  0.00           N
+ATOM      7  CA  ALA A   2       1.752   3.974   2.774  1.00  0.00           C
+ATOM      8  C   ALA A   2       2.328   5.392   2.707  1.00  0.00           C
+ATOM      9  O   ALA A   2       3.338   5.606   2.034  1.00  0.00           O
+ATOM     10  CB  ALA A   2       2.258   3.275   4.038  1.00  0.00           C
+ATOM     11  N   GLY A   3       1.672   6.338   3.380  1.00  0.00           N
+ATOM     12  CA  GLY A   3       2.109   7.726   3.377  1.00  0.00           C
+ATOM     13  C   GLY A   3       1.536   8.483   4.568  1.00  0.00           C
+ATOM     14  O   GLY A   3       0.476   8.157   5.107  1.00  0.00           O
+ATOM     15  OXT GLY A   3       2.154   9.452   4.982  1.00  0.00           O
+TER      16      GLY A   3
+END

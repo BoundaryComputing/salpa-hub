@@ -1,0 +1,46 @@
+# Hello Decrypt Node — Decrypts a Caesar-cipher message from a file
+#
+# Part of the "Secret Message" hello-world workflow template.
+# Reads an encrypted file, decrypts it, and writes the plaintext to a new file.
+#
+# No external dependencies — uses Python stdlib only.
+# Runs IN_PROCESS (no pixi.toml needed).
+
+[package]
+name = "hello-decrypt"
+version = "1.0.0"
+description = "Decrypts a Caesar-cipher message from a file and writes the plaintext"
+author = "BoCoFlow Development Team"
+license = "MIT"
+
+[node]
+class_name = "HelloDecrypt"
+display_name = "Hello Decrypt"
+
+hashtags = [
+    "hello-world",
+    "decryption",
+    "starter",
+    "template",
+    "tutorial",
+    "text-output",
+    "beginner",
+]
+
+[node.metadata]
+tooltip = "Decrypts a Caesar-cipher file and writes the plaintext to a new file"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[dependencies]
+python = ">=3.9"
+
+[compatibility]
+platforms = ["linux", "macos", "windows"]
+
+[documentation]
+readme = "README.md"

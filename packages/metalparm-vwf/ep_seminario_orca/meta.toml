@@ -1,0 +1,34 @@
+[package]
+name = "ep-seminario-orca"
+version = "1.0.0"
+description = "Compute bond and angle force constants from ORCA Hessian using the Modified Seminario Method"
+author = "BoCoFlow / EasyParm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "EpSeminarioOrca"
+display_name = "Seminario"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "easyparm",
+    "seminario-method",
+    "force-constants",
+    "orca",
+    "hessian",
+    "qm-derived-parameters",
+    "metal-complex",
+    "force-field-parameterization",
+]
+
+[node.metadata]
+category = "Force Field Parameterization"
+tooltip = "Extract bond/angle force constants from ORCA freq calculation via Modified Seminario Method"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false

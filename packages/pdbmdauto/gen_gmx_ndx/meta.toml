@@ -1,0 +1,30 @@
+[package]
+name = "gen-gmx-ndx"
+version = "1.0.0"
+description = "Generate GROMACS index groups for original vs modeled residues"
+author = "BoCoFlow Team"
+license = "MIT"
+
+[node]
+class_name = "GenGmxNdx"
+display_name = "GMX Index Groups"
+shared_environment = "pdbmdauto"
+num_in = 1
+num_out = 1
+hashtags = [
+    "gromacs", "index", "ndx", "molecular-dynamics",
+    "restraints", "structure-preparation", "md-simulation",
+]
+
+[node.metadata]
+category = "Molecular Dynamics"
+tooltip = "Creates custom GROMACS index groups (OriHeavy, OriBackBone) that distinguish original resolved residues from homology-modeled residues. Used for position restraints during relaxation."
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[node.platforms]
+supported = ["linux", "macos"]

@@ -1,0 +1,27 @@
+[workspace]
+name = "metaldock_vwf"
+version = "0.1.0"
+description = "Shared environment for metaldock_vwf nodes (refactored MetalDock docking pipeline)"
+channels = ["conda-forge", "bioconda"]
+# Legacy docking toolchain (mgltools/autodock/autogrid) ships osx-64 + linux-64
+# only — no osx-arm64 builds exist. Matches the project's `docking` pixi env.
+# Apple-Silicon users run this env under Rosetta (osx-64).
+platforms = ["linux-64", "osx-64"]
+
+[dependencies]
+python = ">=3.11,<3.13"
+networkx = ">=3.0"
+numpy = ">=1.24"
+scipy = ">=1.10"
+redis-py = ">=5.0.0"   # bocoflow stream logging
+# Docking / prep toolchain (mirrors the project's `docking` pixi env)
+openbabel = ">=3.1"
+pdb2pqr = ">=3.6"
+autogrid = ">=4.2"
+autodock = ">=4.2"
+mgltools = ">=1.5"
+ase = ">=3.22"         # QM engine interface (ORCA/Gaussian/ADF via ASE)
+
+# ORCA is NOT a conda package — download separately (free for academic use)
+# from https://orcaforum.kofo.mpg.de and pass its path to mdock_qm_charges
+# via the `orca_path` parameter (or set ASE_ORCA_COMMAND / put orca on PATH).

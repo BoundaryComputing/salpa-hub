@@ -1,0 +1,22 @@
+; Topology file for water box demo
+; Compatible with GROMACS 2023+
+;
+; This topology uses TIP3P water model from OPLS-AA force field
+; For other water models, change the #include directive
+
+; Include force field parameters
+#include "oplsaa.ff/forcefield.itp"
+
+; Include water topology
+#include "oplsaa.ff/tip3p.itp"
+
+; Include ion parameters (in case you add ions later)
+#include "oplsaa.ff/ions.itp"
+
+[ system ]
+; Name
+Water box demo for GROMACS testing
+
+[ molecules ]
+; Compound        #mols
+SOL               510

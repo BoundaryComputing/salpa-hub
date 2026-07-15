@@ -1,0 +1,46 @@
+# Hello Encrypt Node — Encrypts a message using a configurable cipher
+#
+# Part of the "Secret Message" hello-world workflow template.
+# Takes a plaintext message, encrypts it, and writes the result to a file.
+#
+# No external dependencies — uses Python stdlib only.
+# Runs IN_PROCESS (no pixi.toml needed).
+
+[package]
+name = "hello-encrypt"
+version = "1.0.0"
+description = "Encrypts a message using a Caesar cipher and writes the ciphertext to a file"
+author = "BoCoFlow Development Team"
+license = "MIT"
+
+[node]
+class_name = "HelloEncrypt"
+display_name = "Hello Encrypt"
+
+hashtags = [
+    "hello-world",
+    "encryption",
+    "starter",
+    "template",
+    "tutorial",
+    "text-output",
+    "beginner",
+]
+
+[node.metadata]
+tooltip = "Encrypts a message with a Caesar cipher and writes the ciphertext to a file"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[dependencies]
+python = ">=3.9"
+
+[compatibility]
+platforms = ["linux", "macos", "windows"]
+
+[documentation]
+readme = "README.md"

@@ -1,0 +1,34 @@
+[package]
+name = "mdock-ligand-pdbqt"
+version = "0.1.0"
+description = "Convert a charge-enriched molecular graph into an AutoDock PDBQT with ROOT/BRANCH torsion tree (metal-aware freezing) — MetalDock pipeline step 4"
+author = "BoCoFlow / MetalDock"
+license = "LGPL-2.1"
+
+[node]
+class_name = "MdockLigandPdbqt"
+display_name = "Ligand PDBQT"
+shared_environment = "metaldock_vwf"
+num_in = 1
+num_out = 1
+category = "Metal Docking"
+
+hashtags = [
+    "metaldock",
+    "pdbqt",
+    "torsion-tree",
+    "rotatable-bonds",
+    "metal-complex",
+    "autodock",
+    "molecular-docking",
+    "computational-chemistry",
+]
+
+[node.metadata]
+tooltip = "Enriched graph → ROOT/BRANCH PDBQT (coordination-sphere freezing, 32-torsion cap)"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false

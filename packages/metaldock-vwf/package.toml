@@ -1,0 +1,64 @@
+[package]
+name = "metaldock-vwf"
+version = "0.2.1"
+description = "Visual workflow nodes for metal-protein docking: the refactored MetalDock pipeline (protein prep, ligand prep, QM/ORCA CM5 charges, ligand PDBQT with metal-aware torsion tree, AutoDock4 docking, results analysis) wired as chainable BoCoFlow nodes. Each node wraps one src/metaldock_modules function; molecular graphs are serialized to JSON between nodes."
+author = "BoCoFlow / metaldock"
+license = "LGPL-2.1 (non-commercial: MGLTools)"
+repository = "https://github.com/BoundaryComputing/salpa-hub"
+
+[package.nodes]
+nodes = [
+    "mdock_protein_prep",      # clean PDB → pdb2pqr protonate → prepare_receptor4 PDBQT
+    "mdock_ligand_prep",       # canonicalize XYZ (obabel) → build molecular graph
+    "mdock_qm_charges",        # ORCA/Gaussian/ADF DFT → CM5 charges + Mayer bond orders → enrich graph
+    "mdock_ligand_pdbqt",      # enriched graph → ROOT/BRANCH PDBQT (metal-aware torsion freezing)
+    "mdock_autodock_run",      # GPF/DPF → autogrid4 → autodock4 → extract poses
+    "mdock_results_analysis",  # binding energies, ligand efficiency, interacting residues, RMSD
+]
+
+[package.environment]
+shared_environment = "metaldock_vwf"
+
+[package.metadata]
+category = "Metal Docking"
+keywords = [
+    "metaldock",
+    "molecular-docking",
+    "metal-complex",
+    "autodock4",
+    "qm-charges",
+    "cm5",
+    "orca",
+    "metalloprotein",
+    "computational-chemistry",
+]
+hashtags = [
+    "metaldock",
+    "molecular-docking",
+    "metal-docking",
+    "metal-complex",
+    "autodock4",
+    "autogrid4",
+    "qm-derived-charges",
+    "cm5-charges",
+    "orca",
+    "pdb2pqr",
+    "mgltools",
+    "pdbqt",
+    "metalloprotein",
+    "transition-metal",
+    "computational-chemistry",
+]
+platform_note = "Requires AutoDock4/AutoGrid4 + MGLTools (conda-forge). ORCA is downloaded separately (free for academic use) and its path passed to mdock_qm_charges. Windows users should use WSL2/Docker."
+
+[package.documentation]
+readme = "README.md"
+
+# No installable workflow templates yet. The 1jzi showcase lives under
+# workflows/ as reference docs + a saved .bcflow, but neither is a registry
+# template_info JSON, so they are intentionally NOT listed here (listing them
+# makes generate_registry.py emit parse warnings and register nothing). To
+# ship an installable example, add a template_info workflow JSON with portable
+# (relative / node:demo_data) paths and reference it here.
+[package.workflows]
+examples = []

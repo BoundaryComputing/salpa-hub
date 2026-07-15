@@ -1,0 +1,20 @@
+Salpa Hub — Licensing
+=====================
+
+Salpa Hub has no single, repository-wide license. Each package is licensed
+individually, and the license is finalized per package as its dependency chain
+settles. See LICENSING.md for the full per-package posture and attributions, and
+each package's own NOTICE / license headers under packages/<name>/.
+
+Current per-package licenses
+----------------------------
+
+  metalparm-vwf   LGPL-2.1
+  pdbmdauto       MIT
+  metaldock-vwf   Academic / non-commercial (MGLTools-dependent) — until the
+                  planned Meeko swap makes it commercially clean
+
+Salpa Hub ships 100% free and open — nothing here is ever paywalled. Premium
+execution routes to Salpa Compute, never to this repository.
+
+Full details, third-party attributions, and citations: see LICENSING.md.

@@ -1,0 +1,17 @@
+[workspace]
+name = "metalparm_vwf"
+version = "1.0.0"
+description = "Shared environment for metalparm_vwf nodes (EasyParm pipeline + metallopeptide fragment builder + tleap fuser)"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+
+[dependencies]
+python = ">=3.11,<3.13"
+numpy = ">=1.24"
+scipy = ">=1.10"
+periodictable = ">=1.6"
+ambertools = ">=24"
+biopython = ">=1.80"
+redis-py = ">=5.0.0"
+xtb = ">=6.6"
+mdanalysis = ">=2.8"   # md_analysis_helix / md_analysis_distance (DSSP needs >=2.8)

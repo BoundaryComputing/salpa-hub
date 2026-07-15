@@ -1,0 +1,52 @@
+[package]
+name = "pdb2pqr"
+version = "2.0.0"
+description = "Converts PDB files to PQR format with protonation states, hydrogen addition, and charge assignment using PDB2PQR. Supports PROPKA pKa predictions and multiple force fields."
+author = "BoCoFlow Development Team"
+license = "MIT"
+
+[package.dependencies]
+mdanalysis = ">=2.4.0"
+pdb2pqr = ">=3.0.0"
+
+[node]
+class_name = "PDB2PQR"
+display_name = "PDB to PQR Converter"
+shared_environment = "pdbmdauto"
+# num_in/num_out omitted — defaults to 1
+
+hashtags = [
+    "structure-preparation",
+    "protonation",
+    "pdb2pqr",
+    "propka",
+    "charge-assignment",
+    "hydrogen-addition",
+    "force-field",
+    "protein-preparation",
+]
+
+[node.metadata]
+icon = "icon.svg"
+tooltip = "Convert PDB to PQR format with protonation states, partial charges, and hydrogen addition"
+category = "Structure Preparation"
+tags_display = ["PDB2PQR", "Protonation", "Structure Prep", "PROPKA"]
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[dependencies]
+python = ">=3.9"
+
+[compatibility]
+platforms = ["linux", "macos", "windows"]
+
+[documentation]
+readme = "README.md"
+
+[citation]
+reference = "PDB2PQR: An Automated Pipeline for the Setup of Poisson-Boltzmann Electrostatics Calculations"
+doi = "10.1093/nar/gkm276"

@@ -1,0 +1,34 @@
+[package]
+name = "ep-amber-to-gromacs"
+version = "1.1.0"
+description = "Convert AMBER prmtop+rst7 to GROMACS top+gro via ParmEd"
+author = "BoCoFlow / metalparm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "EpAmberToGromacs"
+display_name = "AMBER → GROMACS"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "amber",
+    "gromacs",
+    "parmed",
+    "format-conversion",
+    "topology",
+    "molecular-dynamics",
+    "metalloprotein",
+    "easyparm",
+]
+
+[node.metadata]
+category = "MD Preparation"
+tooltip = "Convert AMBER prmtop+rst7 → GROMACS top+gro (ParmEd, ships with AmberTools)"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false

@@ -1,0 +1,34 @@
+[package]
+name = "ep-forcefield-assembly"
+version = "1.0.0"
+description = "Assemble AMBER force field: MOL2 correction, parmchk2, ULS labeling, merge Seminario params, UFF fill, cleanup (easyPARM steps 03-13)"
+author = "BoCoFlow / EasyParm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "EpForcefieldAssembly"
+display_name = "FF Assembly"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "easyparm",
+    "force-field",
+    "frcmod",
+    "unique-labeling",
+    "parmchk2",
+    "amber",
+    "metal-parameterization",
+    "seminario",
+]
+
+[node.metadata]
+category = "Force Field Parameterization"
+tooltip = "Full force field assembly: MOL2 correction → parmchk2 → ULS → merge Seminario → UFF fill → cleanup → final .frcmod"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false

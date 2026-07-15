@@ -1,0 +1,34 @@
+[package]
+name = "ep-bond-detection"
+version = "1.0.0"
+description = "Detect bonds, angles, and dihedrals from optimized XYZ geometry using covalent radii (easyPARM step 02)"
+author = "BoCoFlow / EasyParm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "EpBondDetection"
+display_name = "Bond Detection"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "easyparm",
+    "bond-detection",
+    "molecular-connectivity",
+    "covalent-radii",
+    "metal-aware",
+    "force-field-parameterization",
+    "xyz-input",
+    "computational-chemistry",
+]
+
+[node.metadata]
+category = "Force Field Parameterization"
+tooltip = "Detect bonds/angles/dihedrals from XYZ coordinates using covalent radii with metal-aware tolerance"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false

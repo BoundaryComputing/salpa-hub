@@ -1,0 +1,47 @@
+# Hello Reveal Node — Generates a visual comparison report
+#
+# Part of the "Secret Message" hello-world workflow template.
+# Reads the encrypted and decrypted files, then produces a
+# formatted visual report showing the cipher in action.
+#
+# No external dependencies — uses Python stdlib only.
+# Runs IN_PROCESS (no pixi.toml needed).
+
+[package]
+name = "hello-reveal"
+version = "1.0.0"
+description = "Generates a visual report comparing encrypted and decrypted messages"
+author = "BoCoFlow Development Team"
+license = "MIT"
+
+[node]
+class_name = "HelloReveal"
+display_name = "Hello Reveal"
+
+hashtags = [
+    "hello-world",
+    "visualization",
+    "report",
+    "starter",
+    "template",
+    "tutorial",
+    "beginner",
+]
+
+[node.metadata]
+tooltip = "Generates a visual comparison report of encrypted vs decrypted messages"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[dependencies]
+python = ">=3.9"
+
+[compatibility]
+platforms = ["linux", "macos", "windows"]
+
+[documentation]
+readme = "README.md"

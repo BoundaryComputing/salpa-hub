@@ -1,0 +1,43 @@
+; Energy Minimization MDP file for GROMACS
+; Suitable for water box demo
+;
+; Reference: GROMACS 2024 documentation
+; https://manual.gromacs.org/current/user-guide/mdp-options.html
+
+; Run control
+integrator      = steep         ; Steepest descent energy minimization
+emtol           = 1000.0        ; Stop when max force < 1000 kJ/mol/nm
+emstep          = 0.01          ; Energy step size
+nsteps          = 5000          ; Maximum number of steps
+
+; Output control
+nstlog          = 100           ; Write to log every 100 steps
+nstenergy       = 100           ; Write energies every 100 steps
+nstxout-compressed = 100        ; Write compressed coordinates every 100 steps
+
+; Neighbor searching
+cutoff-scheme   = Verlet        ; Use Verlet list (required for GPU)
+nstlist         = 10            ; Update neighbor list every 10 steps
+ns_type         = grid          ; Grid-based neighbor searching
+pbc             = xyz           ; Periodic boundary conditions in all directions
+rlist           = 1.0           ; Neighbor list cutoff (nm)
+
+; Electrostatics
+coulombtype     = PME           ; Particle Mesh Ewald for electrostatics
+rcoulomb        = 1.0           ; Coulomb cutoff (nm)
+pme_order       = 4             ; PME interpolation order
+fourierspacing  = 0.16          ; FFT grid spacing
+
+; Van der Waals
+vdwtype         = Cut-off       ; Cut-off for VdW
+rvdw            = 1.0           ; VdW cutoff (nm)
+DispCorr        = EnerPres      ; Long range dispersion corrections
+
+; Temperature and pressure coupling (not used in EM)
+tcoupl          = no            ; No temperature coupling
+pcoupl          = no            ; No pressure coupling
+
+; Constraints
+constraints     = none          ; No constraints during minimization
+; Note: For flexible water (SETTLE disabled), use:
+; define = -DFLEXIBLE

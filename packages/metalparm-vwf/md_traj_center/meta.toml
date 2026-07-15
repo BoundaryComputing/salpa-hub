@@ -1,0 +1,45 @@
+[package]
+name = "md-traj-center"
+version = "1.0.0"
+description = "PBC-correct an MD trajectory before analysis: make the solute (metallopeptide) whole across periodic boundaries, centre it in the box, and wrap solvent/membrane back in. The MDAnalysis equivalent of 'gmx trjconv -pbc whole -center -pbc mol'; produces a clean .xtc for md_analysis_helix / md_analysis_distance."
+author = "BoCoFlow / metalparm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "MdTrajCenter"
+display_name = "MD Analysis: Trajectory Center"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "molecular-dynamics",
+    "trajectory-analysis",
+    "periodic-boundary",
+    "pbc-correction",
+    "trjconv",
+    "mdanalysis",
+    "metallopeptide",
+    "md-analysis",
+]
+
+[node.metadata]
+category = "MD Analysis"
+tooltip = "Make the solute whole across PBC + centre it → a clean .xtc for downstream analysis"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+default_timeout = 1800
+estimated_runtime = "seconds to a few minutes, scaling with trajectory length"
+
+[dependencies]
+python = ">=3.11"
+# MDAnalysis — declared in the shared metalparm_vwf pixi env. Unwrapping
+# needs the bond graph, so the topology must be a .tpr.
+
+[compatibility]
+platforms = ["linux", "macos"]
+cpu_architectures = ["x86_64", "arm64"]

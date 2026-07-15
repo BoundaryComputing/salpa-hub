@@ -1,0 +1,29 @@
+# Pixi environment for PDB-FASTA BioPython node
+# Enables isolated execution via PIXI_SUBPROCESS strategy
+
+[project]
+name = "pdb-fasta-biopython"
+version = "2.0.0"
+description = "PDB structure parsing and FASTA sequence extraction using BioPython"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+# Python runtime
+python = ">=3.9,<3.13"
+
+# pip is required for installing bocoflow-core
+pip = ">=23.0"
+
+# Node dependencies
+biopython = ">=1.80"
+requests = ">=2.28"
+
+# Redis support for stream_log() in PIXI_SUBPROCESS mode
+redis-py = ">=5.0.0"
+
+# Note: bocoflow-core is automatically installed by PixiManager
+# during environment creation via editable install from the local path
+
+[tasks]
+test = "python -c \"from node import PdbFastaBiopython; print('Node loaded successfully')\""

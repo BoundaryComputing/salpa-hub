@@ -1,0 +1,44 @@
+[package]
+name = "pdbmdauto"
+version = "1.0.0"
+description = "Automated protein structure preparation for molecular dynamics — homology modeling, solvation, relaxation"
+author = "BoCoFlow Team"
+license = "MIT"
+repository = "https://github.com/BoundaryComputing/salpa-hub"
+
+[package.nodes]
+nodes = [
+    # Homology modeling
+    "pdb_fasta_biopython",
+    "gen_ali",
+    "gen_multi_chain_ali",
+    "merge_pdb_chains",
+    "fix_residues_promod3",
+    # Structure preparation
+    "pdb_tools_clean",
+    "pdb2pqr",
+    "pka_gmx_em",
+    # MD preparation
+    "ori_ndx_builder",
+    "gen_gmx_ndx",
+    "gmx_solv_ion",
+    "gmx_md_relax",
+    # MD execution
+    "gmx_mdrun_local",
+    "gmx_mdrun",
+]
+
+[package.environment]
+shared_environment = "pdbmdauto"
+
+[package.metadata]
+category = "Molecular Dynamics"
+keywords = ["molecular-dynamics", "homology-modeling", "gromacs", "promod3", "structure-preparation"]
+hashtags = ["molecular-dynamics", "homology-modeling", "structure-preparation", "gromacs", "promod3", "pdb", "md-simulation"]
+platform_note = "Requires GROMACS and promod3 which have no Windows conda packages. Docker/WSL2 support coming soon (issue #48)."
+
+[package.documentation]
+readme = "README.md"
+
+[package.workflows]
+examples = ["workflows/pdbmdauto-pipeline.json"]

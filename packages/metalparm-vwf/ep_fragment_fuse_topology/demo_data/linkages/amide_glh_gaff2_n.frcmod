@@ -1,0 +1,25 @@
+amide linkage ff19SB+gaff2 (GLH-NH; GLH carboxyl C is type `C`, GAFF2 N is `n`)
+MASS
+
+BOND
+C-n     490.0    1.335                cross-FF amide (parm10 C-N AA general)
+
+ANGLE
+2C-C-n      70.0      116.60          cross-FF (parm10 CT-C-N AA general)
+O-C-n       80.0      122.90          cross-FF (parm10 N-C-O AA general; GLH OE1 type O)
+C-n-hn      50.0      120.00          cross-FF (parm10 C-N-H NMA)
+C-n-ca      50.0      121.90          cross-FF (parm10 C-N-CT AA general)
+
+DIHE
+HC-2C-C-n     1    0.000         0.0             2.    cross-FF amide
+2C-2C-C-n     1    0.000         0.0             2.    cross-FF amide
+2C-C-n-hn     1    0.000         0.0             2.    cross-FF amide
+2C-C-n-ca     1    0.000         0.0             2.    cross-FF amide
+O-C-n-hn      1    0.000         0.0             2.    cross-FF amide
+O-C-n-ca      1    0.000         0.0             2.    cross-FF amide
+C-n-ca-ca     1    0.000         0.0             2.    cross-FF amide-aryl
+
+IMPROPER
+O-2C-C-n           10.5         180.          2.    AMBER X-X-C-O canonical (parm10:893)
+
+NONBON

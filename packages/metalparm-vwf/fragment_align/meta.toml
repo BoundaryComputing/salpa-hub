@@ -1,0 +1,36 @@
+[package]
+name = "fragment-align"
+version = "0.1.0"
+description = "Pure-geometry rigid-body placement of a parameterized fragment onto a peptide anchor (Avogadro-style). Re-saves the fragment OFF library with aligned coordinates so ep_fragment_fuse_topology can combine peptide + fragment with chemically sensible interface geometry — no minimization needed."
+author = "BoCoFlow / metal-md"
+license = "LGPL-2.1"
+
+[node]
+class_name = "FragmentAlign"
+display_name = "Fragment Align"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "geometry",
+    "rigid-body-alignment",
+    "metallopeptide",
+    "tleap",
+    "amber",
+    "force-field-parameterization",
+    "computational-chemistry",
+]
+
+[node.metadata]
+category = "Metallopeptide MD"
+tooltip = "Pure-geometry pre-fuse placement: rotate + translate fragment so its bonding atom sits at standard amide-bond geometry relative to the peptide anchor."
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[node.platforms]
+supported = ["linux", "macos"]

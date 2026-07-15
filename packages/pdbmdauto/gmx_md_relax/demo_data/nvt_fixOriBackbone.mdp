@@ -1,0 +1,47 @@
+; nvt_fixOriBackbone.mdp — NVT equilibration with only backbone atoms frozen
+; Step 2 of 4: relax side chains while keeping backbone fold
+title                   = NVT with frozen OriBackBone
+integrator              = md
+nsteps                  = 5000
+dt                      = 0.001
+
+nstxout                 = 0
+nstvout                 = 0
+nstfout                 = 0
+nstlog                  = 500
+nstenergy               = 500
+nstxtcout               = 500
+
+; Neighbour searching
+nstlist                 = 20
+cutoff-scheme           = Verlet
+rlist                   = 1.2
+rvdw                    = 1.2
+rcoulomb                = 1.2
+coulombtype             = PME
+DispCorr                = EnerPres
+
+; Constraints
+constraint_algorithm    = lincs
+constraints             = h-bonds
+lincs_iter              = 1
+lincs_order             = 4
+
+; Temperature coupling — System group for vacuum (no solvent)
+tcoupl                  = V-rescale
+tc-grps                 = System
+tau_t                   = 0.1
+ref_t                   = 300
+
+; No pressure coupling (NVT)
+pcoupl                  = no
+
+; PBC
+pbc                     = xyz
+
+; No velocity generation — continue from previous step
+gen_vel                 = no
+
+; Position restraints — freeze backbone only (CA for protein)
+freezegrps              = OriBackBone
+freezedim               = Y Y Y

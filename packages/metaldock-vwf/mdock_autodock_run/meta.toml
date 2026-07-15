@@ -1,0 +1,34 @@
+[package]
+name = "mdock-autodock-run"
+version = "0.1.0"
+description = "Generate GPF/DPF, run autogrid4 + autodock4, and extract docked poses — MetalDock pipeline step 5"
+author = "BoCoFlow / MetalDock"
+license = "LGPL-2.1"
+
+[node]
+class_name = "MdockAutodockRun"
+display_name = "AutoDock Run"
+shared_environment = "metaldock_vwf"
+num_in = 1
+num_out = 1
+category = "Metal Docking"
+
+hashtags = [
+    "metaldock",
+    "autodock4",
+    "autogrid4",
+    "docking",
+    "genetic-algorithm",
+    "metal-complex",
+    "pose-prediction",
+    "computational-chemistry",
+]
+
+[node.metadata]
+tooltip = "GPF/DPF → autogrid4 → autodock4 → extract docked poses"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = true

@@ -1,0 +1,35 @@
+[package]
+name = "ep-charges"
+version = "1.0.0"
+description = "Inject QM-derived (ORCA RESP / CHELPG) partial charges into the zero-charge MOL2 from antechamber — the EasyParm charge step the node refactor originally omitted."
+author = "BoCoFlow / EasyParm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "EpCharges"
+display_name = "Charges"
+shared_environment = "metalparm_vwf"
+num_in = 2
+num_out = 1
+
+hashtags = [
+    "easyparm",
+    "resp",
+    "chelpg",
+    "partial-charges",
+    "orca",
+    "qm-derived-parameters",
+    "metal-complex",
+    "force-field-parameterization",
+    "amber",
+]
+
+[node.metadata]
+category = "Force Field Parameterization"
+tooltip = "Assign ORCA RESP (or CHELPG) charges to the antechamber MOL2; sits between MOL2 Generation and Force Field Assembly."
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false

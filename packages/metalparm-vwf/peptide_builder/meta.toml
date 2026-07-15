@@ -1,0 +1,36 @@
+[package]
+name = "peptide-builder"
+version = "0.1.0"
+description = "Build a standalone peptide PDB from a sequence (via tleap) or accept a user-supplied PDB. Forwards peptide.pdb + forcefield to ep_fragment_fuse_topology so the fuse node stays a pure fuser."
+author = "BoCoFlow / metal-md"
+license = "LGPL-2.1"
+
+[node]
+class_name = "PeptideBuilder"
+display_name = "Peptide Builder"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "peptide",
+    "tleap",
+    "amber-ff19sb",
+    "amber-ff14sb",
+    "metallopeptide",
+    "force-field-parameterization",
+    "computational-chemistry",
+]
+
+[node.metadata]
+category = "Metallopeptide MD"
+tooltip = "Build peptide.pdb from a sequence via tleap, or accept a user-supplied PDB. Feeds ep_fragment_fuse_topology."
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[node.platforms]
+supported = ["linux", "macos"]

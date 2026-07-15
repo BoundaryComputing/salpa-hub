@@ -1,0 +1,904 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-07-15T14:43:40.674803+00:00",
+  "source_name": "Salpa Hub",
+  "packages": [
+    {
+      "name": "hello-world-pipeline",
+      "version": "1.0.0",
+      "description": "A 3-node hello-world workflow \u2014 encrypt, decrypt, and reveal messages using a Caesar cipher. The simplest multi-node pipeline for learning BoCoFlow.",
+      "category": "Getting Started",
+      "hashtags": [
+        "hello-world",
+        "starter",
+        "tutorial",
+        "beginner",
+        "pipeline"
+      ],
+      "author": "BoCoFlow Development Team",
+      "license": "MIT",
+      "download_url": "packages/hello-world-pipeline",
+      "nodes": [
+        {
+          "name": "hello-encrypt",
+          "display_name": "Hello Encrypt",
+          "description": "Encrypts a message using a Caesar cipher and writes the ciphertext to a file",
+          "class_name": "HelloEncrypt",
+          "hashtags": [
+            "hello-world",
+            "encryption",
+            "starter",
+            "template",
+            "tutorial",
+            "text-output",
+            "beginner"
+          ]
+        },
+        {
+          "name": "hello-decrypt",
+          "display_name": "Hello Decrypt",
+          "description": "Decrypts a Caesar-cipher message from a file and writes the plaintext",
+          "class_name": "HelloDecrypt",
+          "hashtags": [
+            "hello-world",
+            "decryption",
+            "starter",
+            "template",
+            "tutorial",
+            "text-output",
+            "beginner"
+          ]
+        },
+        {
+          "name": "hello-reveal",
+          "display_name": "Hello Reveal",
+          "description": "Generates a visual report comparing encrypted and decrypted messages",
+          "class_name": "HelloReveal",
+          "hashtags": [
+            "hello-world",
+            "visualization",
+            "report",
+            "starter",
+            "template",
+            "tutorial",
+            "beginner"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "metaldock-vwf",
+      "version": "0.2.1",
+      "description": "Visual workflow nodes for metal-protein docking: the refactored MetalDock pipeline (protein prep, ligand prep, QM/ORCA CM5 charges, ligand PDBQT with metal-aware torsion tree, AutoDock4 docking, results analysis) wired as chainable BoCoFlow nodes. Each node wraps one src/metaldock_modules function; molecular graphs are serialized to JSON between nodes.",
+      "category": "Metal Docking",
+      "hashtags": [
+        "metaldock",
+        "molecular-docking",
+        "metal-docking",
+        "metal-complex",
+        "autodock4",
+        "autogrid4",
+        "qm-derived-charges",
+        "cm5-charges",
+        "orca",
+        "pdb2pqr",
+        "mgltools",
+        "pdbqt",
+        "metalloprotein",
+        "transition-metal",
+        "computational-chemistry"
+      ],
+      "author": "BoCoFlow / metaldock",
+      "license": "LGPL-2.1 (non-commercial: MGLTools)",
+      "download_url": "packages/metaldock-vwf",
+      "nodes": [
+        {
+          "name": "mdock-protein-prep",
+          "display_name": "Protein Prep",
+          "description": "Clean a protein PDB, protonate with pdb2pqr, and convert to PDBQT (prepare_receptor4) \u2014 MetalDock pipeline step 1",
+          "class_name": "MdockProteinPrep",
+          "hashtags": [
+            "metaldock",
+            "protein-prep",
+            "pdb2pqr",
+            "pdbqt",
+            "mgltools",
+            "receptor",
+            "molecular-docking",
+            "computational-chemistry"
+          ]
+        },
+        {
+          "name": "mdock-ligand-prep",
+          "display_name": "Ligand Prep",
+          "description": "Canonicalize a metal-complex XYZ (OpenBabel) and build its molecular graph \u2014 MetalDock pipeline step 2",
+          "class_name": "MdockLigandPrep",
+          "hashtags": [
+            "metaldock",
+            "ligand-prep",
+            "openbabel",
+            "molecular-graph",
+            "metal-complex",
+            "xyz",
+            "molecular-docking",
+            "computational-chemistry"
+          ]
+        },
+        {
+          "name": "mdock-qm-charges",
+          "display_name": "QM Charges",
+          "description": "DFT (ORCA/Gaussian/ADF) \u2192 CM5 partial charges + Mayer bond orders \u2192 enrich molecular graph \u2014 MetalDock pipeline step 3",
+          "class_name": "MdockQmCharges",
+          "hashtags": [
+            "metaldock",
+            "qm-charges",
+            "cm5-charges",
+            "orca",
+            "dft",
+            "mayer-bond-order",
+            "metal-complex",
+            "computational-chemistry"
+          ]
+        },
+        {
+          "name": "mdock-ligand-pdbqt",
+          "display_name": "Ligand PDBQT",
+          "description": "Convert a charge-enriched molecular graph into an AutoDock PDBQT with ROOT/BRANCH torsion tree (metal-aware freezing) \u2014 MetalDock pipeline step 4",
+          "class_name": "MdockLigandPdbqt",
+          "hashtags": [
+            "metaldock",
+            "pdbqt",
+            "torsion-tree",
+            "rotatable-bonds",
+            "metal-complex",
+            "autodock",
+            "molecular-docking",
+            "computational-chemistry"
+          ]
+        },
+        {
+          "name": "mdock-autodock-run",
+          "display_name": "AutoDock Run",
+          "description": "Generate GPF/DPF, run autogrid4 + autodock4, and extract docked poses \u2014 MetalDock pipeline step 5",
+          "class_name": "MdockAutodockRun",
+          "hashtags": [
+            "metaldock",
+            "autodock4",
+            "autogrid4",
+            "docking",
+            "genetic-algorithm",
+            "metal-complex",
+            "pose-prediction",
+            "computational-chemistry"
+          ]
+        },
+        {
+          "name": "mdock-results-analysis",
+          "display_name": "Results Analysis",
+          "description": "Binding energies, ligand efficiency, interacting residues, and RMSD from docking output \u2014 MetalDock pipeline step 6",
+          "class_name": "MdockResultsAnalysis",
+          "hashtags": [
+            "metaldock",
+            "analysis",
+            "binding-energy",
+            "ligand-efficiency",
+            "interacting-residues",
+            "rmsd",
+            "molecular-docking",
+            "computational-chemistry"
+          ]
+        }
+      ],
+      "shared_environment": "metaldock_vwf"
+    },
+    {
+      "name": "metalparm-vwf",
+      "version": "1.29.0",
+      "description": "Visual workflow nodes for metal force-field parameterization: EasyParm pipeline (bond detection, MOL2 generation, ORCA local/HPC, Seminario, FF assembly, library generation) + metallopeptide fragment builder, peptide builder, pure-geometry fragment alignment, two-step fragment fuser (topology + coord-applier), AMBER \u2192 GROMACS converter, packmol-memgen-based mixed-solvent box builder, and a GROMACS-side solvator (md_solvate_gmx) that uses raw packmol + ParmEd so non-standard residues are never re-derived.",
+      "category": "Force Field Parameterization",
+      "hashtags": [
+        "metalparm",
+        "easyparm",
+        "force-field-parameterization",
+        "metal-complex",
+        "metallopeptide",
+        "amber",
+        "seminario-method",
+        "qm-derived-parameters",
+        "orca",
+        "hpc",
+        "slurm",
+        "tleap",
+        "sn-porphyrin",
+        "custom-residue",
+        "fragment-parameterization",
+        "force-field-fusion",
+        "amber-ff19sb",
+        "gromacs",
+        "parmed",
+        "format-conversion",
+        "computational-chemistry"
+      ],
+      "author": "BoCoFlow / metalparm",
+      "license": "LGPL-2.1",
+      "download_url": "packages/metalparm-vwf",
+      "nodes": [
+        {
+          "name": "ep-bond-detection",
+          "display_name": "Bond Detection",
+          "description": "Detect bonds, angles, and dihedrals from optimized XYZ geometry using covalent radii (easyPARM step 02)",
+          "class_name": "EpBondDetection",
+          "hashtags": [
+            "easyparm",
+            "bond-detection",
+            "molecular-connectivity",
+            "covalent-radii",
+            "metal-aware",
+            "force-field-parameterization",
+            "xyz-input",
+            "computational-chemistry"
+          ]
+        },
+        {
+          "name": "ep-mol2-generation",
+          "display_name": "MOL2 Generation",
+          "description": "Generate MOL2 file via antechamber with atom type correction for metals (easyPARM antechamber step)",
+          "class_name": "EpMol2Generation",
+          "hashtags": [
+            "easyparm",
+            "mol2-generation",
+            "antechamber",
+            "atom-typing",
+            "gaff",
+            "amber",
+            "metal-complex",
+            "force-field-parameterization"
+          ]
+        },
+        {
+          "name": "ep-charges",
+          "display_name": "Charges",
+          "description": "Inject QM-derived (ORCA RESP / CHELPG) partial charges into the zero-charge MOL2 from antechamber \u2014 the EasyParm charge step the node refactor originally omitted.",
+          "class_name": "EpCharges",
+          "hashtags": [
+            "easyparm",
+            "resp",
+            "chelpg",
+            "partial-charges",
+            "orca",
+            "qm-derived-parameters",
+            "metal-complex",
+            "force-field-parameterization",
+            "amber"
+          ]
+        },
+        {
+          "name": "xtb-opt",
+          "display_name": "xTB Opt",
+          "description": "GFN-xTB geometry optimization (semi-empirical, local). Fast pre-optimizer for metal-containing fragments before the expensive ep_orca_run DFT step.",
+          "class_name": "XtbOpt",
+          "hashtags": [
+            "xtb",
+            "gfn",
+            "gfn2-xtb",
+            "geometry-optimization",
+            "semi-empirical",
+            "pre-optimization",
+            "metal-complex",
+            "computational-chemistry"
+          ]
+        },
+        {
+          "name": "ep-orca-run",
+          "display_name": "ORCA Run",
+          "description": "Run ORCA (QM DFT opt+freq+CHELPG) locally or on a SLURM HPC cluster. Produces .out/.hess/.xyz artifacts consumed by ep_seminario_orca.",
+          "class_name": "EpOrcaRun",
+          "hashtags": [
+            "easyparm",
+            "orca",
+            "qm",
+            "dft",
+            "hessian",
+            "chelpg",
+            "seminario-method",
+            "force-field-parameterization",
+            "hpc",
+            "slurm",
+            "remote-execution",
+            "metal-complex",
+            "computational-chemistry"
+          ]
+        },
+        {
+          "name": "ep-seminario-orca",
+          "display_name": "Seminario",
+          "description": "Compute bond and angle force constants from ORCA Hessian using the Modified Seminario Method",
+          "class_name": "EpSeminarioOrca",
+          "hashtags": [
+            "easyparm",
+            "seminario-method",
+            "force-constants",
+            "orca",
+            "hessian",
+            "qm-derived-parameters",
+            "metal-complex",
+            "force-field-parameterization"
+          ]
+        },
+        {
+          "name": "ep-forcefield-assembly",
+          "display_name": "FF Assembly",
+          "description": "Assemble AMBER force field: MOL2 correction, parmchk2, ULS labeling, merge Seminario params, UFF fill, cleanup (easyPARM steps 03-13)",
+          "class_name": "EpForcefieldAssembly",
+          "hashtags": [
+            "easyparm",
+            "force-field",
+            "frcmod",
+            "unique-labeling",
+            "parmchk2",
+            "amber",
+            "metal-parameterization",
+            "seminario"
+          ]
+        },
+        {
+          "name": "ep-library-generation",
+          "display_name": "Library Generation",
+          "description": "Generate AMBER library (.lib) file via tleap and fix atomic numbers/bond orders (easyPARM steps tleap + 12)",
+          "class_name": "EpLibraryGeneration",
+          "hashtags": [
+            "easyparm",
+            "tleap",
+            "amber-library",
+            "lib-file",
+            "topology",
+            "metal-complex",
+            "force-field-parameterization"
+          ]
+        },
+        {
+          "name": "snp-builder",
+          "display_name": "SnP Builder",
+          "description": "Build a capped Sn(IV)(OMe)2-porphyrin fragment from a YASARA-style Zn-porphyrin PDB (UNK residue). Outputs XYZ + PDB ready for EasyParm parameterization. Optionally extracts the peptide chain \u2014 whole, or a residue-number sub-span (e.g. 1-7) to carve a shorter peptide out of a longer one \u2014 and can ACE/NME-cap the extracted termini.",
+          "class_name": "SnpBuilder",
+          "hashtags": [
+            "metallopeptide",
+            "sn-porphyrin",
+            "fragment-preparation",
+            "ace-cap",
+            "amide-interface",
+            "force-field-parameterization",
+            "computational-chemistry"
+          ]
+        },
+        {
+          "name": "peptide-builder",
+          "display_name": "Peptide Builder",
+          "description": "Build a standalone peptide PDB from a sequence (via tleap) or accept a user-supplied PDB. Forwards peptide.pdb + forcefield to ep_fragment_fuse_topology so the fuse node stays a pure fuser.",
+          "class_name": "PeptideBuilder",
+          "hashtags": [
+            "peptide",
+            "tleap",
+            "amber-ff19sb",
+            "amber-ff14sb",
+            "metallopeptide",
+            "force-field-parameterization",
+            "computational-chemistry"
+          ]
+        },
+        {
+          "name": "fragment-align",
+          "display_name": "Fragment Align",
+          "description": "Pure-geometry rigid-body placement of a parameterized fragment onto a peptide anchor (Avogadro-style). Re-saves the fragment OFF library with aligned coordinates so ep_fragment_fuse_topology can combine peptide + fragment with chemically sensible interface geometry \u2014 no minimization needed.",
+          "class_name": "FragmentAlign",
+          "hashtags": [
+            "geometry",
+            "rigid-body-alignment",
+            "metallopeptide",
+            "tleap",
+            "amber",
+            "force-field-parameterization",
+            "computational-chemistry"
+          ]
+        },
+        {
+          "name": "ep-fragment-fuse-topology",
+          "display_name": "Fuse Topology",
+          "description": "Topology-only fuser: merge a standard ff19SB peptide library with a custom residue library (.lib + .frcmod) via user-specified interface bonds. Emits complex.prmtop only \u2014 coordinate assembly is handled by the sister ep_apply_coords node. Rebalances the non-integer net charge that interface-atom deletion leaves on the linkage residue so the complex total is an exact integer.",
+          "class_name": "EpFragmentFuseTopology",
+          "hashtags": [
+            "metallopeptide",
+            "force-field-fusion",
+            "tleap",
+            "custom-residue",
+            "amber-ff19sb",
+            "amide-interface",
+            "force-field-parameterization",
+            "computational-chemistry",
+            "topology-only"
+          ]
+        },
+        {
+          "name": "ep-apply-coords",
+          "display_name": "Apply Coords",
+          "description": "Place aligned source-PDB coordinates onto a topology-only complex.prmtop and write the final complex.rst7 + complex.pdb. Sister of ep_fragment_fuse_topology \u2014 together they replace the v1.11.0 monolithic ep_fragment_fuse.",
+          "class_name": "EpApplyCoords",
+          "hashtags": [
+            "metallopeptide",
+            "amber",
+            "parmed",
+            "coordinate-assembly",
+            "rst7",
+            "topology-coords-split",
+            "computational-chemistry"
+          ]
+        },
+        {
+          "name": "ep-amber-to-gromacs",
+          "display_name": "AMBER \u2192 GROMACS",
+          "description": "Convert AMBER prmtop+rst7 to GROMACS top+gro via ParmEd",
+          "class_name": "EpAmberToGromacs",
+          "hashtags": [
+            "amber",
+            "gromacs",
+            "parmed",
+            "format-conversion",
+            "topology",
+            "molecular-dynamics",
+            "metalloprotein",
+            "easyparm"
+          ]
+        },
+        {
+          "name": "md-solvate-packmol",
+          "display_name": "MD: Solvate (packmol-memgen)",
+          "description": "Solvate a metallopeptide AMBER topology in mixed or single solvent boxes via AmberTools' packmol-memgen. Bundled cosolvent library covers methanol, chloroform, DMSO, NMA, acetonitrile, acetone, benzene, phenol, TFE \u2014 all AMBER-compatible.",
+          "class_name": "MdSolvatePackmol",
+          "hashtags": [
+            "amber",
+            "packmol",
+            "packmol-memgen",
+            "solvent",
+            "mixed-solvent",
+            "ff19SB",
+            "opc",
+            "molecular-dynamics",
+            "md-setup",
+            "metalloprotein"
+          ]
+        },
+        {
+          "name": "md-solvate-gmx",
+          "display_name": "MD: Solvate (GROMACS-side)",
+          "description": "Solvate a metallopeptide GROMACS topology (from ep_amber_to_gromacs) with OPC water + Cieplak methanol + ions, using raw packmol + ParmEd assembly. Bypasses packmol-memgen's internal tleap re-derivation, so non-standard residues (fragment-fused GLU, etc.) are preserved bytewise.",
+          "class_name": "MdSolvateGmx",
+          "hashtags": [
+            "gromacs",
+            "packmol",
+            "parmed",
+            "solvent",
+            "mixed-solvent",
+            "opc",
+            "methanol",
+            "molecular-dynamics",
+            "md-setup",
+            "metallopeptide",
+            "metalloprotein",
+            "non-standard-residue"
+          ]
+        },
+        {
+          "name": "md-traj-center",
+          "display_name": "MD Analysis: Trajectory Center",
+          "description": "PBC-correct an MD trajectory before analysis: make the solute (metallopeptide) whole across periodic boundaries, centre it in the box, and wrap solvent/membrane back in. The MDAnalysis equivalent of 'gmx trjconv -pbc whole -center -pbc mol'; produces a clean .xtc for md_analysis_helix / md_analysis_distance.",
+          "class_name": "MdTrajCenter",
+          "hashtags": [
+            "molecular-dynamics",
+            "trajectory-analysis",
+            "periodic-boundary",
+            "pbc-correction",
+            "trjconv",
+            "mdanalysis",
+            "metallopeptide",
+            "md-analysis"
+          ]
+        },
+        {
+          "name": "md-analysis-helix",
+          "display_name": "MD Analysis: \u03b1-Helix Content",
+          "description": "Per-frame \u03b1-helix content of a peptide along an MD trajectory, via DSSP (MDAnalysis). Reads .xtc/.trr + .tpr/.gro and writes a CSV time series of helix fraction + a per-residue helix propensity.",
+          "class_name": "MdAnalysisHelix",
+          "hashtags": [
+            "molecular-dynamics",
+            "trajectory-analysis",
+            "dssp",
+            "secondary-structure",
+            "alpha-helix",
+            "mdanalysis",
+            "metallopeptide",
+            "md-analysis"
+          ]
+        },
+        {
+          "name": "md-analysis-distance",
+          "display_name": "MD Analysis: Residue\u2013Metal Distance",
+          "description": "Per-frame distance from a set of probe atoms (Tyr/His quenchers) to the metal centre (Sn) along an MD trajectory, via MDAnalysis. Minimum-image (PBC-aware); writes a CSV time series in \u00c5ngstr\u00f6m + a closest-approach summary.",
+          "class_name": "MdAnalysisDistance",
+          "hashtags": [
+            "molecular-dynamics",
+            "trajectory-analysis",
+            "distance",
+            "contact-analysis",
+            "mdanalysis",
+            "metallopeptide",
+            "pcet",
+            "md-analysis"
+          ]
+        },
+        {
+          "name": "md-membrane-build",
+          "display_name": "Membrane Build",
+          "description": "Embed a dry metallopeptide GROMACS topology in a DPPC bilayer (transmembrane) via packmol-memgen + ParmEd, and emit a solvated GROMACS topology for membrane MD. Like md_solvate_gmx, the solute topology is preserved bytewise \u2014 never re-derived by tleap \u2014 so fragment-fused residues survive.",
+          "class_name": "MdMembraneBuild",
+          "hashtags": [
+            "gromacs",
+            "packmol-memgen",
+            "parmed",
+            "membrane",
+            "bilayer",
+            "dppc",
+            "lipid21",
+            "molecular-dynamics",
+            "md-setup",
+            "metallopeptide",
+            "transmembrane",
+            "non-standard-residue"
+          ]
+        }
+      ],
+      "shared_environment": "metalparm_vwf"
+    },
+    {
+      "name": "pdbmdauto",
+      "version": "1.0.0",
+      "description": "Automated protein structure preparation for molecular dynamics \u2014 homology modeling, solvation, relaxation",
+      "category": "Molecular Dynamics",
+      "hashtags": [
+        "molecular-dynamics",
+        "homology-modeling",
+        "structure-preparation",
+        "gromacs",
+        "promod3",
+        "pdb",
+        "md-simulation"
+      ],
+      "author": "BoCoFlow Team",
+      "license": "MIT",
+      "download_url": "packages/pdbmdauto",
+      "nodes": [
+        {
+          "name": "pdb-fasta-biopython",
+          "display_name": "PDB FASTA Parser",
+          "description": "Parse PDB structures and extract FASTA sequences using BioPython. Supports RCSB PDB API fetching by ID and local file processing with chain splitting, HETATM handling, and missing residues analysis.",
+          "class_name": "PdbFastaBiopython",
+          "hashtags": [
+            "pdb",
+            "fasta",
+            "sequence-extraction",
+            "biopython",
+            "structure-to-sequence",
+            "protein-sequence",
+            "chain-extraction",
+            "file-conversion",
+            "rcsb-api",
+            "missing-residues",
+            "structural-biology",
+            "bioinformatics",
+            "preprocessing"
+          ]
+        },
+        {
+          "name": "gen-ali",
+          "display_name": "Generate Alignment",
+          "description": "Generate alignment files for homology modeling from PDB structure and FASTA sequences",
+          "class_name": "GenAli",
+          "hashtags": [
+            "alignment",
+            "homology-modeling",
+            "pdb",
+            "fasta",
+            "sequence-alignment",
+            "structure-preparation",
+            "missing-residues",
+            "promod3",
+            "modeller",
+            "bioinformatics"
+          ]
+        },
+        {
+          "name": "gen-multi-chain-ali",
+          "display_name": "Multi-Chain Alignment",
+          "description": "Merge per-chain alignment files into a single multi-chain alignment for homology modeling",
+          "class_name": "GenMultiChainAli",
+          "hashtags": [
+            "alignment",
+            "multi-chain",
+            "homology-modeling",
+            "pdb",
+            "structure-preparation",
+            "promod3",
+            "modeller",
+            "chain-merge",
+            "bioinformatics"
+          ]
+        },
+        {
+          "name": "merge-pdb-chains",
+          "display_name": "Merge PDB Chains",
+          "description": "Merge selected PDB chains into a single structure file for homology modeling",
+          "class_name": "MergePdbChains",
+          "hashtags": [
+            "pdb",
+            "chain-merge",
+            "structure-preparation",
+            "homology-modeling",
+            "biopython",
+            "bioinformatics",
+            "protein-structure",
+            "dna"
+          ]
+        },
+        {
+          "name": "fix-residues-promod3",
+          "display_name": "Fix Missing Residues",
+          "description": "Fix missing residues in PDB structures using ProMod3 homology modeling engine",
+          "class_name": "FixResiduesPromod3",
+          "hashtags": [
+            "homology-modeling",
+            "missing-residues",
+            "loop-modeling",
+            "promod3",
+            "structure-repair",
+            "pdb",
+            "protein-structure",
+            "bioinformatics",
+            "swiss-model"
+          ]
+        },
+        {
+          "name": "pdb-tools-clean",
+          "display_name": "PDB Clean (pdb-tools)",
+          "description": "Clean PDB files by selecting chains, removing HETATM records, and tidying format",
+          "class_name": "PDBToolsClean",
+          "hashtags": [
+            "pdb-cleaning",
+            "structure-preparation",
+            "chain-selection",
+            "pdb-tools",
+            "haddocking",
+            "remove-hetatm",
+            "remove-water",
+            "remove-ligands",
+            "tidy-pdb",
+            "renumber-residues",
+            "structural-biology",
+            "molecular-dynamics-prep",
+            "protein-structure",
+            "pdb-input",
+            "pdb-output",
+            "preprocessing",
+            "structure-cleanup"
+          ]
+        },
+        {
+          "name": "pdb2pqr",
+          "display_name": "PDB to PQR Converter",
+          "description": "Converts PDB files to PQR format with protonation states, hydrogen addition, and charge assignment using PDB2PQR. Supports PROPKA pKa predictions and multiple force fields.",
+          "class_name": "PDB2PQR",
+          "hashtags": [
+            "structure-preparation",
+            "protonation",
+            "pdb2pqr",
+            "propka",
+            "charge-assignment",
+            "hydrogen-addition",
+            "force-field",
+            "protein-preparation"
+          ]
+        },
+        {
+          "name": "pka-gmx-em",
+          "display_name": "pKa + GROMACS EM",
+          "description": "pH-dependent protonation (PDB2PQR/PROPKA) + GROMACS topology (pdb2gmx) + two-step vacuum energy minimisation",
+          "class_name": "PkaGmxEm",
+          "hashtags": [
+            "protonation",
+            "propka",
+            "pdb2pqr",
+            "gromacs",
+            "pdb2gmx",
+            "energy-minimisation",
+            "structure-preparation",
+            "force-field",
+            "molecular-dynamics",
+            "protein-preparation"
+          ]
+        },
+        {
+          "name": "ori-ndx-builder",
+          "display_name": "Original Atom Groups",
+          "description": "Build GROMACS index groups (OriHeavy, OriBackBone) for original vs homology-modeled residues",
+          "class_name": "OriNdxBuilder",
+          "hashtags": [
+            "gromacs",
+            "index",
+            "ndx",
+            "molecular-dynamics",
+            "restraints",
+            "homology-modeling",
+            "freeze-groups",
+            "structure-preparation",
+            "position-restraints"
+          ]
+        },
+        {
+          "name": "gen-gmx-ndx",
+          "display_name": "GMX Index Groups",
+          "description": "Generate GROMACS index groups for original vs modeled residues",
+          "class_name": "GenGmxNdx",
+          "hashtags": [
+            "gromacs",
+            "index",
+            "ndx",
+            "molecular-dynamics",
+            "restraints",
+            "structure-preparation",
+            "md-simulation"
+          ]
+        },
+        {
+          "name": "gmx-solv-ion",
+          "display_name": "GMX Solvate & Ionize",
+          "description": "GROMACS solvation and ionization \u2014 add water box and neutralize with ions",
+          "class_name": "GmxSolvIon",
+          "hashtags": [
+            "gromacs",
+            "solvation",
+            "ionization",
+            "molecular-dynamics",
+            "water-box",
+            "ions",
+            "structure-preparation",
+            "md-simulation"
+          ]
+        },
+        {
+          "name": "gmx-md-relax",
+          "display_name": "GMX MD Relaxation",
+          "description": "GROMACS multi-step relaxation \u2014 energy minimization and NVT equilibration",
+          "class_name": "GmxMdRelax",
+          "hashtags": [
+            "gromacs",
+            "relaxation",
+            "energy-minimization",
+            "equilibration",
+            "nvt",
+            "molecular-dynamics",
+            "md-simulation",
+            "structure-preparation"
+          ]
+        },
+        {
+          "name": "gmx-mdrun-local",
+          "display_name": "GROMACS MD Run (Local)",
+          "description": "Simple GROMACS MD simulation node for local execution - ideal for demos, tutorials, and testing",
+          "class_name": "GmxMdRunLocal",
+          "hashtags": [
+            "molecular-dynamics",
+            "md-simulation",
+            "grompp",
+            "mdrun",
+            "gromacs",
+            "computational-chemistry",
+            "structural-biology",
+            "protein-simulation",
+            "nvt-equilibration",
+            "npt-equilibration",
+            "energy-minimization",
+            "production-run",
+            "gro-input",
+            "top-input",
+            "mdp-input",
+            "xtc-output",
+            "edr-output",
+            "simulation",
+            "local-execution",
+            "tutorial",
+            "demo",
+            "beginner-friendly"
+          ]
+        },
+        {
+          "name": "gmx-mdrun",
+          "display_name": "GROMACS MD Run",
+          "description": "GROMACS MD simulation node with local and HPC/SLURM execution support",
+          "class_name": "GmxMdRun",
+          "hashtags": [
+            "molecular-dynamics",
+            "md-simulation",
+            "grompp",
+            "mdrun",
+            "gromacs",
+            "computational-chemistry",
+            "structural-biology",
+            "protein-simulation",
+            "nvt-equilibration",
+            "npt-equilibration",
+            "energy-minimization",
+            "production-run",
+            "gro-input",
+            "top-input",
+            "mdp-input",
+            "xtc-output",
+            "edr-output",
+            "simulation",
+            "hpc",
+            "slurm",
+            "cluster",
+            "remote-execution",
+            "mpi",
+            "gpu-acceleration"
+          ]
+        }
+      ],
+      "shared_environment": "pdbmdauto"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "hello-world-pipeline",
+      "name": "Hello World Pipeline",
+      "description": "A 3-node workflow that encrypts, decrypts, and reveals a secret message using a Caesar cipher. Demonstrates multi-node pipelines, data flow via case_name, and file-based communication between nodes.",
+      "category": "getting-started",
+      "difficulty": "beginner",
+      "estimated_time": "2 minutes",
+      "tags": [
+        "hello-world",
+        "pipeline",
+        "tutorial",
+        "beginner",
+        "multi-node",
+        "workflow-template"
+      ],
+      "required_packages": [
+        "hello-world-pipeline"
+      ],
+      "file": "packages/hello-world-pipeline/workflows/hello-world-pipeline.json",
+      "author": "BoCoFlow Development Team"
+    },
+    {
+      "id": "pdbmdauto-pipeline",
+      "name": "PDBmdAuto Full 265915",
+      "description": "Automated 11-node MD preparation pipeline: PDB fetch, homology modeling (ProMod3), protonation, GROMACS topology, solvation, vacuum & solvated relaxation, and production MD. Demo: protein 4Z8J (SNX27 PDZ + PTHR peptide, 2 chains, 5 missing residues).",
+      "category": "molecular-dynamics",
+      "difficulty": "advanced",
+      "estimated_time": "5 minutes",
+      "tags": [
+        "molecular-dynamics",
+        "gromacs",
+        "homology-modeling",
+        "promod3",
+        "structure-preparation",
+        "solvation",
+        "relaxation",
+        "pipeline",
+        "pdbmdauto"
+      ],
+      "required_packages": [
+        "pdbmdauto"
+      ],
+      "file": "packages/pdbmdauto/workflows/pdbmdauto-pipeline.json",
+      "author": "BoCoFlow Team"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+# GROMACS MD Run (Local) - Node Package Metadata
+# A simplified node for running GROMACS molecular dynamics simulations locally
+
+[package]
+name = "gmx-mdrun-local"
+version = "1.0.0"
+description = "Simple GROMACS MD simulation node for local execution - ideal for demos, tutorials, and testing"
+author = "BoCoFlow Community"
+license = "MIT"
+repository = "https://github.com/BoundaryComputing/salpa-hub"
+homepage = "https://www.gromacs.org/"
+
+[node]
+class_name = "GmxMdRunLocal"
+display_name = "GROMACS MD Run (Local)"
+shared_environment = "pdbmdauto"
+num_in = 1
+num_out = 1
+
+# Hashtags for discovery and categorization
+hashtags = [
+    # Primary functionality
+    "molecular-dynamics",
+    "md-simulation",
+    "grompp",
+    "mdrun",
+
+    # Tool
+    "gromacs",
+
+    # Scientific domain
+    "computational-chemistry",
+    "structural-biology",
+    "protein-simulation",
+
+    # Simulation types
+    "nvt-equilibration",
+    "npt-equilibration",
+    "energy-minimization",
+    "production-run",
+
+    # File types
+    "gro-input",
+    "top-input",
+    "mdp-input",
+    "xtc-output",
+    "edr-output",
+
+    # Workflow category
+    "simulation",
+    "local-execution",
+
+    # Use case
+    "tutorial",
+    "demo",
+    "beginner-friendly",
+]
+
+[node.metadata]
+icon = "icon.svg"
+tooltip = "Run GROMACS molecular dynamics simulation locally (grompp + mdrun)"
+category = "Molecular Dynamics"
+tags_display = ["GROMACS", "MD", "Local", "Tutorial"]
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = true
+long_running = true
+default_timeout = 3600              # 1 hour — production MD
+estimated_runtime = "Seconds to hours (depends on system size)"
+
+[dependencies]
+python = ">=3.9"
+# Note: GROMACS is installed via pixi (conda-forge)
+
+[compatibility]
+platforms = ["linux", "macos"]
+tested_on = ["ubuntu-22.04", "macos-14"]
+cpu_architectures = ["x86_64", "arm64"]
+
+[documentation]
+readme = "README.md"
+
+[citation]
+reference = "GROMACS: High performance molecular simulations through multi-level parallelism from laptops to supercomputers"
+authors = "Abraham et al."
+journal = "SoftwareX"
+year = "2015"
+doi = "10.1016/j.softx.2015.06.001"
+url = "https://www.gromacs.org/"

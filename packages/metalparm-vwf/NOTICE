@@ -1,0 +1,58 @@
+metalparm-vwf
+Copyright (c) 2025-2026 the metal-md authors (BoundaryComputing)
+
+This package is distributed under the GNU Lesser General Public License,
+version 2.1 (LGPL-2.1). See LICENSING.md at the repository root for the
+per-package license posture.
+
+===============================================================================
+Upstream: easyPARM
+===============================================================================
+
+metalparm-vwf packages the easyPARM force-field parameterization pipeline as
+visual workflow nodes. The scientific pipeline scripts bundled under each EasyParm
+node's scripts/ directory are redistributed from easyPARM:
+
+    easyPARM - Automated, Versatile, and Reliable Force Field Parameterization
+    Workflow for Metal-Containing Molecules with Unique Labeling of
+    Coordinating Atoms.
+    Abdelazim M. A. Abdelgawwad and Antonio Frances-Monerris.
+    Institut de Ciencia Molecular (ICMol), Universitat de Valencia.
+    J. Chem. Theory Comput. 2025, 21, 4, 1817-1830.
+    https://github.com/abenmb/easyPARM
+
+    Copyright 2024 Abdelazim M. A. Abdelgawwad, Universitat de Valencia.
+    Distributed under the GNU Lesser General Public License, version 2.1.
+
+The bundled easyPARM scripts retain their original copyright and license
+headers unchanged. Node integration is handled by separate wrapper modules
+(node.py / core.py), so the scientific scripts are redistributed as-is.
+
+===============================================================================
+Original work (metal-md authors), also under LGPL-2.1
+===============================================================================
+
+The following are original to metal-md and contain no easyPARM code:
+
+  - All node wrappers: */node.py, */core.py, */meta.toml
+  - snp_builder, peptide_builder, fragment_align
+  - ep_fragment_fuse_topology, ep_apply_coords
+  - ep_charges, xtb_opt, ep_amber_to_gromacs
+  - md_solvate_packmol, md_solvate_gmx, md_membrane_build
+  - md_traj_center, md_analysis_helix, md_analysis_distance
+
+A small number of assembly / cleanup helpers (e.g. the no-ULS pass-through
+variants of easyPARM steps, and metal_nonbon_fill.py) are original
+reimplementations informed by the easyPARM pipeline; each acknowledges that
+lineage in its module docstring.
+
+===============================================================================
+Third-party tools invoked (not redistributed)
+===============================================================================
+
+  - AmberTools (antechamber, parmchk2, tleap) - https://ambermd.org
+  - ORCA (user-supplied) - https://www.faccts.de/products/orca
+  - xtb - https://github.com/grimme-lab/xtb
+  - ParmEd, MDAnalysis, packmol / packmol-memgen
+
+See README.md "Citations" for the full reference list.

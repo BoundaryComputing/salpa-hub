@@ -1,0 +1,31 @@
+[package]
+name = "ori-ndx-builder"
+version = "1.0.0"
+description = "Build GROMACS index groups (OriHeavy, OriBackBone) for original vs homology-modeled residues"
+author = "BoCoFlow Team"
+license = "MIT"
+
+[node]
+class_name = "OriNdxBuilder"
+display_name = "Original Atom Groups"
+shared_environment = "pdbmdauto"
+num_in = 1
+num_out = 1
+hashtags = [
+    "gromacs", "index", "ndx", "molecular-dynamics",
+    "restraints", "homology-modeling", "freeze-groups",
+    "structure-preparation", "position-restraints",
+]
+
+[node.metadata]
+category = "Molecular Dynamics"
+tooltip = "Identifies original (crystallographic) vs homology-modeled atoms. Creates OriHeavy and OriBackBone GROMACS index groups for freezegrps during vacuum relaxation."
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[node.platforms]
+supported = ["linux", "macos"]

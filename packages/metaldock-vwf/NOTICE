@@ -1,0 +1,57 @@
+metaldock-vwf
+Copyright (c) 2025-2026 the metal-docking authors (BoundaryComputing)
+
+The node-wrapper and pipeline code in this package is distributed under the
+GNU Lesser General Public License, version 2.1 (LGPL-2.1). HOWEVER, the package
+as a whole is currently usable for ACADEMIC / NON-COMMERCIAL purposes ONLY,
+because of a required non-commercial dependency — see the notice below.
+
+===============================================================================
+IMPORTANT: Academic / non-commercial use only (MGLTools dependency)
+===============================================================================
+
+metaldock-vwf's AutoDock file-preparation steps (mdock_protein_prep,
+mdock_autodock_run) invoke MGLTools / AutoDockTools (prepare_receptor4.py and
+prepare_gpf4.py, run under pythonsh). MGLTools is distributed by the Scripps
+Research Institute under the "MGLTOOLS SOFTWARE LICENSE AGREEMENT", which
+permits NON-COMMERCIAL USE ONLY and forbids commercial redistribution.
+
+Because that required dependency is non-commercial, metaldock-vwf as shipped
+must NOT be used for commercial purposes and carries no permissive/commercial
+license label, regardless of the LGPL-2.1 license of its own code. A planned
+migration to Meeko (Apache-2.0) will remove the MGLTools dependency and make
+the package commercially clean; until that lands, treat this package as
+academic / non-commercial only.
+
+This is not legal advice — confirm the exact MGLTools terms and any AutoDock /
+Meeko obligations with counsel before relying on this for a commercial release.
+
+===============================================================================
+Upstream: MetalDock
+===============================================================================
+
+metaldock-vwf packages a refactored form of the MetalDock metal-organic
+docking pipeline as visual workflow nodes:
+
+    MetalDock: An Open-Source Docking Tool for Metal-Organic Compounds.
+    M. Hakkennes et al.
+    J. Chem. Inf. Model. 2023. doi:10.1021/acs.jcim.3c01582
+    https://github.com/MatthijsHak/MetalDock
+    Distributed under the MIT License.
+
+The scientific modules under _vendor/metaldock_modules/ are a refactored
+(pure-function) reimplementation of the MetalDock pipeline. Node integration
+(*/node.py, */meta.toml) is original metal-docking work.
+
+===============================================================================
+Third-party tools invoked (not redistributed)
+===============================================================================
+
+  - MGLTools / AutoDockTools (Scripps, NON-COMMERCIAL license) -
+    prepare_receptor4.py, prepare_gpf4.py, pythonsh
+  - AutoDock4 / AutoGrid4 (GPL-2, separate binaries) - https://autodock.scripps.edu
+  - pdb2pqr, OpenBabel, ASE
+  - ORCA (user-supplied, free for academic use) - QM / CM5 charges -
+    https://www.faccts.de/products/orca
+
+See README.md for the pipeline description and per-node details.

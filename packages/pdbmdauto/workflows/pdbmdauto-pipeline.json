@@ -1,0 +1,2675 @@
+{
+  "version": "2.0",
+  "template_info": {
+    "id": "pdbmdauto-pipeline",
+    "name": "PDBmdAuto Full 265915",
+    "description": "Automated 11-node MD preparation pipeline: PDB fetch, homology modeling (ProMod3), protonation, GROMACS topology, solvation, vacuum & solvated relaxation, and production MD. Demo: protein 4Z8J (SNX27 PDZ + PTHR peptide, 2 chains, 5 missing residues).",
+    "required_packages": [
+      "pdbmdauto"
+    ],
+    "category": "molecular-dynamics",
+    "difficulty": "advanced",
+    "tags": [
+      "molecular-dynamics",
+      "gromacs",
+      "homology-modeling",
+      "promod3",
+      "structure-preparation",
+      "solvation",
+      "relaxation",
+      "pipeline",
+      "pdbmdauto"
+    ],
+    "author": "BoCoFlow Team",
+    "estimated_time": "5 minutes"
+  },
+  "metadata": {
+    "name": "PDBmdAuto Full 265915",
+    "environment": "local",
+    "status": "draft",
+    "nodeCount": 11,
+    "edgeCount": 10,
+    "createdAt": "2026-03-31T16:24:29.809Z",
+    "updatedAt": "2026-03-31T16:28:41.361Z",
+    "path": ""
+  },
+  "react": {
+    "id": "f6a711c6-55f8-4b7c-8bad-151fb6439d73",
+    "offsetX": 0,
+    "offsetY": 0,
+    "zoom": 100,
+    "gridSize": 20,
+    "layers": [
+      {
+        "id": "60fca827-3a1c-4725-baa5-63fdc1cd8423",
+        "type": "diagram-links",
+        "isSvg": true,
+        "transformed": true,
+        "models": {
+          "d0fdb251-c6c6-4686-8127-1f41d947eb99": {
+            "id": "d0fdb251-c6c6-4686-8127-1f41d947eb99",
+            "type": "vp-link",
+            "selected": false,
+            "source": "09ea5049-bbb6-408f-b829-a10321d67906",
+            "sourcePort": "3548d9fd-c902-4fa1-977e-fd4c79a19fd9",
+            "target": "c3d15483-d69a-49ba-a82d-ced245aa8349",
+            "targetPort": "42604a48-312b-468b-9280-e9f704401e97",
+            "points": [
+              {
+                "id": "b2817279-7109-4433-8ffe-34f251fb43fb",
+                "type": "point",
+                "x": 553.0965499999993,
+                "y": 105
+              },
+              {
+                "id": "3dceaac4-0496-45ea-9db8-c79d0e62f023",
+                "type": "point",
+                "x": 481.0027999999993,
+                "y": 145
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "6b7eba5c-6a6f-436c-a811-679a18afa795": {
+            "id": "6b7eba5c-6a6f-436c-a811-679a18afa795",
+            "type": "vp-link",
+            "selected": false,
+            "source": "c3d15483-d69a-49ba-a82d-ced245aa8349",
+            "sourcePort": "d1f2a380-beba-4205-b182-207b55043ce2",
+            "target": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
+            "targetPort": "ca6d21ae-180b-45ae-88ea-94bd12ea43f1",
+            "points": [
+              {
+                "id": "102dad1e-c84b-428d-bb46-ce400c2fc8de",
+                "type": "point",
+                "x": 667.2840499999993,
+                "y": 145
+              },
+              {
+                "id": "d8399dba-1b4c-4861-8460-5ff5ad41e922",
+                "type": "point",
+                "x": 581.0027999999993,
+                "y": 185
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "d05123e6-70b8-49cf-a4bb-a7d4e64e196b": {
+            "id": "d05123e6-70b8-49cf-a4bb-a7d4e64e196b",
+            "type": "vp-link",
+            "selected": false,
+            "source": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
+            "sourcePort": "6798df54-3ca6-4e15-b89a-696ff4664e36",
+            "target": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
+            "targetPort": "8aae8125-3736-4014-96c8-e3093942cf89",
+            "points": [
+              {
+                "id": "09989d19-ba95-46dd-b496-f572c2ecdb00",
+                "type": "point",
+                "x": 777.0965499999993,
+                "y": 185
+              },
+              {
+                "id": "cc83a6b8-77f6-4cf9-9aef-a0345135c598",
+                "type": "point",
+                "x": 681.0027999999993,
+                "y": 225
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "35a58c49-dfea-483c-a431-32c09087f748": {
+            "id": "35a58c49-dfea-483c-a431-32c09087f748",
+            "type": "vp-link",
+            "selected": false,
+            "source": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
+            "sourcePort": "243f679a-6a91-46b9-b63c-88b5428583b6",
+            "target": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
+            "targetPort": "f869da8c-3167-411c-9a4e-3b3ff63ebdb3",
+            "points": [
+              {
+                "id": "d2c307af-5690-4f42-92cb-455b0c790895",
+                "type": "point",
+                "x": 867.2840499999993,
+                "y": 225
+              },
+              {
+                "id": "ca3552c6-2639-4322-89ca-901f1537147c",
+                "type": "point",
+                "x": 781.0027999999993,
+                "y": 265
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "1d7b9517-5099-4391-a88c-13d6ae7e66a7": {
+            "id": "1d7b9517-5099-4391-a88c-13d6ae7e66a7",
+            "type": "vp-link",
+            "selected": false,
+            "source": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
+            "sourcePort": "553159aa-203b-4aba-89b0-f34c66b50820",
+            "target": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
+            "targetPort": "6ee5bd51-b895-48d8-9257-b651cc5bb175",
+            "points": [
+              {
+                "id": "da1b8a19-4d4f-48f5-947d-ff63802d9ec3",
+                "type": "point",
+                "x": 968.0809249999993,
+                "y": 265
+              },
+              {
+                "id": "8137fa82-e866-449c-a524-83da1c1aa79e",
+                "type": "point",
+                "x": 881.0027999999993,
+                "y": 305
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "575b9aaa-6c6d-4d82-99f9-827c5c8273cb": {
+            "id": "575b9aaa-6c6d-4d82-99f9-827c5c8273cb",
+            "type": "vp-link",
+            "selected": false,
+            "source": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
+            "sourcePort": "15f3c9f8-f7ba-4dea-a0f3-96320a6a8101",
+            "target": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
+            "targetPort": "b9550024-bd43-4d4f-8aaa-f8bef20a32f6",
+            "points": [
+              {
+                "id": "7f8c79e9-8283-48c9-a4a7-1b550ade94b2",
+                "type": "point",
+                "x": 1067.3934249999995,
+                "y": 305
+              },
+              {
+                "id": "93a0ca89-d222-4b91-a3bb-b5af48556655",
+                "type": "point",
+                "x": 981.0027999999993,
+                "y": 345
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "78ab3dc8-745d-4f14-837d-dfab022d479b": {
+            "id": "78ab3dc8-745d-4f14-837d-dfab022d479b",
+            "type": "vp-link",
+            "selected": false,
+            "source": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
+            "sourcePort": "5c9bb3c4-ec55-4ef2-ad75-fa34533b820e",
+            "target": "151a78d1-1188-44a8-901a-8372acef3f70",
+            "targetPort": "38e4adb8-3b5f-4ec5-94b5-e317bad07c93",
+            "points": [
+              {
+                "id": "5ff1b8c8-b9f5-47fd-a440-57dd89d60210",
+                "type": "point",
+                "x": 1170.7684249999998,
+                "y": 345
+              },
+              {
+                "id": "a1f86aaf-c0bb-444d-9536-20abe4c74dcf",
+                "type": "point",
+                "x": 1081.0027999999998,
+                "y": 385
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "fcf7120a-cbd5-4f44-b6b3-9f3a103d1993": {
+            "id": "fcf7120a-cbd5-4f44-b6b3-9f3a103d1993",
+            "type": "vp-link",
+            "selected": false,
+            "source": "151a78d1-1188-44a8-901a-8372acef3f70",
+            "sourcePort": "49bba13f-7226-438d-9b28-b0e9c02eb14a",
+            "target": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
+            "targetPort": "e6de57bb-5625-4dd8-9eb1-2e0f4edbf29e",
+            "points": [
+              {
+                "id": "8a2f28f4-a115-48d3-b114-bb7ba2146780",
+                "type": "point",
+                "x": 1261.9559249999998,
+                "y": 385
+              },
+              {
+                "id": "88b5ead2-6055-4a44-8a21-e12f52427056",
+                "type": "point",
+                "x": 1181.0027999999998,
+                "y": 425
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "07e9532f-8183-47f1-8f72-ef36cc56bf5d": {
+            "id": "07e9532f-8183-47f1-8f72-ef36cc56bf5d",
+            "type": "vp-link",
+            "selected": false,
+            "source": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
+            "sourcePort": "be94b9a0-604f-41cb-b380-c66e81707328",
+            "target": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
+            "targetPort": "fed6d0f2-9cb5-4320-be4a-e358fe4d3f02",
+            "points": [
+              {
+                "id": "e03000f9-a855-407a-873f-787bb86e4469",
+                "type": "point",
+                "x": 1370.4871749999998,
+                "y": 425
+              },
+              {
+                "id": "53c02a75-6c80-468b-be1d-0524e65421c4",
+                "type": "point",
+                "x": 1281.0027999999998,
+                "y": 465
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "b2a32d5b-0a9d-401e-8df3-718d348afbb3": {
+            "id": "b2a32d5b-0a9d-401e-8df3-718d348afbb3",
+            "type": "vp-link",
+            "selected": false,
+            "source": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
+            "sourcePort": "28463f02-6860-418c-af24-fb980d320224",
+            "target": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
+            "targetPort": "7fc0faff-a97a-40e4-9e10-0435641a59a3",
+            "points": [
+              {
+                "id": "5e72a5c6-5166-40d2-836a-f54b9f086bd0",
+                "type": "point",
+                "x": 1461.9559249999998,
+                "y": 465
+              },
+              {
+                "id": "f0e4afbc-b545-44cd-92c7-1c13393dd96d",
+                "type": "point",
+                "x": 1381.0027999999998,
+                "y": 505
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          }
+        }
+      },
+      {
+        "id": "262f1be3-a3d4-4ab0-8951-877d70a2462b",
+        "type": "diagram-nodes",
+        "isSvg": false,
+        "transformed": true,
+        "models": {
+          "09ea5049-bbb6-408f-b829-a10321d67906": {
+            "id": "09ea5049-bbb6-408f-b829-a10321d67906",
+            "type": "custom-node",
+            "selected": false,
+            "x": 380.0027999999993,
+            "y": 80,
+            "ports": [
+              {
+                "id": "e2a18911-18d4-419a-ac96-dabc85540694",
+                "type": "vp-port",
+                "x": 380.0027999999993,
+                "y": 80,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "09ea5049-bbb6-408f-b829-a10321d67906",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "326c551c-ab64-43dc-9e28-4195a2cb673a",
+                "type": "vp-port",
+                "x": 377.0027999999993,
+                "y": 101,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "09ea5049-bbb6-408f-b829-a10321d67906",
+                "links": [],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "3548d9fd-c902-4fa1-977e-fd4c79a19fd9",
+                "type": "vp-port",
+                "x": 549.0965499999993,
+                "y": 101,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "09ea5049-bbb6-408f-b829-a10321d67906",
+                "links": [
+                  "d0fdb251-c6c6-4686-8127-1f41d947eb99"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "09ea5049-bbb6-408f-b829-a10321d67906",
+              "node_key": "PdbFastaBiopython",
+              "name": "PDB FASTA Parser",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Parse PDB structures and extract FASTA sequences using BioPython. Supports RCSB PDB API fetching by ID and local file processing with chain splitting, HETATM handling, and missing residues analysis.",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Bioinformatics",
+              "tags": [],
+              "package_name": "pdb-fasta-biopython",
+              "hashtags": [
+                "pdb",
+                "fasta",
+                "sequence-extraction",
+                "biopython",
+                "structure-to-sequence",
+                "protein-sequence",
+                "chain-extraction",
+                "file-conversion",
+                "rcsb-api",
+                "missing-residues",
+                "structural-biology",
+                "bioinformatics",
+                "preprocessing"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "svg",
+                "data": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\" width=\"64\" height=\"64\">\n  <!-- Background -->\n  <circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#FFF3E0\"/>\n\n  <!-- PDB molecule (left side) - represented as ribbon -->\n  <path d=\"M 14 20 Q 18 24 14 28 Q 10 32 14 36 Q 18 40 14 44\"\n        fill=\"none\" stroke=\"#FF9800\" stroke-width=\"3\" opacity=\"0.8\"/>\n  <path d=\"M 20 20 Q 24 24 20 28 Q 16 32 20 36 Q 24 40 20 44\"\n        fill=\"none\" stroke=\"#FFB74D\" stroke-width=\"2.5\" opacity=\"0.6\"/>\n\n  <!-- Arrow showing conversion -->\n  <path d=\"M 26 30 L 34 30 L 34 28 L 38 32 L 34 36 L 34 34 L 26 34 Z\"\n        fill=\"#FF6F00\"/>\n\n  <!-- FASTA text lines (right side) -->\n  <rect x=\"42\" y=\"22\" width=\"14\" height=\"2\" fill=\"#EF6C00\" opacity=\"0.7\"/>\n  <rect x=\"42\" y=\"26\" width=\"12\" height=\"2\" fill=\"#EF6C00\" opacity=\"0.7\"/>\n  <rect x=\"42\" y=\"30\" width=\"14\" height=\"2\" fill=\"#EF6C00\" opacity=\"0.7\"/>\n  <rect x=\"42\" y=\"34\" width=\"10\" height=\"2\" fill=\"#EF6C00\" opacity=\"0.7\"/>\n  <rect x=\"42\" y=\"38\" width=\"14\" height=\"2\" fill=\"#EF6C00\" opacity=\"0.7\"/>\n  <rect x=\"42\" y=\"42\" width=\"11\" height=\"2\" fill=\"#EF6C00\" opacity=\"0.7\"/>\n\n  <!-- \">chain_A\" header line -->\n  <text x=\"42\" y=\"20\" font-family=\"monospace\" font-size=\"6\" fill=\"#E65100\" font-weight=\"bold\">>A</text>\n\n  <!-- \"PDB\" label at bottom left -->\n  <text x=\"14\" y=\"56\" text-anchor=\"middle\" font-family=\"Arial, sans-serif\" font-size=\"7\" fill=\"#E65100\" font-weight=\"bold\">PDB</text>\n\n  <!-- \"FASTA\" label at bottom right -->\n  <text x=\"50\" y=\"56\" text-anchor=\"middle\" font-family=\"Arial, sans-serif\" font-size=\"7\" fill=\"#E65100\" font-weight=\"bold\">FASTA</text>\n</svg>\n"
+              },
+              "doc": "\n    Parse PDB structures and extract FASTA sequences using BioPython.\n\n    Supports two modes:\n    - **PDB ID mode**: Fetch PDB + FASTA from RCSB by ID (e.g. \"3LZ0\")\n    - **Local file mode**: Process a local PDB file\n\n    Features:\n    - Automatic chain splitting into individual FASTA files\n    - HETATM record handling (ligands, modified residues)\n    - Missing residues extraction from PDB header\n    - Protein and DNA/RNA residue support\n\n    Input: Optional predecessor data (case_name, working_path)\n    Output: FASTA file(s), optional missing residues CSV\n    ",
+              "options": {
+                "input_mode": "pdb_id",
+                "pdb_id": null,
+                "pdb_file": null,
+                "case_name": null,
+                "output_dir": null,
+                "split_chains": true,
+                "include_hetatm": false,
+                "check_pdb_header": false,
+                "force_to_run": false
+              },
+              "option_types": {
+                "input_mode": {
+                  "type": "select",
+                  "label": "Input Mode",
+                  "value": "pdb_id",
+                  "docstring": "'pdb_id' to fetch from RCSB API, 'local_file' for a local PDB.",
+                  "options": [
+                    "pdb_id",
+                    "local_file"
+                  ]
+                },
+                "pdb_id": {
+                  "type": "string",
+                  "label": "PDB ID",
+                  "value": null,
+                  "docstring": "4-character RCSB PDB identifier (e.g. '3LZ0'). Used in pdb_id mode."
+                },
+                "pdb_file": {
+                  "type": "file_edit",
+                  "label": "PDB File",
+                  "value": null,
+                  "docstring": "Path to a local PDB file. Used in local_file mode.",
+                  "manual_input": ""
+                },
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": null,
+                  "docstring": "Identifier for this case. Falls back to PDB ID, predecessor data, or 'protein'."
+                },
+                "output_dir": {
+                  "type": "folder",
+                  "label": "Output Directory",
+                  "value": null,
+                  "docstring": "Directory where output files will be written."
+                },
+                "split_chains": {
+                  "type": "boolean",
+                  "label": "Split by Chain",
+                  "value": true,
+                  "docstring": "Create separate FASTA files for each chain."
+                },
+                "include_hetatm": {
+                  "type": "boolean",
+                  "label": "Include HETATM",
+                  "value": false,
+                  "docstring": "Include HETATM records (ligands, modified residues) in sequence extraction."
+                },
+                "check_pdb_header": {
+                  "type": "boolean",
+                  "label": "Check PDB Header",
+                  "value": false,
+                  "docstring": "Extract missing residues information from the PDB header."
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": true,
+              "is_hpc_capable": false,
+              "default_timeout": null,
+              "type": "custom-node",
+              "node_id": "09ea5049-bbb6-408f-b829-a10321d67906",
+              "status": "unconfigured",
+              "selected": false,
+              "config": {
+                "input_mode": "pdb_id",
+                "pdb_id": "4Z8J",
+                "pdb_file": null,
+                "case_name": "e2e_4z8j",
+                "output_dir": "rel:pdbmdauto-e2e-full",
+                "split_chains": true,
+                "include_hetatm": false,
+                "check_pdb_header": true,
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "input_mode": "pdb_id",
+              "pdb_id": null,
+              "pdb_file": null,
+              "case_name": null,
+              "output_dir": null,
+              "split_chains": true,
+              "include_hetatm": false,
+              "check_pdb_header": false,
+              "force_to_run": false
+            }
+          },
+          "c3d15483-d69a-49ba-a82d-ced245aa8349": {
+            "id": "c3d15483-d69a-49ba-a82d-ced245aa8349",
+            "type": "custom-node",
+            "selected": false,
+            "x": 480.0027999999993,
+            "y": 120,
+            "ports": [
+              {
+                "id": "f1b809dd-302b-48a4-98a4-6a1772ca6563",
+                "type": "vp-port",
+                "x": 480.0027999999993,
+                "y": 120,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "c3d15483-d69a-49ba-a82d-ced245aa8349",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "42604a48-312b-468b-9280-e9f704401e97",
+                "type": "vp-port",
+                "x": 477.0027999999993,
+                "y": 141,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "c3d15483-d69a-49ba-a82d-ced245aa8349",
+                "links": [
+                  "d0fdb251-c6c6-4686-8127-1f41d947eb99"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "d1f2a380-beba-4205-b182-207b55043ce2",
+                "type": "vp-port",
+                "x": 663.2840499999993,
+                "y": 141,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "c3d15483-d69a-49ba-a82d-ced245aa8349",
+                "links": [
+                  "6b7eba5c-6a6f-436c-a811-679a18afa795"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "c3d15483-d69a-49ba-a82d-ced245aa8349",
+              "node_key": "GenAli",
+              "name": "Generate Alignment",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Generate alignment files for homology modeling from PDB structure and FASTA sequences",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Structure Preparation",
+              "tags": [],
+              "package_name": "gen-ali",
+              "hashtags": [
+                "alignment",
+                "homology-modeling",
+                "pdb",
+                "fasta",
+                "sequence-alignment",
+                "structure-preparation",
+                "missing-residues",
+                "promod3",
+                "modeller",
+                "bioinformatics"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "📦"
+              },
+              "doc": "\n    Generate per-chain alignment files for homology modeling.\n\n    Reads a PDB structure and missing residues information (from predecessor\n    pdb_fasta_biopython node or PDB header) and generates:\n    - .seq files: raw FASTA alignment per chain\n    - .ali files: template/target alignment pairs for ProMod3 or MODELLER\n\n    The template entry shows the existing structure with '-' at missing\n    positions. The target entry shows the complete sequence.\n\n    Input: predecessor data from pdb_fasta_biopython (PDB file, chain info,\n           optional missing residues CSVs, optional FASTA files)\n    Output: Per-chain .seq and .ali files in chain-specific subdirectories\n    ",
+              "options": {
+                "case_name": "",
+                "output_dir": "",
+                "append_end_in_seq": true,
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "",
+                  "docstring": "Case identifier. Leave empty to use predecessor data."
+                },
+                "output_dir": {
+                  "type": "folder",
+                  "label": "Output Directory",
+                  "value": "",
+                  "docstring": "Output directory. Leave empty to use predecessor working_path."
+                },
+                "append_end_in_seq": {
+                  "type": "boolean",
+                  "label": "Append End Marker",
+                  "value": true,
+                  "docstring": "Append '*' terminator at the end of sequences."
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "default_timeout": null,
+              "type": "custom-node",
+              "node_id": "c3d15483-d69a-49ba-a82d-ced245aa8349",
+              "status": "unconfigured",
+              "selected": false,
+              "config": {
+                "case_name": "e2e_4z8j",
+                "output_dir": "",
+                "append_end_in_seq": true,
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "",
+              "output_dir": "",
+              "append_end_in_seq": true,
+              "force_to_run": false
+            }
+          },
+          "2d6d9744-1e2c-437c-9097-5ca55a2bca60": {
+            "id": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
+            "type": "custom-node",
+            "selected": false,
+            "x": 580.0027999999993,
+            "y": 160,
+            "ports": [
+              {
+                "id": "983a3326-4725-47d4-98f4-0c877d938266",
+                "type": "vp-port",
+                "x": 580.0027999999993,
+                "y": 160,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "ca6d21ae-180b-45ae-88ea-94bd12ea43f1",
+                "type": "vp-port",
+                "x": 577.0027999999993,
+                "y": 181,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
+                "links": [
+                  "6b7eba5c-6a6f-436c-a811-679a18afa795"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "6798df54-3ca6-4e15-b89a-696ff4664e36",
+                "type": "vp-port",
+                "x": 773.0965499999993,
+                "y": 181,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
+                "links": [
+                  "d05123e6-70b8-49cf-a4bb-a7d4e64e196b"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
+              "node_key": "GenMultiChainAli",
+              "name": "Multi-Chain Alignment",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Merge per-chain alignment files into a single multi-chain alignment for homology modeling",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Structure Preparation",
+              "tags": [],
+              "package_name": "gen-multi-chain-ali",
+              "hashtags": [
+                "alignment",
+                "multi-chain",
+                "homology-modeling",
+                "pdb",
+                "structure-preparation",
+                "promod3",
+                "modeller",
+                "chain-merge",
+                "bioinformatics"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "📦"
+              },
+              "doc": "\n    Merge per-chain alignment files into a single multi-chain alignment.\n\n    Reads per-chain .ali files produced by gen_ali and merges them into\n    a single alignment file for multi-chain homology modeling with\n    ProMod3 or MODELLER.\n\n    Features:\n    - Chain selection (all or specific chains)\n    - DNA/RNA masking with '.' characters (MODELLER convention)\n    - '/' chain separators between chains\n    - Proper protein chain range in header\n\n    Input: predecessor data from gen_ali (per-chain .ali files, chain info)\n    Output: Single merged .ali file in Merge/ subdirectory\n    ",
+              "options": {
+                "case_name": "",
+                "merge_folder_name": "Merge",
+                "selected_chain_ids": "all",
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "",
+                  "docstring": "Case identifier. Leave empty to use predecessor data."
+                },
+                "merge_folder_name": {
+                  "type": "string",
+                  "label": "Merge Folder Name",
+                  "value": "Merge",
+                  "docstring": "Subfolder name for the merged alignment file."
+                },
+                "selected_chain_ids": {
+                  "type": "string",
+                  "label": "Selected Chain IDs",
+                  "value": "all",
+                  "docstring": "Chains to include: 'all' or comma-separated (e.g. 'A,B,C')."
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "default_timeout": null,
+              "type": "custom-node",
+              "node_id": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
+              "status": "unconfigured",
+              "selected": false,
+              "config": {
+                "case_name": "e2e_4z8j",
+                "merge_folder_name": "Merge",
+                "selected_chain_ids": "all",
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "",
+              "merge_folder_name": "Merge",
+              "selected_chain_ids": "all",
+              "force_to_run": false
+            }
+          },
+          "c968b176-082f-4c76-a032-81cf4f6f5ccb": {
+            "id": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
+            "type": "custom-node",
+            "selected": false,
+            "x": 680.0027999999993,
+            "y": 200,
+            "ports": [
+              {
+                "id": "3ec15f69-aabb-438e-b20c-4bf610053850",
+                "type": "vp-port",
+                "x": 680.0027999999993,
+                "y": 200,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "8aae8125-3736-4014-96c8-e3093942cf89",
+                "type": "vp-port",
+                "x": 677.0027999999993,
+                "y": 221,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
+                "links": [
+                  "d05123e6-70b8-49cf-a4bb-a7d4e64e196b"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "243f679a-6a91-46b9-b63c-88b5428583b6",
+                "type": "vp-port",
+                "x": 863.2840499999993,
+                "y": 221,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
+                "links": [
+                  "35a58c49-dfea-483c-a431-32c09087f748"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
+              "node_key": "MergePdbChains",
+              "name": "Merge PDB Chains",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Merge selected PDB chains into a single structure file for homology modeling",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Structure Preparation",
+              "tags": [],
+              "package_name": "merge-pdb-chains",
+              "hashtags": [
+                "pdb",
+                "chain-merge",
+                "structure-preparation",
+                "homology-modeling",
+                "biopython",
+                "bioinformatics",
+                "protein-structure",
+                "dna"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "📦"
+              },
+              "doc": "\n    Merge selected PDB chains into a single structure file.\n\n    Reads chain information from predecessor (gen_multi_chain_ali) and\n    extracts the selected chains from the original PDB file into a\n    merged PDB. DNA/RNA chains are written with HETATM records\n    (MODELLER/ProMod3 convention).\n\n    Output files (in Merge/ subdirectory):\n    - merge.pdb: Merged structure with selected chains\n    - {case}_chain_type.json: Chain type mapping (P1/DL)\n    - {case}_chain_name.json: Selected chain IDs list\n\n    Input: predecessor data (working_path, chain_types, pdb_chain_list)\n    Output: Merged PDB file path and chain metadata\n    ",
+              "options": {
+                "case_name": "",
+                "merge_folder_name": "Merge",
+                "merge_file_name": "merge.pdb",
+                "selected_chain_ids": "all",
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "",
+                  "docstring": "Case identifier. Leave empty to use predecessor data."
+                },
+                "merge_folder_name": {
+                  "type": "string",
+                  "label": "Merge Folder Name",
+                  "value": "Merge",
+                  "docstring": "Subfolder name for merged output files."
+                },
+                "merge_file_name": {
+                  "type": "string",
+                  "label": "Merge File Name",
+                  "value": "merge.pdb",
+                  "docstring": "Output filename for the merged PDB."
+                },
+                "selected_chain_ids": {
+                  "type": "string",
+                  "label": "Selected Chain IDs",
+                  "value": "all",
+                  "docstring": "Chains to include: 'all' or comma-separated (e.g. 'A,B,C')."
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "default_timeout": null,
+              "type": "custom-node",
+              "node_id": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
+              "status": "unconfigured",
+              "selected": false,
+              "config": {
+                "case_name": "e2e_4z8j",
+                "merge_folder_name": "Merge",
+                "merge_file_name": "merge.pdb",
+                "selected_chain_ids": "all",
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "",
+              "merge_folder_name": "Merge",
+              "merge_file_name": "merge.pdb",
+              "selected_chain_ids": "all",
+              "force_to_run": false
+            }
+          },
+          "cbc4194f-fdb2-4656-a7ad-4befff3fb994": {
+            "id": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
+            "type": "custom-node",
+            "selected": false,
+            "x": 780.0027999999993,
+            "y": 240,
+            "ports": [
+              {
+                "id": "c020f108-f02e-4537-b08f-752b5e7295b3",
+                "type": "vp-port",
+                "x": 780.0027999999993,
+                "y": 240,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "f869da8c-3167-411c-9a4e-3b3ff63ebdb3",
+                "type": "vp-port",
+                "x": 777.0027999999993,
+                "y": 261,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
+                "links": [
+                  "35a58c49-dfea-483c-a431-32c09087f748"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "553159aa-203b-4aba-89b0-f34c66b50820",
+                "type": "vp-port",
+                "x": 964.0809249999993,
+                "y": 261,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
+                "links": [
+                  "1d7b9517-5099-4391-a88c-13d6ae7e66a7"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
+              "node_key": "FixResiduesPromod3",
+              "name": "Fix Missing Residues",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Fix missing residues in PDB structures using ProMod3 homology modeling engine",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Structure Preparation",
+              "tags": [],
+              "package_name": "fix-residues-promod3",
+              "hashtags": [
+                "homology-modeling",
+                "missing-residues",
+                "loop-modeling",
+                "promod3",
+                "structure-repair",
+                "pdb",
+                "protein-structure",
+                "bioinformatics",
+                "swiss-model"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "📦"
+              },
+              "doc": "\n    Fix missing residues in PDB structures using ProMod3.\n\n    Uses the ProMod3 homology modeling engine (SWISS-MODEL) to fill\n    gaps in protein structures. ProMod3 searches a fragment database\n    (~19.7M fragments), performs loop modeling, rebuilds sidechains,\n    and runs energy minimization.\n\n    Requires:\n    - ProMod3 installed (`pixi add promod3` from bioconda channel)\n    - Per-chain .ali alignment files (from gen_ali)\n    - Merged PDB structure (from merge_pdb_chains)\n\n    Only protein chains are modeled — DNA/RNA chains are preserved as-is.\n\n    Input: predecessor data (working_path, output_pdb, chain_types)\n    Output: Repaired PDB file in Merge/ subdirectory\n    ",
+              "options": {
+                "case_name": "",
+                "model_termini": false,
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "",
+                  "docstring": "Case identifier. Leave empty to use predecessor data."
+                },
+                "model_termini": {
+                  "type": "boolean",
+                  "label": "Model Terminal Extensions",
+                  "value": false,
+                  "docstring": "If true, also model terminal extensions (N/C-terminal residues beyond the template)."
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "default_timeout": 1800,
+              "type": "custom-node",
+              "node_id": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
+              "status": "unconfigured",
+              "selected": false,
+              "config": {
+                "case_name": "e2e_4z8j",
+                "model_termini": false,
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "",
+              "model_termini": false,
+              "force_to_run": false
+            }
+          },
+          "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb": {
+            "id": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
+            "type": "custom-node",
+            "selected": false,
+            "x": 880.0027999999993,
+            "y": 280,
+            "ports": [
+              {
+                "id": "2dd037d5-6f13-4636-9c01-515fb2b2ba74",
+                "type": "vp-port",
+                "x": 880.0027999999993,
+                "y": 280,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "6ee5bd51-b895-48d8-9257-b651cc5bb175",
+                "type": "vp-port",
+                "x": 877.0027999999993,
+                "y": 301,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
+                "links": [
+                  "1d7b9517-5099-4391-a88c-13d6ae7e66a7"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "15f3c9f8-f7ba-4dea-a0f3-96320a6a8101",
+                "type": "vp-port",
+                "x": 1063.3934249999993,
+                "y": 301,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
+                "links": [
+                  "575b9aaa-6c6d-4d82-99f9-827c5c8273cb"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
+              "node_key": "PkaGmxEm",
+              "name": "pKa + GROMACS EM",
+              "filename": "node",
+              "node_type": "default",
+              "description": "pH-dependent protonation (PDB2PQR/PROPKA) + GROMACS topology (pdb2gmx) + two-step vacuum energy minimisation",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Molecular Dynamics",
+              "tags": [],
+              "package_name": "pka-gmx-em",
+              "hashtags": [
+                "protonation",
+                "propka",
+                "pdb2pqr",
+                "gromacs",
+                "pdb2gmx",
+                "energy-minimisation",
+                "structure-preparation",
+                "force-field",
+                "molecular-dynamics",
+                "protein-preparation"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "📦"
+              },
+              "doc": "\n    Protonation prediction + GROMACS topology + energy minimisation.\n\n    Takes a PDB file (typically from fix_residues or merge step) and:\n    1. Predicts protonation states via PDB2PQR/PROPKA at target pH\n    2. Bridges PQR → PDB by renaming titratable residues (HID/HIE/HIP, ASH, GLH, CYX)\n    3. Generates GROMACS topology via pdb2gmx -ignh on the patched PDB\n    4. Creates triclinic simulation box with padding\n    5. Runs two-step energy minimisation (unconstrained → h-bonds)\n\n    Output: Energy-minimised GRO + topology TOP ready for solvation.\n    ",
+              "options": {
+                "case_name": "",
+                "input_pdb": "",
+                "output_dir": "",
+                "force_field": "amber99sb",
+                "water_model": "tip3p",
+                "box_distance": 2,
+                "em_steps": 1000,
+                "ph": 7,
+                "run_pdb2pqr": true,
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "",
+                  "docstring": "Leave empty to use predecessor data."
+                },
+                "input_pdb": {
+                  "type": "file_edit",
+                  "label": "Input PDB File",
+                  "value": "",
+                  "docstring": "PDB from fix_residues. Leave empty: auto-discovers Merge/fixed.pdb from predecessor working_path.",
+                  "manual_input": ""
+                },
+                "output_dir": {
+                  "type": "folder",
+                  "label": "Output Directory",
+                  "value": "",
+                  "docstring": "GROMACS working folder. Leave empty: creates gmx/ in case folder. All downstream nodes share this folder."
+                },
+                "force_field": {
+                  "type": "select",
+                  "label": "Force Field",
+                  "value": "amber99sb",
+                  "docstring": "GROMACS force field. PDB2PQR uses matching naming: AMBER (HID/HIE/HIP) for amber*, CHARMM (HSD/HSE/HSP) for charmm*.",
+                  "options": [
+                    "amber99sb-ildn",
+                    "amber99sb",
+                    "charmm27",
+                    "oplsaa"
+                  ]
+                },
+                "water_model": {
+                  "type": "select",
+                  "label": "Water Model",
+                  "value": "tip3p",
+                  "docstring": "Water model for pdb2gmx.",
+                  "options": [
+                    "tip3p",
+                    "spc",
+                    "spce",
+                    "tip4p"
+                  ]
+                },
+                "box_distance": {
+                  "type": "float",
+                  "label": "Box Distance (nm)",
+                  "value": 2,
+                  "docstring": "Padding distance around solute for simulation box."
+                },
+                "em_steps": {
+                  "type": "int",
+                  "label": "EM Steps",
+                  "value": 1000,
+                  "docstring": "Maximum steps per EM stage (2 stages total)."
+                },
+                "ph": {
+                  "type": "float",
+                  "label": "pH",
+                  "value": 7,
+                  "docstring": "Target pH for PROPKA protonation state prediction."
+                },
+                "run_pdb2pqr": {
+                  "type": "boolean",
+                  "label": "Run PDB2PQR",
+                  "value": true,
+                  "docstring": "Run PDB2PQR/PROPKA for pH-dependent protonation. If disabled, pdb2gmx uses its own hydrogen-bond analysis."
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "default_timeout": 1800,
+              "type": "custom-node",
+              "node_id": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
+              "status": "unconfigured",
+              "selected": false,
+              "config": {
+                "case_name": "e2e_4z8j",
+                "input_pdb": "",
+                "output_dir": "",
+                "force_field": "amber99sb",
+                "water_model": "tip3p",
+                "box_distance": 2,
+                "em_steps": 1000,
+                "ph": 7,
+                "run_pdb2pqr": true,
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "",
+              "input_pdb": "",
+              "output_dir": "",
+              "force_field": "amber99sb",
+              "water_model": "tip3p",
+              "box_distance": 2,
+              "em_steps": 1000,
+              "ph": 7,
+              "run_pdb2pqr": true,
+              "force_to_run": false
+            }
+          },
+          "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1": {
+            "id": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
+            "type": "custom-node",
+            "selected": false,
+            "x": 980.0027999999993,
+            "y": 320,
+            "ports": [
+              {
+                "id": "dba814a4-be5e-47ea-af29-4664cac52804",
+                "type": "vp-port",
+                "x": 980.0027999999993,
+                "y": 320,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "b9550024-bd43-4d4f-8aaa-f8bef20a32f6",
+                "type": "vp-port",
+                "x": 977.0027999999993,
+                "y": 341,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
+                "links": [
+                  "575b9aaa-6c6d-4d82-99f9-827c5c8273cb"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "5c9bb3c4-ec55-4ef2-ad75-fa34533b820e",
+                "type": "vp-port",
+                "x": 1166.7684249999995,
+                "y": 341,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
+                "links": [
+                  "78ab3dc8-745d-4f14-837d-dfab022d479b"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
+              "node_key": "OriNdxBuilder",
+              "name": "Original Atom Groups",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Build GROMACS index groups (OriHeavy, OriBackBone) for original vs homology-modeled residues",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Molecular Dynamics",
+              "tags": [],
+              "package_name": "ori-ndx-builder",
+              "hashtags": [
+                "gromacs",
+                "index",
+                "ndx",
+                "molecular-dynamics",
+                "restraints",
+                "homology-modeling",
+                "freeze-groups",
+                "structure-preparation",
+                "position-restraints"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "📦"
+              },
+              "doc": "\n    Generate custom GROMACS index groups for position restraints.\n\n    Creates OriHeavy (all heavy atoms from original residues) and\n    OriBackBone (backbone atoms from original residues) groups.\n    Used by gmx_md_relax (full_4step) with freezegrps for vacuum relaxation.\n\n    Runs after pka_gmx_em, before gmx_md_relax and solvation.\n    ",
+              "options": {
+                "case_name": "",
+                "input_structure": "",
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "",
+                  "docstring": "Leave empty to use predecessor data."
+                },
+                "input_structure": {
+                  "type": "file_edit",
+                  "label": "Structure File (.gro/.pdb)",
+                  "value": "",
+                  "docstring": "Vacuum structure from pka_gmx_em. Leave empty: auto-discovers pdb2gmx.gro.",
+                  "manual_input": ""
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "default_timeout": null,
+              "type": "custom-node",
+              "node_id": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
+              "status": "unconfigured",
+              "selected": false,
+              "config": {
+                "case_name": "e2e_4z8j",
+                "input_structure": "",
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "",
+              "input_structure": "",
+              "force_to_run": false
+            }
+          },
+          "151a78d1-1188-44a8-901a-8372acef3f70": {
+            "id": "151a78d1-1188-44a8-901a-8372acef3f70",
+            "type": "custom-node",
+            "selected": false,
+            "x": 1080.0027999999993,
+            "y": 360,
+            "ports": [
+              {
+                "id": "1e46ccfb-2482-418b-99e5-44fb600cf81a",
+                "type": "vp-port",
+                "x": 1080.0027999999995,
+                "y": 360,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "151a78d1-1188-44a8-901a-8372acef3f70",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "38e4adb8-3b5f-4ec5-94b5-e317bad07c93",
+                "type": "vp-port",
+                "x": 1077.0027999999995,
+                "y": 381,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "151a78d1-1188-44a8-901a-8372acef3f70",
+                "links": [
+                  "78ab3dc8-745d-4f14-837d-dfab022d479b"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "49bba13f-7226-438d-9b28-b0e9c02eb14a",
+                "type": "vp-port",
+                "x": 1257.9559249999995,
+                "y": 381,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "151a78d1-1188-44a8-901a-8372acef3f70",
+                "links": [
+                  "fcf7120a-cbd5-4f44-b6b3-9f3a103d1993"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "151a78d1-1188-44a8-901a-8372acef3f70",
+              "node_key": "GmxMdRelax",
+              "name": "GMX MD Relaxation",
+              "filename": "node",
+              "node_type": "default",
+              "description": "GROMACS multi-step relaxation — energy minimization and NVT equilibration",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Molecular Dynamics",
+              "tags": [],
+              "package_name": "gmx-md-relax",
+              "hashtags": [
+                "gromacs",
+                "relaxation",
+                "energy-minimization",
+                "equilibration",
+                "nvt",
+                "molecular-dynamics",
+                "md-simulation",
+                "structure-preparation"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "📦"
+              },
+              "doc": "\n    GROMACS relaxation/equilibration with protocol selector.\n\n    Protocols:\n    - full_4step (default): 4-step progressive unfreezing protocol from legacy pdbmdauto.\n      Uses OriHeavy/OriBackBone freezegrps to first equilibrate water/ions around the\n      rigid protein, then progressively release constraints. Essential for systems with\n      homology-modeled missing residues.\n    - em_only: Single energy minimization (steepest descent). Quick for testing.\n    - custom: Single grompp+mdrun with user-provided MDP file.\n    ",
+              "options": {
+                "case_name": "",
+                "protocol": "full_4step",
+                "input_top_file": "",
+                "input_gro_file": "",
+                "input_mdp_file": "",
+                "input_ndx_file": "",
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "",
+                  "docstring": "Leave empty to use predecessor data."
+                },
+                "protocol": {
+                  "type": "select",
+                  "label": "Relaxation Protocol",
+                  "value": "full_4step",
+                  "docstring": "full_4step: 4-step progressive unfreezing (NVT frozen→NVT backbone→CG EM×2). em_only: single steepest-descent EM. custom: single step with user MDP.",
+                  "options": [
+                    "full_4step",
+                    "em_only",
+                    "custom"
+                  ]
+                },
+                "input_top_file": {
+                  "type": "file_edit",
+                  "label": "Topology File (.top)",
+                  "value": "",
+                  "docstring": "Topology. Leave empty: auto-discovers from predecessor.",
+                  "manual_input": ""
+                },
+                "input_gro_file": {
+                  "type": "file_edit",
+                  "label": "Structure File (.gro)",
+                  "value": "",
+                  "docstring": "Solvated structure. Leave empty: auto-discovers from predecessor.",
+                  "manual_input": ""
+                },
+                "input_mdp_file": {
+                  "type": "file_edit",
+                  "label": "Parameters File (.mdp)",
+                  "value": "",
+                  "docstring": "Custom MDP (only for 'custom' protocol). Leave empty for bundled defaults.",
+                  "manual_input": ""
+                },
+                "input_ndx_file": {
+                  "type": "file_edit",
+                  "label": "Index File (.ndx)",
+                  "value": "",
+                  "docstring": "Index file with OriHeavy/OriBackBone groups. Leave empty: auto-discovers.",
+                  "manual_input": ""
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": true,
+              "is_hpc_capable": false,
+              "default_timeout": 3600,
+              "type": "custom-node",
+              "node_id": "151a78d1-1188-44a8-901a-8372acef3f70",
+              "status": "unconfigured",
+              "selected": false,
+              "config": {
+                "case_name": "e2e_4z8j",
+                "protocol": "full_4step",
+                "input_top_file": "",
+                "input_gro_file": "",
+                "input_mdp_file": "",
+                "input_ndx_file": "",
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "",
+              "protocol": "full_4step",
+              "input_top_file": "",
+              "input_gro_file": "",
+              "input_mdp_file": "",
+              "input_ndx_file": "",
+              "force_to_run": false
+            }
+          },
+          "6ceea911-f34f-4b2e-aff5-49a1e5286446": {
+            "id": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
+            "type": "custom-node",
+            "selected": false,
+            "x": 1180.0027999999993,
+            "y": 400,
+            "ports": [
+              {
+                "id": "928d8f97-55b8-4f57-8102-956adbc374c2",
+                "type": "vp-port",
+                "x": 1180.0027999999995,
+                "y": 400,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "e6de57bb-5625-4dd8-9eb1-2e0f4edbf29e",
+                "type": "vp-port",
+                "x": 1177.0027999999995,
+                "y": 421,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
+                "links": [
+                  "fcf7120a-cbd5-4f44-b6b3-9f3a103d1993"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "be94b9a0-604f-41cb-b380-c66e81707328",
+                "type": "vp-port",
+                "x": 1366.4871749999995,
+                "y": 421,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
+                "links": [
+                  "07e9532f-8183-47f1-8f72-ef36cc56bf5d"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
+              "node_key": "GmxSolvIon",
+              "name": "GMX Solvate & Ionize",
+              "filename": "node",
+              "node_type": "default",
+              "description": "GROMACS solvation and ionization — add water box and neutralize with ions",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Molecular Dynamics",
+              "tags": [],
+              "package_name": "gmx-solv-ion",
+              "hashtags": [
+                "gromacs",
+                "solvation",
+                "ionization",
+                "molecular-dynamics",
+                "water-box",
+                "ions",
+                "structure-preparation",
+                "md-simulation"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "📦"
+              },
+              "doc": "\n    GROMACS solvation and ionization.\n\n    If connected to a predecessor (e.g., fix_residues_promod3 or pdb2pqr),\n    auto-discovers the PDB/PQR file and runs pdb2gmx to generate GRO + TOP.\n    Then sets up box, adds water, neutralizes with ions.\n\n    Includes a bundled ions.mdp for genion preprocessing. Users can override\n    with their own MDP file.\n    ",
+              "options": {
+                "case_name": "",
+                "run_label": "md",
+                "force_field": "amber99sb",
+                "water_model": "tip3p",
+                "box_size": "5 5 5",
+                "ion_conc": 0.15,
+                "input_top_file": "",
+                "input_gro_file": "",
+                "input_mdp_file": "node:demo_data/ions.mdp",
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "",
+                  "docstring": "Leave empty to use predecessor data."
+                },
+                "run_label": {
+                  "type": "string",
+                  "label": "Run Label",
+                  "value": "md",
+                  "docstring": "Simulation label."
+                },
+                "force_field": {
+                  "type": "select",
+                  "label": "Force Field",
+                  "value": "amber99sb",
+                  "docstring": "Force field for pdb2gmx.",
+                  "options": [
+                    "amber99sb",
+                    "charmm27",
+                    "oplsaa",
+                    "gromos53a6"
+                  ]
+                },
+                "water_model": {
+                  "type": "select",
+                  "label": "Water Model",
+                  "value": "tip3p",
+                  "docstring": "Water model for pdb2gmx.",
+                  "options": [
+                    "tip3p",
+                    "spc",
+                    "spce",
+                    "tip4p"
+                  ]
+                },
+                "box_size": {
+                  "type": "string",
+                  "label": "Box Size (nm)",
+                  "value": "5 5 5",
+                  "docstring": "Box dimensions 'X Y Z'. Use '0 0 0' for auto triclinic."
+                },
+                "ion_conc": {
+                  "type": "float",
+                  "label": "Ion Concentration (mol/L)",
+                  "value": 0.15,
+                  "docstring": "Na+/Cl- concentration. Set 0 to skip."
+                },
+                "input_top_file": {
+                  "type": "file_edit",
+                  "label": "Topology File (.top)",
+                  "value": "",
+                  "docstring": "Topology from pka_gmx_em. Leave empty: auto-discovers gmx_em/pdb2gmx.top.",
+                  "manual_input": ""
+                },
+                "input_gro_file": {
+                  "type": "file_edit",
+                  "label": "Structure File (.gro)",
+                  "value": "",
+                  "docstring": "Structure from pka_gmx_em. Leave empty: auto-discovers gmx_em/pdb2gmx.gro.",
+                  "manual_input": ""
+                },
+                "input_mdp_file": {
+                  "type": "file_edit",
+                  "label": "Parameters File (.mdp)",
+                  "value": "node:demo_data/ions.mdp",
+                  "docstring": "MDP for genion preprocessing.",
+                  "manual_input": ""
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": true,
+              "is_hpc_capable": false,
+              "default_timeout": null,
+              "type": "custom-node",
+              "node_id": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
+              "status": "unconfigured",
+              "selected": false,
+              "config": {
+                "case_name": "e2e_4z8j",
+                "run_label": "md",
+                "force_field": "amber99sb",
+                "water_model": "tip3p",
+                "box_size": "5 5 5",
+                "ion_conc": 0.15,
+                "input_top_file": "",
+                "input_gro_file": "",
+                "input_mdp_file": "node:demo_data/ions.mdp",
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "",
+              "run_label": "md",
+              "force_field": "amber99sb",
+              "water_model": "tip3p",
+              "box_size": "5 5 5",
+              "ion_conc": 0.15,
+              "input_top_file": "",
+              "input_gro_file": "",
+              "input_mdp_file": "node:demo_data/ions.mdp",
+              "force_to_run": false
+            }
+          },
+          "870ac5ec-e12e-4370-8397-a3f0c54d0caf": {
+            "id": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
+            "type": "custom-node",
+            "selected": false,
+            "x": 1280.0027999999993,
+            "y": 440,
+            "ports": [
+              {
+                "id": "e29261c2-4e9b-4459-83d1-7c33c1aebb35",
+                "type": "vp-port",
+                "x": 1280.0027999999995,
+                "y": 440,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "fed6d0f2-9cb5-4320-be4a-e358fe4d3f02",
+                "type": "vp-port",
+                "x": 1277.0027999999995,
+                "y": 461,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
+                "links": [
+                  "07e9532f-8183-47f1-8f72-ef36cc56bf5d"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "28463f02-6860-418c-af24-fb980d320224",
+                "type": "vp-port",
+                "x": 1457.9559249999995,
+                "y": 461,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
+                "links": [
+                  "b2a32d5b-0a9d-401e-8df3-718d348afbb3"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
+              "node_key": "GmxMdRelax",
+              "name": "GMX MD Relaxation",
+              "filename": "node",
+              "node_type": "default",
+              "description": "GROMACS multi-step relaxation — energy minimization and NVT equilibration",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Molecular Dynamics",
+              "tags": [],
+              "package_name": "gmx-md-relax",
+              "hashtags": [
+                "gromacs",
+                "relaxation",
+                "energy-minimization",
+                "equilibration",
+                "nvt",
+                "molecular-dynamics",
+                "md-simulation",
+                "structure-preparation"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "📦"
+              },
+              "doc": "\n    GROMACS relaxation/equilibration with protocol selector.\n\n    Protocols:\n    - full_4step (default): 4-step progressive unfreezing protocol from legacy pdbmdauto.\n      Uses OriHeavy/OriBackBone freezegrps to first equilibrate water/ions around the\n      rigid protein, then progressively release constraints. Essential for systems with\n      homology-modeled missing residues.\n    - em_only: Single energy minimization (steepest descent). Quick for testing.\n    - custom: Single grompp+mdrun with user-provided MDP file.\n    ",
+              "options": {
+                "case_name": "",
+                "protocol": "full_4step",
+                "input_top_file": "",
+                "input_gro_file": "",
+                "input_mdp_file": "",
+                "input_ndx_file": "",
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "",
+                  "docstring": "Leave empty to use predecessor data."
+                },
+                "protocol": {
+                  "type": "select",
+                  "label": "Relaxation Protocol",
+                  "value": "full_4step",
+                  "docstring": "full_4step: 4-step progressive unfreezing (NVT frozen→NVT backbone→CG EM×2). em_only: single steepest-descent EM. custom: single step with user MDP.",
+                  "options": [
+                    "full_4step",
+                    "em_only",
+                    "custom"
+                  ]
+                },
+                "input_top_file": {
+                  "type": "file_edit",
+                  "label": "Topology File (.top)",
+                  "value": "",
+                  "docstring": "Topology. Leave empty: auto-discovers from predecessor.",
+                  "manual_input": ""
+                },
+                "input_gro_file": {
+                  "type": "file_edit",
+                  "label": "Structure File (.gro)",
+                  "value": "",
+                  "docstring": "Solvated structure. Leave empty: auto-discovers from predecessor.",
+                  "manual_input": ""
+                },
+                "input_mdp_file": {
+                  "type": "file_edit",
+                  "label": "Parameters File (.mdp)",
+                  "value": "",
+                  "docstring": "Custom MDP (only for 'custom' protocol). Leave empty for bundled defaults.",
+                  "manual_input": ""
+                },
+                "input_ndx_file": {
+                  "type": "file_edit",
+                  "label": "Index File (.ndx)",
+                  "value": "",
+                  "docstring": "Index file with OriHeavy/OriBackBone groups. Leave empty: auto-discovers.",
+                  "manual_input": ""
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": true,
+              "is_hpc_capable": false,
+              "default_timeout": 3600,
+              "type": "custom-node",
+              "node_id": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
+              "status": "unconfigured",
+              "selected": false,
+              "config": {
+                "case_name": "e2e_4z8j",
+                "protocol": "em_only",
+                "input_top_file": "",
+                "input_gro_file": "",
+                "input_mdp_file": "",
+                "input_ndx_file": "",
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "",
+              "protocol": "full_4step",
+              "input_top_file": "",
+              "input_gro_file": "",
+              "input_mdp_file": "",
+              "input_ndx_file": "",
+              "force_to_run": false
+            }
+          },
+          "21584ac2-1abf-4b25-8d3b-f44aee1c9b80": {
+            "id": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
+            "type": "custom-node",
+            "selected": true,
+            "x": 1380.0027999999993,
+            "y": 480,
+            "ports": [
+              {
+                "id": "40cbc07b-2733-496d-ba74-c0b39be4ff34",
+                "type": "vp-port",
+                "x": 1380.0027999999995,
+                "y": 480,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "7fc0faff-a97a-40e4-9e10-0435641a59a3",
+                "type": "vp-port",
+                "x": 1377.0027999999995,
+                "y": 501,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
+                "links": [
+                  "b2a32d5b-0a9d-401e-8df3-718d348afbb3"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "34976916-0ccc-4342-9760-9f0bd9a55458",
+                "type": "vp-port",
+                "x": 1596.1590499999995,
+                "y": 501,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
+                "links": [],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
+              "node_key": "GmxMdRunLocal",
+              "name": "GROMACS MD Run (Local)",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Simple GROMACS MD simulation node for local execution - ideal for demos, tutorials, and testing",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Molecular Dynamics",
+              "tags": [],
+              "package_name": "gmx-mdrun-local",
+              "hashtags": [
+                "molecular-dynamics",
+                "md-simulation",
+                "grompp",
+                "mdrun",
+                "gromacs",
+                "computational-chemistry",
+                "structural-biology",
+                "protein-simulation",
+                "nvt-equilibration",
+                "npt-equilibration",
+                "energy-minimization",
+                "production-run",
+                "gro-input",
+                "top-input",
+                "mdp-input",
+                "xtc-output",
+                "edr-output",
+                "simulation",
+                "local-execution",
+                "tutorial",
+                "demo",
+                "beginner-friendly"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "svg",
+                "data": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\" fill=\"none\">\n  <!-- Background circle -->\n  <circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#9C27B0\" fill-opacity=\"0.1\" stroke=\"#9C27B0\" stroke-width=\"2\"/>\n\n  <!-- Molecule representation -->\n  <circle cx=\"24\" cy=\"24\" r=\"6\" fill=\"#9C27B0\"/>\n  <circle cx=\"40\" cy=\"24\" r=\"6\" fill=\"#9C27B0\"/>\n  <circle cx=\"32\" cy=\"40\" r=\"6\" fill=\"#9C27B0\"/>\n\n  <!-- Bonds -->\n  <line x1=\"28\" y1=\"26\" x2=\"36\" y2=\"26\" stroke=\"#9C27B0\" stroke-width=\"2\"/>\n  <line x1=\"26\" y1=\"29\" x2=\"30\" y2=\"36\" stroke=\"#9C27B0\" stroke-width=\"2\"/>\n  <line x1=\"38\" y1=\"29\" x2=\"34\" y2=\"36\" stroke=\"#9C27B0\" stroke-width=\"2\"/>\n\n  <!-- Play/Run arrow overlay -->\n  <path d=\"M44 46 L54 52 L44 58 Z\" fill=\"#9C27B0\"/>\n</svg>\n"
+              },
+              "doc": "\n    Simple GROMACS MD simulation node for local execution.\n\n    This is a Level 2 wrapper that:\n    1. Extracts parameters from BoCoFlow UI\n    2. Resolves file paths\n    3. Calls core functions (Level 1)\n    4. Formats results for BoCoFlow\n\n    The actual GROMACS execution logic is in core.py and can be\n    tested independently without BoCoFlow dependencies.\n    ",
+              "options": {
+                "case_name": "",
+                "run_label": "md",
+                "input_top_file": "",
+                "input_gro_file": "",
+                "input_mdp_file": "node:demo_data/md.mdp",
+                "input_ndx_file": "",
+                "output_folder": "",
+                "num_threads": 0,
+                "max_warnings": 10,
+                "verbose": true,
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "",
+                  "docstring": "Name for this simulation (optional)"
+                },
+                "run_label": {
+                  "type": "string",
+                  "label": "Run Label",
+                  "value": "md",
+                  "docstring": "Label for output files (e.g., md, nvt, npt, em)"
+                },
+                "input_top_file": {
+                  "type": "file_edit",
+                  "label": "Topology File (.top)",
+                  "value": "",
+                  "docstring": "Topology. Leave empty: auto-discovers from predecessor.",
+                  "manual_input": ""
+                },
+                "input_gro_file": {
+                  "type": "file_edit",
+                  "label": "Structure File (.gro)",
+                  "value": "",
+                  "docstring": "Relaxed structure. Leave empty: auto-discovers from predecessor.",
+                  "manual_input": ""
+                },
+                "input_mdp_file": {
+                  "type": "file_edit",
+                  "label": "Parameters File (.mdp)",
+                  "value": "node:demo_data/md.mdp",
+                  "docstring": "Production MD parameters (bundled: 1000 steps, 2 ps).",
+                  "manual_input": ""
+                },
+                "input_ndx_file": {
+                  "type": "file_edit",
+                  "label": "Index File (.ndx)",
+                  "value": "",
+                  "docstring": "Index file. Leave empty: auto-discovers from predecessor.",
+                  "manual_input": ""
+                },
+                "output_folder": {
+                  "type": "folder",
+                  "label": "Output Folder",
+                  "value": "",
+                  "docstring": "Output subfolder. Leave empty: creates gmx_md/ in predecessor working_path."
+                },
+                "num_threads": {
+                  "type": "int",
+                  "label": "Number of Threads",
+                  "value": 0,
+                  "docstring": "Number of threads for mdrun (0 = auto-detect)"
+                },
+                "max_warnings": {
+                  "type": "int",
+                  "label": "Max Warnings",
+                  "value": 10,
+                  "docstring": "Maximum warnings allowed by grompp"
+                },
+                "verbose": {
+                  "type": "boolean",
+                  "label": "Verbose Output",
+                  "value": true,
+                  "docstring": "Show verbose output during simulation"
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": true,
+              "is_hpc_capable": false,
+              "default_timeout": 3600,
+              "type": "custom-node",
+              "node_id": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
+              "status": "unconfigured",
+              "selected": true,
+              "config": {
+                "case_name": "e2e_4z8j",
+                "run_label": "md",
+                "input_top_file": "",
+                "input_gro_file": "",
+                "input_mdp_file": "node:demo_data/md.mdp",
+                "input_ndx_file": "",
+                "output_folder": "",
+                "num_threads": 0,
+                "max_warnings": 10,
+                "verbose": true,
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "",
+              "run_label": "md",
+              "input_top_file": "",
+              "input_gro_file": "",
+              "input_mdp_file": "node:demo_data/md.mdp",
+              "input_ndx_file": "",
+              "output_folder": "",
+              "num_threads": 0,
+              "max_warnings": 10,
+              "verbose": true,
+              "force_to_run": false
+            }
+          }
+        }
+      }
+    ]
+  },
+  "settings": {
+    "workingPath": ""
+  },
+  "graph": {
+    "directed": true,
+    "multigraph": false,
+    "graph": {},
+    "nodes": [
+      {
+        "name": "PDB FASTA Parser",
+        "node_id": "09ea5049-bbb6-408f-b829-a10321d67906",
+        "node_key": "PdbFastaBiopython",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "input_mode": "pdb_id",
+          "pdb_id": "4Z8J",
+          "pdb_file": null,
+          "case_name": "e2e_4z8j",
+          "output_dir": "rel:pdbmdauto-e2e-full",
+          "split_chains": true,
+          "include_hetatm": false,
+          "check_pdb_header": true,
+          "force_to_run": false
+        },
+        "package_name": "pdb-fasta-biopython",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "unconfigured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "io",
+        "tags": [
+          "pdb",
+          "fasta",
+          "sequence-extraction",
+          "biopython",
+          "structure-to-sequence",
+          "protein-sequence",
+          "chain-extraction",
+          "file-conversion",
+          "rcsb-api",
+          "missing-residues",
+          "structural-biology",
+          "bioinformatics",
+          "preprocessing"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "EXECUTION_STRATEGY": "pixi_subprocess",
+        "ENVIRONMENT": {
+          "type": "pixi",
+          "name": "pdbmdauto",
+          "pixi_toml": ""
+        },
+        "option_replace": {},
+        "id": "09ea5049-bbb6-408f-b829-a10321d67906"
+      },
+      {
+        "name": "Generate Alignment",
+        "node_id": "c3d15483-d69a-49ba-a82d-ced245aa8349",
+        "node_key": "GenAli",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "e2e_4z8j",
+          "output_dir": "",
+          "append_end_in_seq": true,
+          "force_to_run": false
+        },
+        "package_name": "gen-ali",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "unconfigured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "general",
+        "tags": [
+          "alignment",
+          "homology-modeling",
+          "pdb",
+          "fasta",
+          "sequence-alignment",
+          "structure-preparation",
+          "missing-residues",
+          "promod3",
+          "modeller",
+          "bioinformatics"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "EXECUTION_STRATEGY": "pixi_subprocess",
+        "ENVIRONMENT": {
+          "type": "pixi",
+          "name": "pdbmdauto",
+          "pixi_toml": ""
+        },
+        "option_replace": {},
+        "id": "c3d15483-d69a-49ba-a82d-ced245aa8349"
+      },
+      {
+        "name": "Multi-Chain Alignment",
+        "node_id": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
+        "node_key": "GenMultiChainAli",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "e2e_4z8j",
+          "merge_folder_name": "Merge",
+          "selected_chain_ids": "all",
+          "force_to_run": false
+        },
+        "package_name": "gen-multi-chain-ali",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "unconfigured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "general",
+        "tags": [
+          "alignment",
+          "multi-chain",
+          "homology-modeling",
+          "pdb",
+          "structure-preparation",
+          "promod3",
+          "modeller",
+          "chain-merge",
+          "bioinformatics"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "EXECUTION_STRATEGY": "pixi_subprocess",
+        "ENVIRONMENT": {
+          "type": "pixi",
+          "name": "pdbmdauto",
+          "pixi_toml": ""
+        },
+        "option_replace": {},
+        "id": "2d6d9744-1e2c-437c-9097-5ca55a2bca60"
+      },
+      {
+        "name": "Merge PDB Chains",
+        "node_id": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
+        "node_key": "MergePdbChains",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "e2e_4z8j",
+          "merge_folder_name": "Merge",
+          "merge_file_name": "merge.pdb",
+          "selected_chain_ids": "all",
+          "force_to_run": false
+        },
+        "package_name": "merge-pdb-chains",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "unconfigured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "general",
+        "tags": [
+          "pdb",
+          "chain-merge",
+          "structure-preparation",
+          "homology-modeling",
+          "biopython",
+          "bioinformatics",
+          "protein-structure",
+          "dna"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "EXECUTION_STRATEGY": "pixi_subprocess",
+        "ENVIRONMENT": {
+          "type": "pixi",
+          "name": "pdbmdauto",
+          "pixi_toml": ""
+        },
+        "option_replace": {},
+        "id": "c968b176-082f-4c76-a032-81cf4f6f5ccb"
+      },
+      {
+        "name": "Fix Missing Residues",
+        "node_id": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
+        "node_key": "FixResiduesPromod3",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "e2e_4z8j",
+          "model_termini": false,
+          "force_to_run": false
+        },
+        "package_name": "fix-residues-promod3",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "unconfigured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "general",
+        "tags": [
+          "homology-modeling",
+          "missing-residues",
+          "loop-modeling",
+          "promod3",
+          "structure-repair",
+          "pdb",
+          "protein-structure",
+          "bioinformatics",
+          "swiss-model"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "EXECUTION_STRATEGY": "pixi_subprocess",
+        "ENVIRONMENT": {
+          "type": "pixi",
+          "name": "pdbmdauto",
+          "pixi_toml": ""
+        },
+        "option_replace": {},
+        "id": "cbc4194f-fdb2-4656-a7ad-4befff3fb994"
+      },
+      {
+        "name": "pKa + GROMACS EM",
+        "node_id": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
+        "node_key": "PkaGmxEm",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "e2e_4z8j",
+          "input_pdb": "",
+          "output_dir": "",
+          "force_field": "amber99sb",
+          "water_model": "tip3p",
+          "box_distance": 2,
+          "em_steps": 1000,
+          "ph": 7,
+          "run_pdb2pqr": true,
+          "force_to_run": false
+        },
+        "package_name": "pka-gmx-em",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "unconfigured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "general",
+        "tags": [
+          "protonation",
+          "propka",
+          "pdb2pqr",
+          "gromacs",
+          "pdb2gmx",
+          "energy-minimisation",
+          "structure-preparation",
+          "force-field",
+          "molecular-dynamics",
+          "protein-preparation"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "EXECUTION_STRATEGY": "pixi_subprocess",
+        "ENVIRONMENT": {
+          "type": "pixi",
+          "name": "pdbmdauto",
+          "pixi_toml": ""
+        },
+        "option_replace": {},
+        "id": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb"
+      },
+      {
+        "name": "Original Atom Groups",
+        "node_id": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
+        "node_key": "OriNdxBuilder",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "e2e_4z8j",
+          "input_structure": "",
+          "force_to_run": false
+        },
+        "package_name": "ori-ndx-builder",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "unconfigured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "general",
+        "tags": [
+          "gromacs",
+          "index",
+          "ndx",
+          "molecular-dynamics",
+          "restraints",
+          "homology-modeling",
+          "freeze-groups",
+          "structure-preparation",
+          "position-restraints"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "EXECUTION_STRATEGY": "pixi_subprocess",
+        "ENVIRONMENT": {
+          "type": "pixi",
+          "name": "pdbmdauto",
+          "pixi_toml": ""
+        },
+        "option_replace": {},
+        "id": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1"
+      },
+      {
+        "name": "GMX MD Relaxation",
+        "node_id": "151a78d1-1188-44a8-901a-8372acef3f70",
+        "node_key": "GmxMdRelax",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "e2e_4z8j",
+          "protocol": "full_4step",
+          "input_top_file": "",
+          "input_gro_file": "",
+          "input_mdp_file": "",
+          "input_ndx_file": "",
+          "force_to_run": false
+        },
+        "package_name": "gmx-md-relax",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "unconfigured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "general",
+        "tags": [
+          "gromacs",
+          "relaxation",
+          "energy-minimization",
+          "equilibration",
+          "nvt",
+          "molecular-dynamics",
+          "md-simulation",
+          "structure-preparation"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "EXECUTION_STRATEGY": "pixi_subprocess",
+        "ENVIRONMENT": {
+          "type": "pixi",
+          "name": "pdbmdauto",
+          "pixi_toml": ""
+        },
+        "option_replace": {},
+        "id": "151a78d1-1188-44a8-901a-8372acef3f70"
+      },
+      {
+        "name": "GMX Solvate & Ionize",
+        "node_id": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
+        "node_key": "GmxSolvIon",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "e2e_4z8j",
+          "run_label": "md",
+          "force_field": "amber99sb",
+          "water_model": "tip3p",
+          "box_size": "5 5 5",
+          "ion_conc": 0.15,
+          "input_top_file": "",
+          "input_gro_file": "",
+          "input_mdp_file": "node:demo_data/ions.mdp",
+          "force_to_run": false
+        },
+        "package_name": "gmx-solv-ion",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "unconfigured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "general",
+        "tags": [
+          "gromacs",
+          "solvation",
+          "ionization",
+          "molecular-dynamics",
+          "water-box",
+          "ions",
+          "structure-preparation",
+          "md-simulation"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "EXECUTION_STRATEGY": "pixi_subprocess",
+        "ENVIRONMENT": {
+          "type": "pixi",
+          "name": "pdbmdauto",
+          "pixi_toml": ""
+        },
+        "option_replace": {},
+        "id": "6ceea911-f34f-4b2e-aff5-49a1e5286446"
+      },
+      {
+        "name": "GMX MD Relaxation",
+        "node_id": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
+        "node_key": "GmxMdRelax",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "e2e_4z8j",
+          "protocol": "em_only",
+          "input_top_file": "",
+          "input_gro_file": "",
+          "input_mdp_file": "",
+          "input_ndx_file": "",
+          "force_to_run": false
+        },
+        "package_name": "gmx-md-relax",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "unconfigured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "general",
+        "tags": [
+          "gromacs",
+          "relaxation",
+          "energy-minimization",
+          "equilibration",
+          "nvt",
+          "molecular-dynamics",
+          "md-simulation",
+          "structure-preparation"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "EXECUTION_STRATEGY": "pixi_subprocess",
+        "ENVIRONMENT": {
+          "type": "pixi",
+          "name": "pdbmdauto",
+          "pixi_toml": ""
+        },
+        "option_replace": {},
+        "id": "870ac5ec-e12e-4370-8397-a3f0c54d0caf"
+      },
+      {
+        "name": "GROMACS MD Run (Local)",
+        "node_id": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
+        "node_key": "GmxMdRunLocal",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "e2e_4z8j",
+          "run_label": "md",
+          "input_top_file": "",
+          "input_gro_file": "",
+          "input_mdp_file": "node:demo_data/md.mdp",
+          "input_ndx_file": "",
+          "output_folder": "",
+          "num_threads": 0,
+          "max_warnings": 10,
+          "verbose": true,
+          "force_to_run": false
+        },
+        "package_name": "gmx-mdrun-local",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "unconfigured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "simulation",
+        "tags": [
+          "molecular-dynamics",
+          "md-simulation",
+          "grompp",
+          "mdrun",
+          "gromacs",
+          "computational-chemistry",
+          "structural-biology",
+          "protein-simulation",
+          "nvt-equilibration",
+          "npt-equilibration",
+          "energy-minimization",
+          "production-run",
+          "gro-input",
+          "top-input",
+          "mdp-input",
+          "xtc-output",
+          "edr-output",
+          "simulation",
+          "local-execution",
+          "tutorial",
+          "demo",
+          "beginner-friendly"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "EXECUTION_STRATEGY": "pixi_subprocess",
+        "ENVIRONMENT": {
+          "type": "pixi",
+          "name": "pdbmdauto",
+          "pixi_toml": ""
+        },
+        "option_replace": {},
+        "id": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80"
+      }
+    ],
+    "links": [
+      {
+        "source": "09ea5049-bbb6-408f-b829-a10321d67906",
+        "target": "c3d15483-d69a-49ba-a82d-ced245aa8349"
+      },
+      {
+        "source": "c3d15483-d69a-49ba-a82d-ced245aa8349",
+        "target": "2d6d9744-1e2c-437c-9097-5ca55a2bca60"
+      },
+      {
+        "source": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
+        "target": "c968b176-082f-4c76-a032-81cf4f6f5ccb"
+      },
+      {
+        "source": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
+        "target": "cbc4194f-fdb2-4656-a7ad-4befff3fb994"
+      },
+      {
+        "source": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
+        "target": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb"
+      },
+      {
+        "source": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
+        "target": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1"
+      },
+      {
+        "source": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
+        "target": "151a78d1-1188-44a8-901a-8372acef3f70"
+      },
+      {
+        "source": "151a78d1-1188-44a8-901a-8372acef3f70",
+        "target": "6ceea911-f34f-4b2e-aff5-49a1e5286446"
+      },
+      {
+        "source": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
+        "target": "870ac5ec-e12e-4370-8397-a3f0c54d0caf"
+      },
+      {
+        "source": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
+        "target": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80"
+      }
+    ]
+  },
+  "flow_vars": {
+    "directed": true,
+    "multigraph": false,
+    "graph": {},
+    "nodes": [],
+    "links": []
+  }
+}

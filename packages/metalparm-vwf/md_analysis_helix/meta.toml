@@ -1,0 +1,52 @@
+[package]
+name = "md-analysis-helix"
+version = "1.0.0"
+description = "Per-frame α-helix content of a peptide along an MD trajectory, via DSSP (MDAnalysis). Reads .xtc/.trr + .tpr/.gro and writes a CSV time series of helix fraction + a per-residue helix propensity."
+author = "BoCoFlow / metalparm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "MdAnalysisHelix"
+display_name = "MD Analysis: α-Helix Content"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "molecular-dynamics",
+    "trajectory-analysis",
+    "dssp",
+    "secondary-structure",
+    "alpha-helix",
+    "mdanalysis",
+    "metallopeptide",
+    "md-analysis",
+]
+
+[node.metadata]
+category = "MD Analysis"
+tooltip = "DSSP per-frame helix content of the peptide → CSV time series + per-residue propensity"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+default_timeout = 1800
+estimated_runtime = "seconds to a few minutes, scaling with trajectory length"
+
+[dependencies]
+python = ">=3.11"
+# MDAnalysis (>=2.8 for the DSSP module) — declared in the shared
+# metalparm_vwf pixi env.
+
+[compatibility]
+platforms = ["linux", "macos"]
+cpu_architectures = ["x86_64", "arm64"]
+
+[citation]
+reference = "Kabsch & Sander, Dictionary of protein secondary structure"
+authors = "W. Kabsch, C. Sander"
+journal = "Biopolymers"
+year = "1983"
+doi = "10.1002/bip.360221211"

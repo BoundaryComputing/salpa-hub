@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Background -->
+  <circle cx="32" cy="32" r="30" fill="#FFF3E0"/>
+
+  <!-- PDB molecule (left side) - represented as ribbon -->
+  <path d="M 14 20 Q 18 24 14 28 Q 10 32 14 36 Q 18 40 14 44"
+        fill="none" stroke="#FF9800" stroke-width="3" opacity="0.8"/>
+  <path d="M 20 20 Q 24 24 20 28 Q 16 32 20 36 Q 24 40 20 44"
+        fill="none" stroke="#FFB74D" stroke-width="2.5" opacity="0.6"/>
+
+  <!-- Arrow showing conversion -->
+  <path d="M 26 30 L 34 30 L 34 28 L 38 32 L 34 36 L 34 34 L 26 34 Z"
+        fill="#FF6F00"/>
+
+  <!-- FASTA text lines (right side) -->
+  <rect x="42" y="22" width="14" height="2" fill="#EF6C00" opacity="0.7"/>
+  <rect x="42" y="26" width="12" height="2" fill="#EF6C00" opacity="0.7"/>
+  <rect x="42" y="30" width="14" height="2" fill="#EF6C00" opacity="0.7"/>
+  <rect x="42" y="34" width="10" height="2" fill="#EF6C00" opacity="0.7"/>
+  <rect x="42" y="38" width="14" height="2" fill="#EF6C00" opacity="0.7"/>
+  <rect x="42" y="42" width="11" height="2" fill="#EF6C00" opacity="0.7"/>
+
+  <!-- ">chain_A" header line -->
+  <text x="42" y="20" font-family="monospace" font-size="6" fill="#E65100" font-weight="bold">>A</text>
+
+  <!-- "PDB" label at bottom left -->
+  <text x="14" y="56" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" fill="#E65100" font-weight="bold">PDB</text>
+
+  <!-- "FASTA" label at bottom right -->
+  <text x="50" y="56" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" fill="#E65100" font-weight="bold">FASTA</text>
+</svg>

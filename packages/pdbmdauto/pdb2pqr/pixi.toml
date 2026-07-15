@@ -1,0 +1,33 @@
+# Pixi environment for PDB2PQR node
+# This enables isolated execution via PIXI_SUBPROCESS strategy
+
+[project]
+name = "pdb2pqr"
+version = "2.0.0"
+description = "PDB2PQR protonation and PQR file generation"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+# Python runtime
+python = ">=3.9,<3.13"
+
+# pip is required for installing bocoflow-core and PyPI packages
+pip = ">=23.0"
+
+# Node dependencies
+mdanalysis = ">=2.4.0"
+
+[pypi-dependencies]
+# pdb2pqr is only available on PyPI, not conda-forge
+pdb2pqr = ">=3.0.0"
+
+# redis-py for stream_log() real-time UI updates
+redis = ">=5.0.0"
+
+# Note: bocoflow-core is automatically installed by PixiManager
+# during environment creation via editable install from the local path
+
+[tasks]
+# Quick test that the node can be imported
+test = "python -c \"from node import PDB2PQR; print('Node loaded successfully')\""

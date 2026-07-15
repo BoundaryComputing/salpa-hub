@@ -1,0 +1,36 @@
+[package]
+name = "ep-apply-coords"
+version = "1.0.0"
+description = "Place aligned source-PDB coordinates onto a topology-only complex.prmtop and write the final complex.rst7 + complex.pdb. Sister of ep_fragment_fuse_topology — together they replace the v1.11.0 monolithic ep_fragment_fuse."
+author = "BoCoFlow / metal-md"
+license = "LGPL-2.1"
+
+[node]
+class_name = "EpApplyCoords"
+display_name = "Apply Coords"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "metallopeptide",
+    "amber",
+    "parmed",
+    "coordinate-assembly",
+    "rst7",
+    "topology-coords-split",
+    "computational-chemistry",
+]
+
+[node.metadata]
+category = "Metallopeptide MD"
+tooltip = "ParmEd wrapper: load complex.prmtop, transfer coords from aligned peptide+fragment PDBs by (resid, atom_name) match, write complex.rst7 + complex.pdb"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[node.platforms]
+supported = ["linux", "macos"]

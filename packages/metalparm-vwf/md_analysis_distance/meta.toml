@@ -1,0 +1,51 @@
+[package]
+name = "md-analysis-distance"
+version = "1.0.0"
+description = "Per-frame distance from a set of probe atoms (Tyr/His quenchers) to the metal centre (Sn) along an MD trajectory, via MDAnalysis. Minimum-image (PBC-aware); writes a CSV time series in Ångström + a closest-approach summary."
+author = "BoCoFlow / metalparm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "MdAnalysisDistance"
+display_name = "MD Analysis: Residue–Metal Distance"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "molecular-dynamics",
+    "trajectory-analysis",
+    "distance",
+    "contact-analysis",
+    "mdanalysis",
+    "metallopeptide",
+    "pcet",
+    "md-analysis",
+]
+
+[node.metadata]
+category = "MD Analysis"
+tooltip = "Per-frame Tyr/His-probe → Sn distances → CSV time series + closest-approach summary"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+default_timeout = 1800
+estimated_runtime = "seconds to a few minutes, scaling with trajectory length"
+
+[dependencies]
+python = ">=3.11"
+# MDAnalysis — declared in the shared metalparm_vwf pixi env.
+
+[compatibility]
+platforms = ["linux", "macos"]
+cpu_architectures = ["x86_64", "arm64"]
+
+[citation]
+reference = "Michaud-Agrawal et al., MDAnalysis: A toolkit for the analysis of molecular dynamics simulations"
+authors = "N. Michaud-Agrawal, E. J. Denning, T. B. Woolf, O. Beckstein"
+journal = "J. Comput. Chem."
+year = "2011"
+doi = "10.1002/jcc.21787"

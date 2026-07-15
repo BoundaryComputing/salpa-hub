@@ -1,0 +1,55 @@
+[package]
+name = "md-solvate-gmx"
+version = "1.0.0"
+description = "Solvate a metallopeptide GROMACS topology (from ep_amber_to_gromacs) with OPC water + Cieplak methanol + ions, using raw packmol + ParmEd assembly. Bypasses packmol-memgen's internal tleap re-derivation, so non-standard residues (fragment-fused GLU, etc.) are preserved bytewise."
+author = "BoCoFlow / metalparm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "MdSolvateGmx"
+display_name = "MD: Solvate (GROMACS-side)"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "gromacs",
+    "packmol",
+    "parmed",
+    "solvent",
+    "mixed-solvent",
+    "opc",
+    "methanol",
+    "molecular-dynamics",
+    "md-setup",
+    "metallopeptide",
+    "metalloprotein",
+    "non-standard-residue",
+]
+
+[node.metadata]
+category = "MD Preparation"
+tooltip = "Solvate a dry GROMACS topology via raw packmol + ParmEd; never re-derives the solute (safe for fragment-fused residues)"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+default_timeout = 1200
+estimated_runtime = "1-3 minutes for a ~30k-atom mixed-solvent box"
+
+[dependencies]
+python = ">=3.11"
+# tleap + packmol + ParmEd all come from ambertools (in the metalparm_vwf env)
+
+[compatibility]
+platforms = ["linux", "macos"]
+cpu_architectures = ["x86_64", "arm64"]
+
+[citation]
+reference = "Martínez et al., PACKMOL — A package for building initial configurations for molecular dynamics simulations"
+authors = "L. Martínez, R. Andrade, E. G. Birgin, J. M. Martínez"
+journal = "J. Comput. Chem."
+year = "2009"
+doi = "10.1002/jcc.21224"

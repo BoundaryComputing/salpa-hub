@@ -1,0 +1,34 @@
+[package]
+name = "mdock-qm-charges"
+version = "0.1.0"
+description = "DFT (ORCA/Gaussian/ADF) → CM5 partial charges + Mayer bond orders → enrich molecular graph — MetalDock pipeline step 3"
+author = "BoCoFlow / MetalDock"
+license = "LGPL-2.1"
+
+[node]
+class_name = "MdockQmCharges"
+display_name = "QM Charges"
+shared_environment = "metaldock_vwf"
+num_in = 1
+num_out = 1
+category = "Metal Docking"
+
+hashtags = [
+    "metaldock",
+    "qm-charges",
+    "cm5-charges",
+    "orca",
+    "dft",
+    "mayer-bond-order",
+    "metal-complex",
+    "computational-chemistry",
+]
+
+[node.metadata]
+tooltip = "Run DFT (ORCA primary) → CM5 charges + bond orders → enriched molecular graph"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = true

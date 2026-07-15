@@ -1,0 +1,36 @@
+[package]
+name = "merge-pdb-chains"
+version = "1.0.0"
+description = "Merge selected PDB chains into a single structure file for homology modeling"
+author = "BoCoFlow Team"
+license = "MIT"
+
+[node]
+class_name = "MergePdbChains"
+display_name = "Merge PDB Chains"
+shared_environment = "pdbmdauto"
+num_in = 1
+num_out = 1
+hashtags = [
+    "pdb",
+    "chain-merge",
+    "structure-preparation",
+    "homology-modeling",
+    "biopython",
+    "bioinformatics",
+    "protein-structure",
+    "dna",
+]
+
+[node.metadata]
+category = "Structure Preparation"
+tooltip = "Extracts selected chains from a PDB file and merges them into a single structure. Handles protein and DNA/RNA chains. Uses BioPython (no PyMOL dependency)."
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[node.platforms]
+supported = ["linux", "macos", "windows"]

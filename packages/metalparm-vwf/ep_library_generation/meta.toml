@@ -1,0 +1,33 @@
+[package]
+name = "ep-library-generation"
+version = "1.0.0"
+description = "Generate AMBER library (.lib) file via tleap and fix atomic numbers/bond orders (easyPARM steps tleap + 12)"
+author = "BoCoFlow / EasyParm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "EpLibraryGeneration"
+display_name = "Library Generation"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "easyparm",
+    "tleap",
+    "amber-library",
+    "lib-file",
+    "topology",
+    "metal-complex",
+    "force-field-parameterization",
+]
+
+[node.metadata]
+category = "Force Field Parameterization"
+tooltip = "Generate AMBER .lib file via tleap + fix atomic numbers and bond connectivity for metals"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false

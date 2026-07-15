@@ -1,0 +1,38 @@
+[package]
+name = "fix-residues-promod3"
+version = "1.0.0"
+description = "Fix missing residues in PDB structures using ProMod3 homology modeling engine"
+author = "BoCoFlow Team"
+license = "MIT"
+
+[node]
+class_name = "FixResiduesPromod3"
+display_name = "Fix Missing Residues"
+shared_environment = "pdbmdauto"
+num_in = 1
+num_out = 1
+hashtags = [
+    "homology-modeling",
+    "missing-residues",
+    "loop-modeling",
+    "promod3",
+    "structure-repair",
+    "pdb",
+    "protein-structure",
+    "bioinformatics",
+    "swiss-model",
+]
+
+[node.metadata]
+category = "Structure Preparation"
+tooltip = "Fills missing residues in PDB structures using ProMod3 (SWISS-MODEL engine). Reads merged PDB + alignment from upstream nodes. Apache 2.0 licensed — no registration required."
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = true
+default_timeout = 1800              # 30 min — homology modeling loop repair
+
+[node.platforms]
+supported = ["linux", "macos"]

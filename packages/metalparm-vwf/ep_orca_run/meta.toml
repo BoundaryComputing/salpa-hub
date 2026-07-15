@@ -1,0 +1,59 @@
+[package]
+name = "ep-orca-run"
+version = "0.1.0"
+description = "Run ORCA (QM DFT opt+freq+CHELPG) locally or on a SLURM HPC cluster. Produces .out/.hess/.xyz artifacts consumed by ep_seminario_orca."
+author = "BoCoFlow / EasyParm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "EpOrcaRun"
+display_name = "ORCA Run"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "easyparm",
+    "orca",
+    "qm",
+    "dft",
+    "hessian",
+    "chelpg",
+    "seminario-method",
+    "force-field-parameterization",
+    "hpc",
+    "slurm",
+    "remote-execution",
+    "metal-complex",
+    "computational-chemistry",
+]
+
+[node.metadata]
+category = "Force Field Parameterization"
+tooltip = "Execute an ORCA DFT job (local or HPC/SLURM) that produces the .hess + .out needed by the Seminario node"
+
+[node.metadata.hpc_support]
+execution_modes = ["local", "remote"]
+slurm_integration = true
+template_variables = [
+    "{{JOB_NAME}}",
+    "{{REMOTE_WORK_DIR}}",
+    "{{OUTPUT_DIR}}",
+    "{{WORKING_DIR}}",
+    "{{NODE_ID}}",
+    "{{RUN_LABEL}}",
+    "{{ORCA_INPUT_FILE}}",
+    "{{ORCA_OUTPUT_FILE}}",
+    "{{XYZ_FILE}}",
+    "{{NPROCS}}"
+]
+
+[node.features]
+supports_resume = true
+requires_gpu = false
+parallel_capable = true
+long_running = true
+estimated_runtime = "Minutes to days (system size + method dependent)"
+
+[node.platforms]
+supported = ["linux", "macos"]

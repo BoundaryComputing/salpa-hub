@@ -1,0 +1,36 @@
+[package]
+name = "snp-builder"
+version = "0.3.0"
+description = "Build a capped Sn(IV)(OMe)2-porphyrin fragment from a YASARA-style Zn-porphyrin PDB (UNK residue). Outputs XYZ + PDB ready for EasyParm parameterization. Optionally extracts the peptide chain — whole, or a residue-number sub-span (e.g. 1-7) to carve a shorter peptide out of a longer one — and can ACE/NME-cap the extracted termini."
+author = "BoCoFlow / metal-md"
+license = "LGPL-2.1"
+
+[node]
+class_name = "SnpBuilder"
+display_name = "SnP Builder"
+shared_environment = "metalparm_vwf"
+num_in = 0
+num_out = 1
+
+hashtags = [
+    "metallopeptide",
+    "sn-porphyrin",
+    "fragment-preparation",
+    "ace-cap",
+    "amide-interface",
+    "force-field-parameterization",
+    "computational-chemistry",
+]
+
+[node.metadata]
+category = "Metallopeptide MD"
+tooltip = "Swap Zn->Sn, add 2 axial OMe, ACE-cap the aniline NH2 so the QM sees amide electronics at the interface"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[node.platforms]
+supported = ["linux", "macos"]

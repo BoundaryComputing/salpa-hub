@@ -1,0 +1,30 @@
+[package]
+name = "gmx-solv-ion"
+version = "1.0.0"
+description = "GROMACS solvation and ionization — add water box and neutralize with ions"
+author = "BoCoFlow Team"
+license = "MIT"
+
+[node]
+class_name = "GmxSolvIon"
+display_name = "GMX Solvate & Ionize"
+shared_environment = "pdbmdauto"
+num_in = 1
+num_out = 1
+hashtags = [
+    "gromacs", "solvation", "ionization", "molecular-dynamics",
+    "water-box", "ions", "structure-preparation", "md-simulation",
+]
+
+[node.metadata]
+category = "Molecular Dynamics"
+tooltip = "Sets up simulation box, adds SPC216 water, neutralizes with Na+/Cl- ions. Requires GROMACS and topology/MDP/NDX input files."
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[node.platforms]
+supported = ["linux", "macos"]

@@ -1,0 +1,37 @@
+.DS_Store
+
+# Machine-specific state (tracks which packages are installed locally)
+.installed_packages.json
+
+# Per-package dev marker written by the installer / a dev source
+**/.installed_from.json
+
+# Pixi environments & lockfiles — installed per-package, regenerated on install,
+# and stripped at packaging. Use ** so NESTED multi-node packages are covered too,
+# e.g. packages/metalparm-vwf/<node>/.pixi/ and .../<node>/pixi.lock. The old
+# one-level `packages/*/.pixi/` pattern missed these and let build caches slip in.
+**/.pixi/
+**/pixi.lock
+
+# Test / coverage build caches
+**/.pytest_cache/
+**/.coverage
+**/.coverage.*
+**/htmlcov/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Internal dev notes / handoff — LOCAL only, never published
+/dev-notes/
+
+# Claude Code / AI guidance — LOCAL only, not for the public mirror
+/CLAUDE.md
+
+# Maintainer tooling — LOCAL only. The public repo ships the product (packages +
+# registry + docs); the mirror/audit tooling is run from the working copy.
+/Makefile
+/MIRRORS.json
+/scripts/

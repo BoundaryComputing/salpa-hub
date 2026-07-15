@@ -1,0 +1,26 @@
+[package]
+name = "hello-world-pipeline"
+version = "1.0.0"
+description = "A 3-node hello-world workflow — encrypt, decrypt, and reveal messages using a Caesar cipher. The simplest multi-node pipeline for learning BoCoFlow."
+author = "BoCoFlow Development Team"
+license = "MIT"
+
+[package.nodes]
+nodes = [
+    "hello_encrypt",
+    "hello_decrypt",
+    "hello_reveal",
+]
+
+# No shared environment — all nodes are stdlib-only, IN_PROCESS
+
+[package.metadata]
+category = "Getting Started"
+keywords = ["hello-world", "tutorial", "encryption", "beginner", "workflow-template", "pipeline"]
+hashtags = ["hello-world", "starter", "tutorial", "beginner", "pipeline"]
+
+[package.documentation]
+readme = "README.md"
+
+[package.workflows]
+examples = ["workflows/hello-world-pipeline.json"]

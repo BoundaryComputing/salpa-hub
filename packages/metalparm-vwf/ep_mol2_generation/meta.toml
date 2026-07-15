@@ -1,0 +1,34 @@
+[package]
+name = "ep-mol2-generation"
+version = "1.0.0"
+description = "Generate MOL2 file via antechamber with atom type correction for metals (easyPARM antechamber step)"
+author = "BoCoFlow / EasyParm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "EpMol2Generation"
+display_name = "MOL2 Generation"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "easyparm",
+    "mol2-generation",
+    "antechamber",
+    "atom-typing",
+    "gaff",
+    "amber",
+    "metal-complex",
+    "force-field-parameterization",
+]
+
+[node.metadata]
+category = "Force Field Parameterization"
+tooltip = "Convert XYZ to PDB, run antechamber for MOL2, correct atom types for metals"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false

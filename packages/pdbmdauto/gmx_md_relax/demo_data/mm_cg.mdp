@@ -1,0 +1,22 @@
+; mm_cg.mdp — Conjugate gradient energy minimization (no restraints)
+; Steps 3-4 of 4: remove remaining bad contacts after NVT equilibration
+title                   = CG Energy Minimization
+integrator              = cg
+nsteps                  = 5000
+emtol                   = 100.0
+emstep                  = 0.01
+
+nstlog                  = 500
+nstenergy               = 500
+
+; Neighbour searching
+nstlist                 = 20
+cutoff-scheme           = Verlet
+rlist                   = 1.2
+rvdw                    = 1.2
+rcoulomb                = 1.2
+coulombtype             = PME
+DispCorr                = EnerPres
+
+; PBC
+pbc                     = xyz

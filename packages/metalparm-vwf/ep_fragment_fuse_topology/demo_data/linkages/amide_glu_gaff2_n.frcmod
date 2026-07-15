@@ -1,0 +1,25 @@
+amide linkage ff19SB+gaff2 (GLU-NH, GAFF2 type `n` instead of `ns`)
+MASS
+
+BOND
+CO-n    490.0    1.335                cross-FF amide (parm10 C-N AA general)
+
+ANGLE
+2C-CO-n     70.0      116.60          cross-FF (parm10 CT-C-N AA general)
+O2-CO-n     80.0      122.90          cross-FF (parm10 N-C-O AA general)
+CO-n-hn     50.0      120.00          cross-FF (parm10 C-N-H NMA)
+CO-n-ca     50.0      121.90          cross-FF (parm10 C-N-CT AA general)
+
+DIHE
+HC-2C-CO-n    1    0.000         0.0             2.    cross-FF amide
+2C-2C-CO-n    1    0.000         0.0             2.    cross-FF amide
+2C-CO-n-hn    1    0.000         0.0             2.    cross-FF amide
+2C-CO-n-ca    1    0.000         0.0             2.    cross-FF amide
+O2-CO-n-hn    1    0.000         0.0             2.    cross-FF amide
+O2-CO-n-ca    1    0.000         0.0             2.    cross-FF amide
+CO-n-ca-ca    1    0.000         0.0             2.    cross-FF amide-aryl
+
+IMPROPER
+O2-2C-CO-n         10.5         180.          2.    AMBER X-X-C-O canonical (parm10:893)
+
+NONBON

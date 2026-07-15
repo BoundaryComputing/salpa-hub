@@ -1,0 +1,31 @@
+[package]
+name = "gmx-md-relax"
+version = "1.0.0"
+description = "GROMACS multi-step relaxation — energy minimization and NVT equilibration"
+author = "BoCoFlow Team"
+license = "MIT"
+
+[node]
+class_name = "GmxMdRelax"
+display_name = "GMX MD Relaxation"
+shared_environment = "pdbmdauto"
+num_in = 1
+num_out = 1
+hashtags = [
+    "gromacs", "relaxation", "energy-minimization", "equilibration",
+    "nvt", "molecular-dynamics", "md-simulation", "structure-preparation",
+]
+
+[node.metadata]
+category = "Molecular Dynamics"
+tooltip = "Runs GROMACS grompp + mdrun for relaxation steps (nvt_fixOri, nvt_fixOriBackbone, mm1, mm2). Uses position restraints on original residues."
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = true
+default_timeout = 3600              # 1 hour — 4-step vacuum relaxation needs time
+
+[node.platforms]
+supported = ["linux", "macos"]

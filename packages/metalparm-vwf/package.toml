@@ -1,0 +1,79 @@
+[package]
+name = "metalparm-vwf"
+version = "1.29.0"
+description = "Visual workflow nodes for metal force-field parameterization: EasyParm pipeline (bond detection, MOL2 generation, ORCA local/HPC, Seminario, FF assembly, library generation) + metallopeptide fragment builder, peptide builder, pure-geometry fragment alignment, two-step fragment fuser (topology + coord-applier), AMBER → GROMACS converter, packmol-memgen-based mixed-solvent box builder, and a GROMACS-side solvator (md_solvate_gmx) that uses raw packmol + ParmEd so non-standard residues are never re-derived."
+author = "BoCoFlow / metalparm"
+license = "LGPL-2.1"
+repository = "https://github.com/BoundaryComputing/salpa-hub"
+
+[package.nodes]
+nodes = [
+    "ep_bond_detection",
+    "ep_mol2_generation",
+    "ep_charges",                      # v1.23.0: QM (RESP/CHELPG) charge injection — the step the refactor dropped
+    "xtb_opt",
+    "ep_orca_run",
+    "ep_seminario_orca",
+    "ep_forcefield_assembly",
+    "ep_library_generation",
+    "snp_builder",
+    "peptide_builder",
+    "fragment_align",
+    "ep_fragment_fuse_topology",       # topology side of the fuser split (was ep_fragment_fuse, removed v1.29.0)
+    "ep_apply_coords",                 # coord side of the fuser split (was ep_fragment_fuse, removed v1.29.0)
+    "ep_amber_to_gromacs",
+    "md_solvate_packmol",              # v1.15.0: packmol-memgen wrapper
+    "md_solvate_gmx",                  # v1.16.0: raw packmol + ParmEd (no re-derivation)
+    "md_traj_center",                  # v1.22.0: PBC-correct trajectory (unwrap + center)
+    "md_analysis_helix",               # v1.20.0: per-frame DSSP α-helix content
+    "md_analysis_distance",            # v1.20.0: per-frame Tyr/His → Sn distance
+    "md_membrane_build",               # v1.21.0: DPPC bilayer build (packmol-memgen + ParmEd)
+]
+
+[package.environment]
+shared_environment = "metalparm_vwf"
+
+[package.metadata]
+category = "Force Field Parameterization"
+keywords = [
+    "metalparm",
+    "easyparm",
+    "force-field-parameterization",
+    "metal-complex",
+    "metallopeptide",
+    "amber",
+    "seminario-method",
+    "tleap",
+    "fragment-parameterization",
+    "computational-chemistry",
+]
+hashtags = [
+    "metalparm",
+    "easyparm",
+    "force-field-parameterization",
+    "metal-complex",
+    "metallopeptide",
+    "amber",
+    "seminario-method",
+    "qm-derived-parameters",
+    "orca",
+    "hpc",
+    "slurm",
+    "tleap",
+    "sn-porphyrin",
+    "custom-residue",
+    "fragment-parameterization",
+    "force-field-fusion",
+    "amber-ff19sb",
+    "gromacs",
+    "parmed",
+    "format-conversion",
+    "computational-chemistry",
+]
+platform_note = "Requires AmberTools (ambertools >= 24) which has no Windows conda packages. Docker/WSL2 recommended on Windows."
+
+[package.documentation]
+readme = "README.md"
+
+[package.workflows]
+examples = []

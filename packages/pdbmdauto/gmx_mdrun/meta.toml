@@ -1,0 +1,150 @@
+# GROMACS MD Run - Node Package Metadata
+# A comprehensive node for running GROMACS molecular dynamics simulations
+# with support for both local and HPC/SLURM execution
+
+[package]
+name = "gmx-mdrun"
+version = "2.0.0"
+description = "GROMACS MD simulation node with local and HPC/SLURM execution support"
+author = "BoCoFlow Community"
+license = "MIT"
+repository = "https://github.com/BoundaryComputing/salpa-hub"
+homepage = "https://www.gromacs.org/"
+
+[node]
+class_name = "GmxMdRun"
+display_name = "GROMACS MD Run"
+shared_environment = "pdbmdauto"
+num_in = 1
+num_out = 1
+
+# Hashtags for discovery and categorization
+hashtags = [
+    # Primary functionality
+    "molecular-dynamics",
+    "md-simulation",
+    "grompp",
+    "mdrun",
+
+    # Tool
+    "gromacs",
+
+    # Scientific domain
+    "computational-chemistry",
+    "structural-biology",
+    "protein-simulation",
+
+    # Simulation types
+    "nvt-equilibration",
+    "npt-equilibration",
+    "energy-minimization",
+    "production-run",
+
+    # File types
+    "gro-input",
+    "top-input",
+    "mdp-input",
+    "xtc-output",
+    "edr-output",
+
+    # Workflow category
+    "simulation",
+
+    # HPC/Cluster support
+    "hpc",
+    "slurm",
+    "cluster",
+    "remote-execution",
+    "mpi",
+    "gpu-acceleration",
+]
+
+[node.metadata]
+icon = "icon.svg"
+tooltip = "Run GROMACS molecular dynamics simulation locally or on HPC clusters"
+category = "Molecular Dynamics"
+tags_display = ["GROMACS", "MD", "HPC", "SLURM"]
+
+[node.metadata.hpc_support]
+execution_modes = ["local", "remote"]
+slurm_integration = true
+template_variables = [
+    "{{JOB_NAME}}",
+    "{{REMOTE_WORK_DIR}}",
+    "{{OUTPUT_DIR}}",
+    "{{WORKING_DIR}}",
+    "{{NODE_ID}}",
+    "{{RUN_LABEL}}",
+    "{{INPUT_TOP_FILE}}",
+    "{{INPUT_GRO_FILE}}",
+    "{{INPUT_MDP_FILE}}",
+    "{{INPUT_NDX_FILE}}"
+]
+
+[node.metadata.parameters]
+run_label = "Label for output files (e.g., md, nvt, npt, production)"
+execution_mode = "Local execution or remote HPC cluster via SLURM"
+hpc_profile = "HPC cluster connection profile (Settings > HPC Profiles)"
+slurm_script = "User-provided SLURM script with {{VARIABLE}} placeholders"
+
+[node.metadata.inputs]
+topology = "GROMACS topology file (.top) with force field and molecular structure"
+structure = "GROMACS structure file (.gro) with atomic coordinates"
+parameters = "GROMACS MD parameters file (.mdp) specifying simulation settings"
+index = "Optional GROMACS index file (.ndx) defining atom groups"
+itp_files = "Automatically includes all .itp files from working directory"
+
+[node.metadata.outputs]
+tpr = "Portable binary run input file ({run_label}.tpr)"
+structure = "Final structure coordinates ({run_label}.gro)"
+trajectory = "Compressed trajectory file ({run_label}.xtc)"
+energy = "Energy data file ({run_label}.edr)"
+log = "Simulation log file ({run_label}.log)"
+
+[node.features]
+supports_resume = true
+requires_gpu = false
+parallel_capable = true
+long_running = true
+estimated_runtime = "Minutes to days (depends on simulation length and cluster)"
+
+[node.metadata.performance]
+typical_runtime = "Minutes to days depending on simulation length and system size"
+memory_requirement = "Scales with system size (100MB - several GB)"
+disk_space = "Large for trajectories (GB scale for production runs)"
+gpu_support = "Recommended for performance (via SLURM --gres=gpu)"
+mpi_support = "Parallel execution via srun gmx_mpi mdrun"
+
+[node.metadata.workflow_position]
+typical_position = "After solvation/ionization, for equilibration or production runs"
+upstream = ["gmx-solv-ion", "gmx-minimize", "gmx-nvt", "gmx-npt"]
+downstream = ["gmx-energy", "gmx-trjconv", "analysis-nodes"]
+
+[node.metadata.notes]
+local_execution = "Uses 'gmx grompp' and 'gmx mdrun' commands"
+remote_execution = "User provides SLURM script with template variables"
+script_flexibility = "User controls partitions, modules, MPI settings via their script"
+cluster_compatibility = "Works with any SLURM cluster - user adapts script to their environment"
+state_persistence = "Job status tracked for resumable execution"
+file_transfer = "Automatic upload of inputs and download of outputs for HPC jobs"
+
+[dependencies]
+python = ">=3.9"
+# Note: GROMACS is installed via pixi (conda-forge) for local execution
+# For HPC: GROMACS is expected to be available via module load
+
+[compatibility]
+platforms = ["linux", "macos"]
+tested_on = ["ubuntu-22.04", "macos-14"]
+cpu_architectures = ["x86_64", "arm64"]
+
+[documentation]
+readme = "README.md"
+
+[citation]
+reference = "GROMACS: High performance molecular simulations through multi-level parallelism from laptops to supercomputers"
+authors = "Abraham et al."
+journal = "SoftwareX"
+year = "2015"
+doi = "10.1016/j.softx.2015.06.001"
+url = "https://www.gromacs.org/"

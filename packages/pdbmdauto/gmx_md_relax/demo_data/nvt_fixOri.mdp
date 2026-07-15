@@ -1,0 +1,49 @@
+; nvt_fixOri.mdp — NVT equilibration with ALL original heavy atoms frozen
+; Step 1 of 4: equilibrate water/ions around rigid protein
+title                   = NVT with frozen OriHeavy
+integrator              = md
+nsteps                  = 5000
+dt                      = 0.001
+
+nstxout                 = 0
+nstvout                 = 0
+nstfout                 = 0
+nstlog                  = 500
+nstenergy               = 500
+nstxtcout               = 500
+
+; Neighbour searching
+nstlist                 = 20
+cutoff-scheme           = Verlet
+rlist                   = 1.2
+rvdw                    = 1.2
+rcoulomb                = 1.2
+coulombtype             = PME
+DispCorr                = EnerPres
+
+; Constraints
+constraint_algorithm    = lincs
+constraints             = h-bonds
+lincs_iter              = 1
+lincs_order             = 4
+
+; Temperature coupling — System group for vacuum (no solvent)
+tcoupl                  = V-rescale
+tc-grps                 = System
+tau_t                   = 0.1
+ref_t                   = 300
+
+; No pressure coupling (NVT)
+pcoupl                  = no
+
+; PBC
+pbc                     = xyz
+
+; Velocity generation
+gen_vel                 = yes
+gen_temp                = 300
+gen_seed                = -1
+
+; Position restraints — freeze all original heavy atoms
+freezegrps              = OriHeavy
+freezedim               = Y Y Y

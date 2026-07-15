@@ -1,0 +1,53 @@
+[package]
+name = "pdb-fasta-biopython"
+version = "2.0.0"
+description = "Parse PDB structures and extract FASTA sequences using BioPython. Supports RCSB PDB API fetching by ID and local file processing with chain splitting, HETATM handling, and missing residues analysis."
+author = "BoCoFlow Development Team"
+license = "MIT"
+
+[package.dependencies]
+biopython = ">=1.80"
+requests = ">=2.28"
+
+[node]
+class_name = "PdbFastaBiopython"
+display_name = "PDB FASTA Parser"
+shared_environment = "pdbmdauto"
+# num_in/num_out omitted — defaults to 1
+
+hashtags = [
+    "pdb",
+    "fasta",
+    "sequence-extraction",
+    "biopython",
+    "structure-to-sequence",
+    "protein-sequence",
+    "chain-extraction",
+    "file-conversion",
+    "rcsb-api",
+    "missing-residues",
+    "structural-biology",
+    "bioinformatics",
+    "preprocessing",
+]
+
+[node.metadata]
+icon = "icon.svg"
+tooltip = "Parse PDB structures and extract FASTA sequences — supports RCSB API fetch and local files"
+category = "Bioinformatics"
+tags_display = ["BioPython", "PDB", "FASTA", "RCSB"]
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[dependencies]
+python = ">=3.9"
+
+[compatibility]
+platforms = ["linux", "macos", "windows"]
+
+[documentation]
+readme = "README.md"

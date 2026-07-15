@@ -1,0 +1,72 @@
+Remark line goes here
+MASS
+Sn     118.710
+
+
+BOND
+na-Sn 115.01 2.135
+Sn-os 168.09 2.036
+os-c3 322.88 1.389
+c3-h1 352.41 1.111
+c2-c3 231.51 1.522
+c3-hc 401.30 1.100
+
+
+ANGLE
+ns-c2-c3 144.530 113.433
+o-c2-c3 119.460 122.642
+c2-na-Sn 78.510 124.831
+na-Sn-na 49.890 119.616
+na-Sn-os 31.580 90.004
+os-Sn-os 30.420 176.082
+Sn-os-c3 47.550 122.923
+os-c3-h1 52.260 112.283
+h1-c3-h1 38.350 106.507
+c2-c3-hc 53.090 110.150
+hc-c3-hc 33.490 108.787
+c2-ns-ca 76.390 125.030
+
+
+DIHE
+c2-c2-na-Sn   3    0.000       0.0000           3.000
+c2-na-Sn-na   3    0.000       0.0000           3.000
+na-Sn-na-c2   3    0.000       0.0000           3.000
+Sn-na-c2-c2   3    0.000       0.0000           3.000
+c2-na-Sn-os   3    0.000       0.0000           3.000
+na-Sn-os-c3   3    0.000       0.0000           3.000
+os-Sn-na-c2   3    0.000       0.0000           3.000
+c3-os-Sn-na   3    0.000       0.0000           3.000
+os-Sn-os-c3   3    0.000       0.0000           3.000
+c3-os-Sn-os   3    0.000       0.0000           3.000
+Sn-os-c3-h1   3    0.000       0.0000           3.000
+h1-c3-os-Sn   3    0.000       0.0000           3.000
+ca-ns-c2-c3   3    0.000       0.0000           3.000
+c3-c2-ns-ca   3    0.000       0.0000           3.000
+ns-c2-c3-hc   3    0.000       0.0000           3.000
+hn-ns-c2-c3   3    0.000       0.0000           3.000
+c3-c2-ns-hn   3    0.000       0.0000           3.000
+hc-c3-c2-ns   3    0.000       0.0000           3.000
+o-c2-c3-hc   3    0.000       0.0000           3.000
+hc-c3-c2-o   3    0.000       0.0000           3.000
+ca-ca-ns-hn   4    1.800       180.0000           2.000
+o-c2-ns-hn   4    2.600       180.0000           2.000
+o-c2-ns-ca   4    2.600       180.0000           2.000
+ca-ca-ns-c2   4    4.080       180.000          -2.000      same as ca-ca-n -c2
+ca-ca-ns-c2   1    0.000         0.000          -3.000      same as ca-ca-n -c2
+ca-ca-ns-c2   1    0.000       0.0000           1.000
+
+
+IMPROPER
+c2-ca-ns-hn         1.1          180.0         2.0          Using the default value
+ca-ca-ca-ns         1.1          180.0         2.0          Using the default value
+ca-ca-ca-ha         1.1          180.0         2.0          Using general improper torsional angle  X- X-ca-ha, penalty score=  6.0)
+c2-c2-c2-ca         1.1          180.0         2.0          Same as c2-ca-ca-ca, penalty score=404.3)
+c2-c2-c2-na         1.1          180.0         2.0          Using the default value
+c2-c2-c2-ha         1.1          180.0         2.0          Same as ca-ca-ca-ha, penalty score=373.2)
+
+
+NONBON
+  Sn          1.7380  0.1650
+
+
+

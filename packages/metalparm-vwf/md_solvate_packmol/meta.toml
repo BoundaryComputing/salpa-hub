@@ -1,0 +1,36 @@
+[package]
+name = "md-solvate-packmol"
+version = "1.0.0"
+description = "Solvate a metallopeptide AMBER topology in mixed or single solvent boxes via AmberTools' packmol-memgen. Bundled cosolvent library covers methanol, chloroform, DMSO, NMA, acetonitrile, acetone, benzene, phenol, TFE — all AMBER-compatible."
+author = "BoCoFlow / metalparm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "MdSolvatePackmol"
+display_name = "MD: Solvate (packmol-memgen)"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "amber",
+    "packmol",
+    "packmol-memgen",
+    "solvent",
+    "mixed-solvent",
+    "ff19SB",
+    "opc",
+    "molecular-dynamics",
+    "md-setup",
+    "metalloprotein",
+]
+
+[node.metadata]
+category = "MD Preparation"
+tooltip = "Wrap AmberTools packmol-memgen: box + mixed solvent + ions in one tleap-built AMBER topology"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false

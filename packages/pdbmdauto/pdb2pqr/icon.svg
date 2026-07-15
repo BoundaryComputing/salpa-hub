@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="30" fill="#FFEBEE"/>
+
+  <!-- Left side: PDB representation (protein backbone) -->
+  <g opacity="0.8">
+    <circle cx="16" cy="22" r="4" fill="#FF6B6B"/>
+    <circle cx="16" cy="32" r="4" fill="#FF6B6B"/>
+    <circle cx="16" cy="42" r="4" fill="#FF6B6B"/>
+    <line x1="16" y1="26" x2="16" y2="28" stroke="#FF6B6B" stroke-width="3" stroke-linecap="round"/>
+    <line x1="16" y1="36" x2="16" y2="38" stroke="#FF6B6B" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Arrow indicating conversion -->
+  <g>
+    <line x1="24" y1="32" x2="38" y2="32" stroke="#EF5350" stroke-width="2.5" stroke-linecap="round"/>
+    <polyline points="34,28 38,32 34,36" fill="none" stroke="#EF5350" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Right side: PQR representation (with charges and hydrogens) -->
+  <g>
+    <!-- Main atoms with charges -->
+    <circle cx="48" cy="22" r="4" fill="#EF5350"/>
+    <circle cx="48" cy="32" r="4" fill="#EF5350"/>
+    <circle cx="48" cy="42" r="4" fill="#EF5350"/>
+    <line x1="48" y1="26" x2="48" y2="28" stroke="#EF5350" stroke-width="3" stroke-linecap="round"/>
+    <line x1="48" y1="36" x2="48" y2="38" stroke="#EF5350" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Added hydrogens (smaller circles) -->
+    <circle cx="54" cy="22" r="2" fill="#FFCDD2"/>
+    <circle cx="54" cy="32" r="2" fill="#FFCDD2"/>
+    <circle cx="54" cy="42" r="2" fill="#FFCDD2"/>
+
+    <!-- Charge indicators (+/-) -->
+    <text x="48" y="24" text-anchor="middle" font-family="Arial, sans-serif" font-size="6" fill="white" font-weight="bold">+</text>
+    <text x="48" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="6" fill="white" font-weight="bold">-</text>
+  </g>
+
+  <!-- "PQR" label at bottom -->
+  <text x="32" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#C62828" font-weight="bold">PQR</text>
+</svg>

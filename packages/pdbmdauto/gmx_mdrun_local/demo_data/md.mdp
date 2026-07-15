@@ -1,0 +1,40 @@
+; md.mdp — Short production MD (bundled default for testing)
+; 1000 steps × 2 fs = 2 ps — enough to verify pipeline works
+integrator  = md
+dt          = 0.002       ; 2 fs timestep
+nsteps      = 1000        ; 2 ps total
+nstxout     = 100
+nstvout     = 0
+nstfout     = 0
+nstlog      = 100
+nstenergy   = 100
+
+; Neighbour searching
+nstlist     = 10
+cutoff-scheme = Verlet
+
+; Electrostatics + VdW
+coulombtype = PME
+rcoulomb    = 1.0
+rvdw        = 1.0
+
+; Temperature coupling — separate groups for solvated system
+tcoupl      = V-rescale
+tc-grps     = Protein non-Protein
+tau_t       = 0.1     0.1
+ref_t       = 300     300
+
+; Pressure coupling (off for short test)
+pcoupl      = no
+
+; Bond constraints
+constraints = h-bonds
+constraint_algorithm = LINCS
+
+; PBC
+pbc         = xyz
+
+; Velocity generation
+gen_vel     = yes
+gen_temp    = 300
+gen_seed    = -1

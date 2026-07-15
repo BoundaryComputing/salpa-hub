@@ -1,0 +1,38 @@
+[package]
+name = "ep-fragment-fuse-topology"
+version = "1.1.0"
+description = "Topology-only fuser: merge a standard ff19SB peptide library with a custom residue library (.lib + .frcmod) via user-specified interface bonds. Emits complex.prmtop only — coordinate assembly is handled by the sister ep_apply_coords node. Rebalances the non-integer net charge that interface-atom deletion leaves on the linkage residue so the complex total is an exact integer."
+author = "BoCoFlow / metal-md"
+license = "LGPL-2.1"
+
+[node]
+class_name = "EpFragmentFuseTopology"
+display_name = "Fuse Topology"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "metallopeptide",
+    "force-field-fusion",
+    "tleap",
+    "custom-residue",
+    "amber-ff19sb",
+    "amide-interface",
+    "force-field-parameterization",
+    "computational-chemistry",
+    "topology-only",
+]
+
+[node.metadata]
+category = "Metallopeptide MD"
+tooltip = "tleap wrapper (topology only): loads fragment library, removes cap atoms, creates interface bond(s), saves complex.prmtop. Pair with ep_apply_coords for the final rst7+pdb."
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[node.platforms]
+supported = ["linux", "macos"]

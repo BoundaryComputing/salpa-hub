@@ -1,0 +1,34 @@
+[package]
+name = "mdock-ligand-prep"
+version = "0.1.0"
+description = "Canonicalize a metal-complex XYZ (OpenBabel) and build its molecular graph — MetalDock pipeline step 2"
+author = "BoCoFlow / MetalDock"
+license = "LGPL-2.1"
+
+[node]
+class_name = "MdockLigandPrep"
+display_name = "Ligand Prep"
+shared_environment = "metaldock_vwf"
+num_in = 1
+num_out = 1
+category = "Metal Docking"
+
+hashtags = [
+    "metaldock",
+    "ligand-prep",
+    "openbabel",
+    "molecular-graph",
+    "metal-complex",
+    "xyz",
+    "molecular-docking",
+    "computational-chemistry",
+]
+
+[node.metadata]
+tooltip = "Metal-complex XYZ → canonicalize (OpenBabel) → molecular graph (JSON)"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false

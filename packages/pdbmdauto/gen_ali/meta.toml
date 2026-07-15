@@ -1,0 +1,38 @@
+[package]
+name = "gen-ali"
+version = "1.0.0"
+description = "Generate alignment files for homology modeling from PDB structure and FASTA sequences"
+author = "BoCoFlow Team"
+license = "MIT"
+
+[node]
+class_name = "GenAli"
+display_name = "Generate Alignment"
+shared_environment = "pdbmdauto"
+num_in = 1
+num_out = 1
+hashtags = [
+    "alignment",
+    "homology-modeling",
+    "pdb",
+    "fasta",
+    "sequence-alignment",
+    "structure-preparation",
+    "missing-residues",
+    "promod3",
+    "modeller",
+    "bioinformatics",
+]
+
+[node.metadata]
+category = "Structure Preparation"
+tooltip = "Generates per-chain alignment files (.ali) for homology modeling. Maps present PDB residues against missing residues to create template/target alignment pairs."
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+
+[node.platforms]
+supported = ["linux", "macos", "windows"]

@@ -1,0 +1,655 @@
+{
+  "version": "2.0",
+  "template_info": {
+    "id": "hello-world-pipeline",
+    "name": "Hello World Pipeline",
+    "description": "A 3-node workflow that encrypts, decrypts, and reveals a secret message using a Caesar cipher. Demonstrates multi-node pipelines, data flow via case_name, and file-based communication between nodes.",
+    "required_packages": [
+      "hello-world-pipeline"
+    ],
+    "category": "getting-started",
+    "difficulty": "beginner",
+    "tags": [
+      "hello-world",
+      "pipeline",
+      "tutorial",
+      "beginner",
+      "multi-node",
+      "workflow-template"
+    ],
+    "author": "BoCoFlow Development Team",
+    "estimated_time": "2 minutes"
+  },
+  "metadata": {
+    "workflowId": "27be7603-55f4-4c34-9661-7849da6f521a",
+    "name": "Hello World Pipeline",
+    "environment": "local",
+    "status": "draft",
+    "createdAt": "2026-03-29T13:54:09.404Z",
+    "updatedAt": "2026-03-29T14:00:58.008Z"
+  },
+  "react": {
+    "id": "27be7603-55f4-4c34-9661-7849da6f521a",
+    "offsetX": 0,
+    "offsetY": 1,
+    "zoom": 100,
+    "gridSize": 20,
+    "layers": [
+      {
+        "id": "5898f06f-fc89-41d9-a132-827adeec986f",
+        "type": "diagram-links",
+        "isSvg": true,
+        "transformed": true,
+        "models": {
+          "450fdbc4-3845-4dfd-9f43-c46ecc3a4b9a": {
+            "id": "450fdbc4-3845-4dfd-9f43-c46ecc3a4b9a",
+            "type": "vp-link",
+            "selected": false,
+            "source": "e73ecc9d-3324-437a-8384-d9fbb33f7cd0",
+            "sourcePort": "b57aa0bc-2525-43c6-9c23-c4abcff82ee0",
+            "target": "4f72e3b8-284b-47f0-a494-fb964acb9e6b",
+            "targetPort": "2f9063dc-be4b-45f1-9ea9-4a2e97be55f5",
+            "points": [
+              {
+                "id": "1b7f2f7d-c844-4b5e-bc2b-cd9c4032bd54",
+                "type": "point",
+                "x": 659.0002999999999,
+                "y": 225
+              },
+              {
+                "id": "9c8077fd-aa25-4f71-9351-cf33e903de4a",
+                "type": "point",
+                "x": 501.0002999999999,
+                "y": 405
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "5dae1162-62fb-4f87-97b2-57e7e6d77e51": {
+            "id": "5dae1162-62fb-4f87-97b2-57e7e6d77e51",
+            "type": "vp-link",
+            "selected": false,
+            "source": "4f72e3b8-284b-47f0-a494-fb964acb9e6b",
+            "sourcePort": "5133aaa2-09be-4ade-8d70-1ddc454db6b4",
+            "target": "34b26943-b530-4098-b252-d6c03d709b97",
+            "targetPort": "0766f5cd-1333-49ac-9282-18dd18052892",
+            "points": [
+              {
+                "id": "01cf79a4-0946-447d-85e0-144fc4140722",
+                "type": "point",
+                "x": 659.0002999999999,
+                "y": 405
+              },
+              {
+                "id": "75cd511b-5709-4d45-befa-b9d0e9e43882",
+                "type": "point",
+                "x": 501.0002999999999,
+                "y": 583
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          }
+        }
+      },
+      {
+        "id": "ea739d8c-0c14-49b4-9aa9-935c1936a6af",
+        "type": "diagram-nodes",
+        "isSvg": false,
+        "transformed": true,
+        "models": {
+          "e73ecc9d-3324-437a-8384-d9fbb33f7cd0": {
+            "id": "e73ecc9d-3324-437a-8384-d9fbb33f7cd0",
+            "type": "custom-node",
+            "selected": false,
+            "x": 500.00059999999985,
+            "y": 200,
+            "ports": [
+              {
+                "id": "f21041fe-f295-4298-bdde-39890dc9f754",
+                "type": "default",
+                "x": 500.00059999999985,
+                "y": 200,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "e73ecc9d-3324-437a-8384-d9fbb33f7cd0",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "4758b134-b839-4f52-91f0-adb0b3a09187",
+                "type": "default",
+                "x": 497.0002999999999,
+                "y": 221,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "e73ecc9d-3324-437a-8384-d9fbb33f7cd0",
+                "links": [],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "b57aa0bc-2525-43c6-9c23-c4abcff82ee0",
+                "type": "default",
+                "x": 655.0002999999999,
+                "y": 221,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "e73ecc9d-3324-437a-8384-d9fbb33f7cd0",
+                "links": [
+                  "450fdbc4-3845-4dfd-9f43-c46ecc3a4b9a"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "e73ecc9d-3324-437a-8384-d9fbb33f7cd0",
+              "node_key": "HelloEncrypt",
+              "name": "Hello Encrypt",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Encrypts a message using a Caesar cipher and writes the ciphertext to a file",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Hello World",
+              "tags": [],
+              "package_name": "hello-encrypt",
+              "hashtags": [
+                "hello-world",
+                "encryption",
+                "starter",
+                "template",
+                "tutorial",
+                "text-output",
+                "beginner"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "\ud83d\udce6"
+              },
+              "doc": "\n    Encrypts a plaintext message using a Caesar cipher.\n\n    Input: Optional predecessor data (uses case_name from upstream if available)\n    Output: A text file containing the encrypted message\n    ",
+              "options": {
+                "case_name": null,
+                "message": "Hello from BoCoFlow!",
+                "shift": 3,
+                "output_dir": null,
+                "force_to_run": true
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": null,
+                  "docstring": "Name for this case (used in output file names). If left empty, uses predecessor data or defaults to 'secret'."
+                },
+                "message": {
+                  "type": "string",
+                  "label": "Message",
+                  "value": "Hello from BoCoFlow!",
+                  "docstring": "The plaintext message to encrypt."
+                },
+                "shift": {
+                  "type": "int",
+                  "label": "Cipher Shift",
+                  "value": 3,
+                  "docstring": "Number of positions to shift each letter (1-25). Classic Caesar cipher uses 3."
+                },
+                "output_dir": {
+                  "type": "folder",
+                  "label": "Output Directory",
+                  "value": null,
+                  "docstring": "Directory where the encrypted file will be written."
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": true,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "type": "custom-node",
+              "node_id": "e73ecc9d-3324-437a-8384-d9fbb33f7cd0",
+              "status": "configured",
+              "selected": false,
+              "config": {
+                "case_name": "demo",
+                "message": "Hello from BoCoFlow!",
+                "shift": 3,
+                "output_dir": "rel:./",
+                "force_to_run": true
+              }
+            },
+            "config": {
+              "case_name": null,
+              "message": "Hello from BoCoFlow!",
+              "shift": 3,
+              "output_dir": null,
+              "force_to_run": true
+            }
+          },
+          "4f72e3b8-284b-47f0-a494-fb964acb9e6b": {
+            "id": "4f72e3b8-284b-47f0-a494-fb964acb9e6b",
+            "type": "custom-node",
+            "selected": false,
+            "x": 500.00059999999985,
+            "y": 380,
+            "ports": [
+              {
+                "id": "a608ea48-214f-4952-82fc-152fb9cdaf41",
+                "type": "default",
+                "x": 500.00059999999985,
+                "y": 380,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "4f72e3b8-284b-47f0-a494-fb964acb9e6b",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "2f9063dc-be4b-45f1-9ea9-4a2e97be55f5",
+                "type": "default",
+                "x": 497.0002999999999,
+                "y": 401,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "4f72e3b8-284b-47f0-a494-fb964acb9e6b",
+                "links": [
+                  "450fdbc4-3845-4dfd-9f43-c46ecc3a4b9a"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "5133aaa2-09be-4ade-8d70-1ddc454db6b4",
+                "type": "default",
+                "x": 655.0002999999999,
+                "y": 401,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "4f72e3b8-284b-47f0-a494-fb964acb9e6b",
+                "links": [
+                  "5dae1162-62fb-4f87-97b2-57e7e6d77e51"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "4f72e3b8-284b-47f0-a494-fb964acb9e6b",
+              "node_key": "HelloDecrypt",
+              "name": "Hello Decrypt",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Decrypts a Caesar-cipher message from a file and writes the plaintext",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Hello World",
+              "tags": [],
+              "package_name": "hello-decrypt",
+              "hashtags": [
+                "hello-world",
+                "decryption",
+                "starter",
+                "template",
+                "tutorial",
+                "text-output",
+                "beginner"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "\ud83d\udce6"
+              },
+              "doc": "\n    Decrypts a Caesar-cipher message from an encrypted file.\n\n    Input: Predecessor data with case_name (to locate the encrypted file)\n    Output: A text file containing the decrypted plaintext\n    ",
+              "options": {
+                "case_name": null,
+                "shift": 3,
+                "input_dir": null,
+                "output_dir": null,
+                "force_to_run": true
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": null,
+                  "docstring": "Name for this case (used to find the encrypted file). If left empty, uses predecessor data or defaults to 'secret'."
+                },
+                "shift": {
+                  "type": "int",
+                  "label": "Cipher Shift",
+                  "value": 3,
+                  "docstring": "Number of positions to reverse-shift each letter (1-25). Must match the shift used for encryption."
+                },
+                "input_dir": {
+                  "type": "folder",
+                  "label": "Input Directory",
+                  "value": null,
+                  "docstring": "Directory where the encrypted file is located."
+                },
+                "output_dir": {
+                  "type": "folder",
+                  "label": "Output Directory",
+                  "value": null,
+                  "docstring": "Directory where the decrypted file will be written."
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": true,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "type": "custom-node",
+              "node_id": "4f72e3b8-284b-47f0-a494-fb964acb9e6b",
+              "status": "configured",
+              "selected": false,
+              "config": {
+                "case_name": "demo",
+                "shift": 3,
+                "input_dir": "rel:./",
+                "output_dir": "rel:./",
+                "force_to_run": true
+              }
+            },
+            "config": {
+              "case_name": null,
+              "shift": 3,
+              "input_dir": null,
+              "output_dir": null,
+              "force_to_run": true
+            }
+          },
+          "34b26943-b530-4098-b252-d6c03d709b97": {
+            "id": "34b26943-b530-4098-b252-d6c03d709b97",
+            "type": "custom-node",
+            "selected": false,
+            "x": 500.00059999999985,
+            "y": 560,
+            "ports": [
+              {
+                "id": "1e151e8c-25f7-428d-bcd3-1d57b71c4c9a",
+                "type": "default",
+                "x": 500.00059999999985,
+                "y": 560,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "34b26943-b530-4098-b252-d6c03d709b97",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "0766f5cd-1333-49ac-9282-18dd18052892",
+                "type": "default",
+                "x": 497.0002999999999,
+                "y": 579,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "34b26943-b530-4098-b252-d6c03d709b97",
+                "links": [
+                  "5dae1162-62fb-4f87-97b2-57e7e6d77e51"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "a3c9bbb6-7955-4ce2-9ee2-1f7bfe43d7ba",
+                "type": "default",
+                "x": 655.0002999999999,
+                "y": 579,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "34b26943-b530-4098-b252-d6c03d709b97",
+                "links": [],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "34b26943-b530-4098-b252-d6c03d709b97",
+              "node_key": "HelloReveal",
+              "name": "Hello Reveal",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Generates a visual report comparing encrypted and decrypted messages",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Hello World",
+              "tags": [],
+              "package_name": "hello-reveal",
+              "hashtags": [
+                "hello-world",
+                "visualization",
+                "report",
+                "starter",
+                "template",
+                "tutorial",
+                "beginner"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "\ud83d\udce6"
+              },
+              "doc": "\n    Generates a visual comparison report for encrypted vs decrypted messages.\n\n    Input: Predecessor data with case_name (to locate the encrypted/decrypted files)\n    Output: A formatted visual report file\n    ",
+              "options": {
+                "case_name": null,
+                "input_dir": null,
+                "output_dir": null,
+                "report_style": "detailed",
+                "force_to_run": true
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": null,
+                  "docstring": "Name for this case (used to find the encrypted/decrypted files). If left empty, uses predecessor data or defaults to 'secret'."
+                },
+                "input_dir": {
+                  "type": "folder",
+                  "label": "Input Directory",
+                  "value": null,
+                  "docstring": "Directory where the encrypted and decrypted files are located."
+                },
+                "output_dir": {
+                  "type": "folder",
+                  "label": "Output Directory",
+                  "value": null,
+                  "docstring": "Directory where the reveal report will be written."
+                },
+                "report_style": {
+                  "type": "select",
+                  "label": "Report Style",
+                  "value": "detailed",
+                  "docstring": "Visual style for the report: 'box' for a compact framed summary, 'detailed' for character-by-character analysis.",
+                  "options": [
+                    "box",
+                    "detailed"
+                  ]
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": true,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "type": "custom-node",
+              "node_id": "34b26943-b530-4098-b252-d6c03d709b97",
+              "status": "configured",
+              "selected": false,
+              "config": {
+                "case_name": "demo",
+                "input_dir": "rel:./",
+                "output_dir": "rel:./",
+                "report_style": "detailed",
+                "force_to_run": true
+              }
+            },
+            "config": {
+              "case_name": null,
+              "input_dir": null,
+              "output_dir": null,
+              "report_style": "detailed",
+              "force_to_run": true
+            }
+          }
+        }
+      }
+    ]
+  },
+  "settings": {
+    "workingPath": ""
+  },
+  "graph": {
+    "directed": true,
+    "multigraph": false,
+    "graph": {},
+    "nodes": [
+      {
+        "name": "Hello Encrypt",
+        "node_id": "e73ecc9d-3324-437a-8384-d9fbb33f7cd0",
+        "node_key": "HelloEncrypt",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "demo",
+          "message": "Hello from BoCoFlow!",
+          "shift": 3,
+          "output_dir": "rel:./",
+          "force_to_run": true
+        },
+        "package_name": "hello-encrypt",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "configured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "general",
+        "tags": [
+          "hello-world",
+          "encryption",
+          "starter",
+          "template",
+          "tutorial",
+          "text-output",
+          "beginner"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "option_replace": {},
+        "id": "e73ecc9d-3324-437a-8384-d9fbb33f7cd0"
+      },
+      {
+        "name": "Hello Decrypt",
+        "node_id": "4f72e3b8-284b-47f0-a494-fb964acb9e6b",
+        "node_key": "HelloDecrypt",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "demo",
+          "shift": 3,
+          "input_dir": "rel:./",
+          "output_dir": "rel:./",
+          "force_to_run": true
+        },
+        "package_name": "hello-decrypt",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "configured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "general",
+        "tags": [
+          "hello-world",
+          "decryption",
+          "starter",
+          "template",
+          "tutorial",
+          "text-output",
+          "beginner"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "option_replace": {},
+        "id": "4f72e3b8-284b-47f0-a494-fb964acb9e6b"
+      },
+      {
+        "name": "Hello Reveal",
+        "node_id": "34b26943-b530-4098-b252-d6c03d709b97",
+        "node_key": "HelloReveal",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "demo",
+          "input_dir": "rel:./",
+          "output_dir": "rel:./",
+          "report_style": "detailed",
+          "force_to_run": true
+        },
+        "package_name": "hello-reveal",
+        "from_registry": true,
+        "data": null,
+        "is_global": false,
+        "status": "configured",
+        "num_in": 1,
+        "num_out": 1,
+        "category": "general",
+        "tags": [
+          "hello-world",
+          "visualization",
+          "report",
+          "starter",
+          "template",
+          "tutorial",
+          "beginner"
+        ],
+        "custom_nodes_dir": null,
+        "_node_dir": "",
+        "option_replace": {},
+        "id": "34b26943-b530-4098-b252-d6c03d709b97"
+      }
+    ],
+    "links": [
+      {
+        "source": "e73ecc9d-3324-437a-8384-d9fbb33f7cd0",
+        "target": "4f72e3b8-284b-47f0-a494-fb964acb9e6b"
+      },
+      {
+        "source": "4f72e3b8-284b-47f0-a494-fb964acb9e6b",
+        "target": "34b26943-b530-4098-b252-d6c03d709b97"
+      }
+    ]
+  },
+  "flow_vars": {
+    "directed": true,
+    "multigraph": false,
+    "graph": {},
+    "nodes": [],
+    "links": []
+  }
+}

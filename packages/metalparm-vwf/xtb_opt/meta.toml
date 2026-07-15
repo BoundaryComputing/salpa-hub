@@ -1,0 +1,38 @@
+[package]
+name = "xtb-opt"
+version = "0.1.0"
+description = "GFN-xTB geometry optimization (semi-empirical, local). Fast pre-optimizer for metal-containing fragments before the expensive ep_orca_run DFT step."
+author = "BoCoFlow / metalparm"
+license = "LGPL-2.1"
+
+[node]
+class_name = "XtbOpt"
+display_name = "xTB Opt"
+shared_environment = "metalparm_vwf"
+num_in = 1
+num_out = 1
+
+hashtags = [
+    "xtb",
+    "gfn",
+    "gfn2-xtb",
+    "geometry-optimization",
+    "semi-empirical",
+    "pre-optimization",
+    "metal-complex",
+    "computational-chemistry",
+]
+
+[node.metadata]
+category = "Force Field Parameterization"
+tooltip = "Fast semi-empirical geometry optimization with GFN2-xTB. Sits between snp_builder and ep_orca_run to seed DFT with a near-minimum structure."
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+estimated_runtime = "Seconds to minutes (size-dependent; ~1 min for 100 atoms)"
+
+[node.platforms]
+supported = ["linux", "macos"]

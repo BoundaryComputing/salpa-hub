@@ -1,0 +1,39 @@
+[project]
+name = "pdbmdauto"
+version = "1.0.0"
+description = "Shared environment for PDBmdAuto workflow nodes"
+channels = ["conda-forge", "bioconda"]
+# win-64 not supported: gromacs and promod3 have no Windows conda packages.
+# Windows users need Docker or WSL2 — see issue #48.
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+
+[dependencies]
+python = ">=3.9,<3.13"
+pip = "*"
+# Shared across homology modeling nodes
+biopython = ">=1.80"
+requests = "*"
+# Redis for stream_log() in PIXI_SUBPROCESS
+redis-py = ">=5.0.0"
+
+# GROMACS for MD preparation nodes
+gromacs = ">=2023"
+promod3 = ">=3.5"            # fix_residues_promod3 (from bioconda, Apache 2.0)
+
+# Protonation state prediction for pka_gmx_em
+pdb2pqr = ">=3.0"            # PDB2PQR + PROPKA (pH-dependent protonation)
+propka = ">=3.5"             # pKa predictor (dependency of pdb2pqr, explicit for clarity)
+
+# NOTE: GromacsWrapper removed — `import gromacs` prints config NOTEs to stdout,
+# corrupting node_runner JSON output. gen_gmx_ndx now writes NDX manually.
+
+[tasks]
+test = "pixi run -e dev pytest tests/ -v"
+
+[feature.dev.dependencies]
+pytest = ">=7.0"
+pytest-cov = "*"
+
+[environments]
+default = []
+dev = ["dev"]

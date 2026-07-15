@@ -1,0 +1,34 @@
+[package]
+name = "mdock-protein-prep"
+version = "0.1.0"
+description = "Clean a protein PDB, protonate with pdb2pqr, and convert to PDBQT (prepare_receptor4) — MetalDock pipeline step 1"
+author = "BoCoFlow / MetalDock"
+license = "LGPL-2.1"
+
+[node]
+class_name = "MdockProteinPrep"
+display_name = "Protein Prep"
+shared_environment = "metaldock_vwf"
+num_in = 0
+num_out = 1
+category = "Metal Docking"
+
+hashtags = [
+    "metaldock",
+    "protein-prep",
+    "pdb2pqr",
+    "pdbqt",
+    "mgltools",
+    "receptor",
+    "molecular-docking",
+    "computational-chemistry",
+]
+
+[node.metadata]
+tooltip = "Protein PDB → protonate (pdb2pqr) → clean → receptor PDBQT (prepare_receptor4)"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
