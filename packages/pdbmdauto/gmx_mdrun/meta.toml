@@ -128,10 +128,6 @@ cluster_compatibility = "Works with any SLURM cluster - user adapts script to th
 state_persistence = "Job status tracked for resumable execution"
 file_transfer = "Automatic upload of inputs and download of outputs for HPC jobs"
 
-[dependencies]
-python = ">=3.9"
-# Note: GROMACS is installed via pixi (conda-forge) for local execution
-# For HPC: GROMACS is expected to be available via module load
 
 [compatibility]
 platforms = ["linux", "macos"]

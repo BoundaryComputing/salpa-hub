@@ -70,9 +70,6 @@ long_running = true
 default_timeout = 3600              # 1 hour — production MD
 estimated_runtime = "Seconds to hours (depends on system size)"
 
-[dependencies]
-python = ">=3.9"
-# Note: GROMACS is installed via pixi (conda-forge)
 
 [compatibility]
 platforms = ["linux", "macos"]

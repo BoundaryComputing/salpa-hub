@@ -43,8 +43,6 @@ requires_gpu = false
 parallel_capable = false
 long_running = false
 
-[dependencies]
-python = ">=3.9"
 
 [compatibility]
 platforms = ["linux", "macos", "windows"]
