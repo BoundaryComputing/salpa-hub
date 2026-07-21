@@ -63,6 +63,12 @@ parallel_capable = true
 long_running = false
 estimated_runtime = "< 5 seconds"
 
+# Kept deliberately, unlike the other members' blocks (#65).
+# Multi-node members normally declare no dependencies — theirs live in the shared
+# pixi.toml — and the python-only blocks on the other members were removed because
+# node_schema/extractor.py filters `python` out, making them provably inert.
+# This one also carries pdb-tools, which the extractor DOES surface to the Copilot,
+# so removing it would lose real information about what this node uses.
 [dependencies]
 python = ">=3.9"
 pdb-tools = ">=2.5.0"
