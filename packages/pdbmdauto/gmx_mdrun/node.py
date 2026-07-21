@@ -55,7 +55,6 @@ import glob
 import json
 import os
 from datetime import datetime
-from pathlib import Path
 from typing import Dict, List
 
 from bocoflow_core.hpc_node import HPCNodeBase
@@ -105,13 +104,6 @@ class GmxMdRun(HPCNodeBase):
     num_in = 1
     num_out = 1
 
-    # Environment specification for Pixi subprocess execution
-    # GROMACS is installed in the pixi environment defined by pixi.toml
-    ENVIRONMENT = {
-        "type": "pixi",
-        "name": "gmx-mdrun",
-        "pixi_toml": str(Path(__file__).parent / "pixi.toml"),
-    }
 
     # Node options: Combine HPC options with node-specific options
     OPTIONS = {
