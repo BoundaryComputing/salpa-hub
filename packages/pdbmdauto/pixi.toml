@@ -49,3 +49,19 @@ pytest-cov = "*"
 [environments]
 default = []
 dev = ["dev"]
+test = ["test"]
+
+# The environment `salpa validate`'s import checks and `salpa smoke` look for.
+#
+# Without it both verbs SKIP on this package — they said so honestly and were
+# never able to check a single node. The default environment carries the science
+# tooling but deliberately has no bocoflow_core: the app injects the full runtime
+# when it executes a node, and a copy in the default env would shadow it.
+#
+# `test` inherits the default feature, so it gets the science tooling AND the
+# authoring API. The SDK belongs here and nowhere else.
+[feature.test.dependencies]
+pytest = ">=7.0"
+
+[feature.test.pypi-dependencies]
+bocoflow-core-sdk = ">=0.1.2"
