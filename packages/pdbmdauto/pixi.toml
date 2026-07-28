@@ -24,12 +24,16 @@ promod3 = ">=3.5"            # fix_residues_promod3 (from bioconda, Apache 2.0)
 pdb2pqr = ">=3.0"            # PDB2PQR + PROPKA (pH-dependent protonation)
 propka = ">=3.5"             # pKa predictor (dependency of pdb2pqr, explicit for clarity)
 
-# Required by pdbmdauto's own members — pdb_tools_clean, pdb2pqr and
+# Required by pdbmdauto's own members — pdb2pqr and
 # pdb_fasta_biopython are full members of this package (listed in package.toml) and
 # run in THIS shared env, exactly like every other member. Do NOT trim these:
 # removing them breaks pdb2pqr at runtime (see issue #64). Their per-node pixi.toml
 # files are vestigial and never read — the registry resolves shared_environment first.
-pdb-tools = ">=2.5"          # pdb_tools_clean CLI helpers
+pdb-tools = ">=2.5"          # was pdb_tools_clean's; that node is gone (issue #73) and
+                             # nothing else calls the CLI. DELIBERATELY KEPT: the warning
+                             # above is a scar from #64, where trimming this block broke
+                             # pdb2pqr at runtime. Removing it is a separate change that
+                             # needs an environment rebuild to verify, not a tidy-up.
 mdanalysis = ">=2.0"         # pdb2pqr needs this at runtime
 
 # NOTE: GromacsWrapper removed — `import gromacs` prints config NOTEs to stdout,

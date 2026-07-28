@@ -15,7 +15,6 @@ nodes = [
     "merge_pdb_chains",
     "fix_residues_promod3",
     # Structure preparation
-    "pdb_tools_clean",
     "pdb2pqr",
     "pka_gmx_em",
     # MD preparation

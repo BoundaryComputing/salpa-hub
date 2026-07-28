@@ -31,11 +31,23 @@ try:
         run_pdb2pqr,
     )
 except ImportError:
-    # Server environment: pdb2pqr not installed.
-    # OPTIONS still work — functions only called in PIXI_SUBPROCESS.
-    build_pdb2pqr_command = convert_pqr_to_pdb = None
-    extract_pqr_statistics = find_pdb2pqr_executable = run_pdb2pqr = None
-
+    # Stage 2. node_runner puts the node's directory on sys.path and imports
+    # node.py as a TOP-LEVEL module, so there is no package for `.core` to be
+    # relative to. Without this the next stage ran instead and every symbol
+    # below was None by the time execute() called it.
+    try:
+        from core import (
+            build_pdb2pqr_command,
+            convert_pqr_to_pdb,
+            extract_pqr_statistics,
+            find_pdb2pqr_executable,
+            run_pdb2pqr,
+        )
+    except ImportError:
+        # Server environment: pdb2pqr not installed.
+        # OPTIONS still work — functions only called in PIXI_SUBPROCESS.
+        build_pdb2pqr_command = convert_pqr_to_pdb = None
+        extract_pqr_statistics = find_pdb2pqr_executable = run_pdb2pqr = None
 
 class PDB2PQR(Node):
     """

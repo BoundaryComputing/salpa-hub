@@ -65,10 +65,16 @@ from bocoflow_core.parameters import BooleanParameter, FileParameterEdit, String
 try:
     from .core import run_md_simulation
 except ImportError:
-    # Server environment: core deps not available.
-    # OPTIONS still work — functions only called at execution time.
-    run_md_simulation = None
-
+    # Stage 2. node_runner puts the node's directory on sys.path and imports
+    # node.py as a TOP-LEVEL module, so there is no package for `.core` to be
+    # relative to. Without this the next stage ran instead and every symbol
+    # below was None by the time execute() called it.
+    try:
+        from core import run_md_simulation
+    except ImportError:
+        # Server environment: core deps not available.
+        # OPTIONS still work — functions only called at execution time.
+        run_md_simulation = None
 
 class GmxMdRun(HPCNodeBase):
     """

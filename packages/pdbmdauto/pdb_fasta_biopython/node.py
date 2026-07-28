@@ -33,12 +33,26 @@ try:
         write_missing_residues_csv,
     )
 except ImportError:
-    # Server environment: BioPython not installed.
-    # OPTIONS still work — functions only called in PIXI_SUBPROCESS.
-    extract_missing_residues = extract_sequences = fetch_fasta_from_rcsb = None
-    fetch_pdb_from_rcsb = parse_pdb_structure = write_fasta_files = None
-    write_missing_residues_csv = None
-
+    # Stage 2. node_runner puts the node's directory on sys.path and imports
+    # node.py as a TOP-LEVEL module, so there is no package for `.core` to be
+    # relative to. Without this the next stage ran instead and every symbol
+    # below was None by the time execute() called it.
+    try:
+        from core import (
+            extract_missing_residues,
+            extract_sequences,
+            fetch_fasta_from_rcsb,
+            fetch_pdb_from_rcsb,
+            parse_pdb_structure,
+            write_fasta_files,
+            write_missing_residues_csv,
+        )
+    except ImportError:
+        # Server environment: BioPython not installed.
+        # OPTIONS still work — functions only called in PIXI_SUBPROCESS.
+        extract_missing_residues = extract_sequences = fetch_fasta_from_rcsb = None
+        fetch_pdb_from_rcsb = parse_pdb_structure = write_fasta_files = None
+        write_missing_residues_csv = None
 
 class PdbFastaBiopython(Node):
     """

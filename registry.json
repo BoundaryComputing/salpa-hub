@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-07-21T13:41:46.932290+00:00",
+  "generated_at": "2026-07-28T10:59:16.979189+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
@@ -663,31 +663,6 @@
             "protein-structure",
             "bioinformatics",
             "swiss-model"
-          ]
-        },
-        {
-          "name": "pdb-tools-clean",
-          "display_name": "PDB Clean (pdb-tools)",
-          "description": "Clean PDB files by selecting chains, removing HETATM records, and tidying format",
-          "class_name": "PDBToolsClean",
-          "hashtags": [
-            "pdb-cleaning",
-            "structure-preparation",
-            "chain-selection",
-            "pdb-tools",
-            "haddocking",
-            "remove-hetatm",
-            "remove-water",
-            "remove-ligands",
-            "tidy-pdb",
-            "renumber-residues",
-            "structural-biology",
-            "molecular-dynamics-prep",
-            "protein-structure",
-            "pdb-input",
-            "pdb-output",
-            "preprocessing",
-            "structure-cleanup"
           ]
         },
         {

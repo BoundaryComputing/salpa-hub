@@ -23,8 +23,14 @@ from bocoflow_core.parameters import (
 try:
     from .core import generate_ori_ndx
 except ImportError:
-    generate_ori_ndx = None
-
+    # Stage 2. node_runner puts the node's directory on sys.path and imports
+    # node.py as a TOP-LEVEL module, so there is no package for `.core` to be
+    # relative to. Without this the next stage ran instead and every symbol
+    # below was None by the time execute() called it.
+    try:
+        from core import generate_ori_ndx
+    except ImportError:
+        generate_ori_ndx = None
 
 class OriNdxBuilder(Node):
     """
