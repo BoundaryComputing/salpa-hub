@@ -1,0 +1,60 @@
+# Cloud GCP ProteinMPNN — protein sequence design from backbone structure.
+# This is a client stub that calls the BoCoFlow API Gateway → GCP Cloud Run (CPU).
+
+[package]
+name = "cloud-gcp-proteinmpnn"
+version = "1.0.0"
+description = "Protein sequence design from backbone structure using ProteinMPNN (GCP Cloud)"
+author = "BoCoFlow Team"
+license = "MIT"
+
+[node]
+shared_environment = "cloud-client"
+class_name = "CloudGcpProteinmpnn"
+module = "node"
+display_name = "ProteinMPNN Design (GCP)"
+# num_in/num_out omitted — defaults to 1
+
+# Hashtags for discovery — cloud-gcp is key for frontend filtering
+hashtags = [
+    "cloud",
+    "cloud-gcp",
+    "protein",
+    "sequence-design",
+    "inverse-folding",
+    "proteinmpnn",
+    "protein-design",
+    "pdb",
+    "fasta-output",
+]
+
+[node.metadata]
+category = "Protein Design"
+tooltip = "Design amino acid sequences from backbone structure using ProteinMPNN (GCP Cloud Run, CPU)"
+
+[node.features]
+supports_resume = false
+requires_gpu = false
+parallel_capable = false
+long_running = false
+estimated_runtime = "1-30 seconds"
+
+[node.cloud]
+provider = "gcp"
+credential_mode = "bocoflow"
+# api_gateway_endpoint = "/api/cloud/nodes/proteinmpnn/execute"
+credits_per_call = 0.01
+estimated_duration = "1-30 seconds"
+requires_login = true
+requires_gpu = false
+tier = "standard"
+
+[dependencies]
+python = ">=3.9"
+requests = ">=2.28.0"
+
+[compatibility]
+platforms = ["linux", "macos", "windows"]
+
+[documentation]
+readme = "README.md"

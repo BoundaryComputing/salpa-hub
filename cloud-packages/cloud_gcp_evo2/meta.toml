@@ -1,0 +1,62 @@
+# Cloud GCP Evo2 — DNA foundation model.
+# This is a client stub that calls the BoCoFlow API Gateway -> GCP Cloud Run (L4 GPU).
+
+[package]
+name = "cloud-gcp-evo2"
+version = "1.0.0"
+description = "DNA sequence scoring, embeddings, and generation using Evo2 on GCP (L4 GPU)"
+author = "BoCoFlow Team"
+license = "MIT"
+
+[node]
+shared_environment = "cloud-client"
+class_name = "CloudGcpEvo2"
+module = "node"
+display_name = "Evo2 DNA Model (GCP)"
+# num_in/num_out omitted — defaults to 1
+
+# Hashtags for discovery — cloud-gcp is key for frontend filtering
+hashtags = [
+    "cloud",
+    "cloud-gcp",
+    "evo2",
+    "dna",
+    "genomics",
+    "sequence-analysis",
+    "foundation-model",
+    "gpu",
+    "ai",
+    "generation",
+]
+
+[node.metadata]
+category = "Genomics"
+tooltip = "DNA sequence scoring, embeddings, and generation using Evo2 7B (GCP Cloud Run, L4 GPU)"
+
+[node.features]
+supports_resume = false
+requires_gpu = true
+gpu_type = "L4"
+parallel_capable = false
+long_running = true
+estimated_runtime = "10-60 seconds"
+
+[node.cloud]
+provider = "gcp"
+credential_mode = "bocoflow"
+api_gateway_endpoint = "/api/cloud/nodes/evo2/execute"
+credits_per_call = 0.10
+estimated_duration = "10-60 seconds"
+requires_login = true
+requires_gpu = true
+tier = "standard"
+
+[dependencies]
+python = ">=3.9"
+requests = ">=2.28.0"
+
+[compatibility]
+platforms = ["linux", "macos", "windows"]
+
+[documentation]
+readme = "README.md"

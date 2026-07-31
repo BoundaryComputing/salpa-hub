@@ -1,0 +1,64 @@
+# Cloud Modal Boltz-2 - Mode B (BoCoFlow Credits)
+# Protein structure prediction using Boltz-2 on Modal H100 GPU
+# This is a client stub that calls the API Gateway, not Modal directly.
+
+[package]
+name = "cloud-modal-boltz2"
+version = "1.0.0"
+description = "Protein structure prediction using Boltz-2 on Modal H100 GPU (BoCoFlow Credits)"
+author = "BoCoFlow Team"
+license = "MIT"
+
+[node]
+shared_environment = "cloud-client"
+class_name = "CloudModalBoltz2"
+display_name = "Boltz-2 Prediction (Modal)"
+node_type = "cloud"
+category = "protein"
+num_in = 1
+num_out = 1
+color = "purple"
+
+# cloud-modal hashtag indicates Mode B (BoCoFlow credits)
+# UI can use this to show cloud/credits indicator
+hashtags = [
+    "cloud-modal",
+    "protein",
+    "structure-prediction",
+    "boltz2",
+    "gpu",
+    "ai",
+    "h100",
+]
+
+[node.metadata]
+icon = "🧬"
+
+[node.cloud]
+provider = "modal"
+credential_mode = "bocoflow"  # Mode B - NOT "user"
+# api_gateway_endpoint = "/api/cloud/nodes/boltz2/execute"
+credits_per_call = 0.50
+estimated_duration = "3-10 minutes"
+requires_login = true
+requires_gpu = true
+gpu_type = "H100"
+
+[dependencies]
+python = ">=3.9"
+requests = ">=2.31.0"
+
+[documentation]
+usage = """
+Boltz-2 is a state-of-the-art protein structure prediction model.
+
+Input: Protein amino acid sequence (one-letter codes)
+Output: 3D structure prediction in CIF format (as tarball)
+
+Example sequence:
+MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSH
+
+This node runs on Modal's H100 GPU infrastructure and typically
+takes 3-10 minutes depending on sequence length.
+"""
+reference = "https://modal.com/docs/examples/boltz_predict"

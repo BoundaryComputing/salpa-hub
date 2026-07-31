@@ -1,0 +1,75 @@
+# Cloud Modal Chai-1 - Mode B (BoCoFlow Credits)
+# Multi-modal structure prediction using Chai-1 on Modal H100 GPU
+# This is a client stub that calls the API Gateway, not Modal directly.
+
+[package]
+name = "cloud-modal-chai1"
+version = "1.0.0"
+description = "Multi-modal structure prediction using Chai-1 on Modal H100 GPU (BoCoFlow Credits)"
+author = "BoCoFlow Team"
+license = "MIT"
+
+[node]
+shared_environment = "cloud-client"
+class_name = "CloudModalChai1"
+display_name = "Chai-1 Prediction (Modal)"
+node_type = "cloud"
+category = "protein"
+num_in = 1
+num_out = 1
+color = "purple"
+
+# cloud-modal hashtag indicates Mode B (BoCoFlow credits)
+# UI can use this to show cloud/credits indicator
+hashtags = [
+    "cloud-modal",
+    "protein",
+    "structure-prediction",
+    "chai1",
+    "gpu",
+    "ai",
+    "h100",
+    "ligand",
+    "complex",
+]
+
+[node.metadata]
+icon = "🧬"
+
+[node.cloud]
+provider = "modal"
+credential_mode = "bocoflow"  # Mode B - NOT "user"
+# api_gateway_endpoint = "/api/cloud/nodes/chai1/execute"
+credits_per_call = 0.50
+estimated_duration = "3-15 minutes"
+requires_login = true
+requires_gpu = true
+gpu_type = "H100"
+
+[dependencies]
+python = ">=3.9"
+requests = ">=2.31.0"
+
+[documentation]
+usage = """
+Chai-1 is a multi-modal foundation model for molecular structure prediction.
+
+It can predict 3D structures of:
+- Proteins (from amino acid sequences)
+- Protein-ligand complexes (protein + SMILES)
+- Protein-nucleic acid complexes (protein + DNA/RNA)
+- Multi-chain complexes
+
+Input: FASTA-format with entity type annotations, or simple protein sequence
+Output: 3D structure predictions in CIF format (5 diffusion samples)
+
+Example FASTA input:
+>protein|name=example
+MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSH
+>ligand|name=aspirin
+CC(=O)OC1=CC=CC=C1C(=O)O
+
+This node runs on Modal's H100 GPU infrastructure and typically
+takes 3-15 minutes depending on complex size.
+"""
+reference = "https://github.com/chaidiscovery/chai-lab"

@@ -1,0 +1,65 @@
+# Cloud Modal DiffDock - Mode B (BoCoFlow Credits)
+# Blind protein-ligand docking using DiffDock on Modal A10G GPU
+# This is a client stub that calls the API Gateway, not Modal directly.
+
+[package]
+name = "cloud-modal-diffdock"
+version = "1.0.0"
+description = "Blind protein-ligand docking using DiffDock on Modal A10G GPU (BoCoFlow Credits)"
+author = "BoCoFlow Team"
+license = "MIT"
+
+[node]
+shared_environment = "cloud-client"
+class_name = "CloudModalDiffdock"
+display_name = "DiffDock Docking (Modal)"
+node_type = "cloud"
+category = "drug-discovery"
+num_in = 1
+num_out = 1
+color = "purple"
+
+# cloud-modal hashtag indicates Mode B (BoCoFlow credits)
+# UI can use this to show cloud/credits indicator
+hashtags = [
+    "cloud-modal",
+    "docking",
+    "diffdock",
+    "protein-ligand",
+    "drug-discovery",
+    "gpu",
+    "ai",
+    "a10g",
+    "molecular-docking",
+]
+
+[node.metadata]
+icon = "💊"
+
+[node.cloud]
+provider = "modal"
+credential_mode = "bocoflow"  # Mode B - NOT "user"
+api_gateway_endpoint = "/api/cloud/nodes/modal-diffdock/execute"
+credits_per_call = 0.10
+estimated_duration = "30-120 seconds"
+requires_login = true
+requires_gpu = true
+gpu_type = "A10G"
+
+[dependencies]
+python = ">=3.9"
+requests = ">=2.31.0"
+
+[documentation]
+usage = """
+DiffDock is a generative diffusion model for blind protein-ligand docking.
+
+Input: Protein PDB + Ligand (SMILES or SDF)
+Output: Ranked binding poses as SDF files (in tarball)
+
+Example SMILES (Aspirin): CC(=O)Oc1ccccc1C(=O)O
+
+This node runs on Modal's A10G GPU infrastructure and typically
+takes 30-120 seconds depending on protein/ligand complexity.
+"""
+reference = "https://github.com/gcorso/DiffDock"
