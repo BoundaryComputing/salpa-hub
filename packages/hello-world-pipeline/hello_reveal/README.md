@@ -38,17 +38,17 @@ Includes character-by-character mapping and statistics:
 
 --------------------------------------------------
   ENCRYPTED:
-    Khoor iurp ErFrIorz!
+    Khoor iurp Vdosd!
 
   DECRYPTED:
-    Hello from BoCoFlow!
+    Hello from Salpa!
 
 --------------------------------------------------
   CHARACTER MAPPING:
 
-    Encrypted:  Khoor iurp ErFrIorz!
+    Encrypted:  Khoor iurp Vdosd!
                 ||||||||||||||||||||
-    Decrypted:  Hello from BoCoFlow!
+    Decrypted:  Hello from Salpa!
 
 --------------------------------------------------
   STATISTICS:
@@ -71,8 +71,8 @@ Compact framed summary:
 +------------------------------------------+
 |  Case:       demo                        |
 |  Cipher:     Caesar (shift=3)            |
-|  Encrypted:  Khoor iurp ErFrIorz!       |
-|  Decrypted:  Hello from BoCoFlow!        |
+|  Encrypted:  Khoor iurp Vdosd!           |
+|  Decrypted:  Hello from Salpa!           |
 |  Status:     Match verified              |
 +==========================================+
 ```

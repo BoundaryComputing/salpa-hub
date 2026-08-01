@@ -1,6 +1,6 @@
 # Hello World Pipeline
 
-A 3-node workflow that encrypts, decrypts, and reveals a secret message using a Caesar cipher. This is the simplest multi-node pipeline in BoCoFlow — designed to teach you how workflows work without any external dependencies.
+A 3-node workflow that encrypts, decrypts, and reveals a secret message using a Caesar cipher. This is the simplest multi-node pipeline in Salpa — designed to teach you how workflows work without any external dependencies.
 
 ## What You'll Learn
 
@@ -26,7 +26,7 @@ A 3-node workflow that encrypts, decrypts, and reveals a secret message using a 
 
 ### Option A: Load from Template (recommended)
 
-1. Open the **Load Workflow** dialog in the BoCoFlow canvas
+1. Open the **Load Workflow** dialog in the Salpa canvas
 2. Switch to the **Templates** tab
 3. Find **"Hello World Pipeline"** and click **Load**
 4. All three nodes are pre-wired and configured — just click **Execute All**
@@ -35,12 +35,12 @@ The bundled workflow template (`workflows/hello-world-pipeline.json`) sets up th
 
 ### Option B: Build Manually
 
-1. **Create a new workflow** in the BoCoFlow canvas
+1. **Create a new workflow** in the Salpa canvas
 2. **Add the three nodes** from the node palette (search "hello")
 3. **Connect them** in order: Encrypt → Decrypt → Reveal
 4. **Configure** each node:
    - Set all `Output Directory` / `Input Directory` fields to `rel:./` (the workflow's working folder)
-   - On the Encrypt node, set your `Message` (e.g., "Hello from BoCoFlow!") and `Cipher Shift` (default: 3)
+   - On the Encrypt node, set your `Message` (e.g., "Hello from Salpa!") and `Cipher Shift` (default: 3)
    - On the Decrypt node, set the same `Cipher Shift` value
    - Set a `Case Name` on the first node (e.g., "demo") — it will flow to downstream nodes automatically
 5. **Execute** the workflow — click Execute on each node in order, or use Execute All
@@ -67,17 +67,17 @@ demo_reveal.txt       ← Visual comparison report
 
 --------------------------------------------------
   ENCRYPTED:
-    Khoor iurp ErFrIorz!
+    Khoor iurp Vdosd!
 
   DECRYPTED:
-    Hello from BoCoFlow!
+    Hello from Salpa!
 
 --------------------------------------------------
   CHARACTER MAPPING:
 
-    Encrypted:  Khoor iurp ErFrIorz!
+    Encrypted:  Khoor iurp Vdosd!
                 ||||||||||||||||||||
-    Decrypted:  Hello from BoCoFlow!
+    Decrypted:  Hello from Salpa!
 
 --------------------------------------------------
   STATISTICS:
@@ -97,7 +97,7 @@ demo_reveal.txt       ← Visual comparison report
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | Case Name | String | `secret` | Identifier for output files; passed to downstream nodes |
-| Message | String | `Hello from BoCoFlow!` | The plaintext message to encrypt |
+| Message | String | `Hello from Salpa!` | The plaintext message to encrypt |
 | Cipher Shift | Integer | `3` | Caesar cipher shift (1-25) |
 | Output Directory | Folder | — | Where to write the encrypted file |
 | Include Timestamp | Boolean | `true` | Add timestamp to file header |
@@ -124,7 +124,7 @@ demo_reveal.txt       ← Visual comparison report
 
 ## How Data Flows
 
-Only `case_name` is passed between nodes via BoCoFlow's predecessor data mechanism. All other parameters are configured independently on each node.
+Only `case_name` is passed between nodes via Salpa's predecessor data mechanism. All other parameters are configured independently on each node.
 
 ```
 Encrypt                    Decrypt                    Reveal
@@ -151,4 +151,4 @@ Encrypt                    Decrypt                    Reveal
 - **Package**: `hello-world-pipeline`
 - **Version**: 1.0.0
 - **License**: MIT
-- **Author**: BoCoFlow Development Team
+- **Author**: Boundary Computing

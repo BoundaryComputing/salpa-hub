@@ -17,7 +17,7 @@
       "multi-node",
       "workflow-template"
     ],
-    "author": "BoCoFlow Development Team",
+    "author": "Boundary Computing",
     "estimated_time": "2 minutes"
   },
   "metadata": {
@@ -180,7 +180,7 @@
               "doc": "\n    Encrypts a plaintext message using a Caesar cipher.\n\n    Input: Optional predecessor data (uses case_name from upstream if available)\n    Output: A text file containing the encrypted message\n    ",
               "options": {
                 "case_name": null,
-                "message": "Hello from BoCoFlow!",
+                "message": "Hello from Salpa!",
                 "shift": 3,
                 "output_dir": null,
                 "force_to_run": true
@@ -195,7 +195,7 @@
                 "message": {
                   "type": "string",
                   "label": "Message",
-                  "value": "Hello from BoCoFlow!",
+                  "value": "Hello from Salpa!",
                   "docstring": "The plaintext message to encrypt."
                 },
                 "shift": {
@@ -226,7 +226,7 @@
               "selected": false,
               "config": {
                 "case_name": "demo",
-                "message": "Hello from BoCoFlow!",
+                "message": "Hello from Salpa!",
                 "shift": 3,
                 "output_dir": "rel:./",
                 "force_to_run": true
@@ -234,7 +234,7 @@
             },
             "config": {
               "case_name": null,
-              "message": "Hello from BoCoFlow!",
+              "message": "Hello from Salpa!",
               "shift": 3,
               "output_dir": null,
               "force_to_run": true
@@ -536,7 +536,7 @@
         "filename": "node",
         "options": {
           "case_name": "demo",
-          "message": "Hello from BoCoFlow!",
+          "message": "Hello from Salpa!",
           "shift": 3,
           "output_dir": "rel:./",
           "force_to_run": true

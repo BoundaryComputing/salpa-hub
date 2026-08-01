@@ -49,7 +49,7 @@ class HelloEncrypt(Node):
         ),
         "message": StringParameter(
             "Message",
-            default="Hello from BoCoFlow!",
+            default="Hello from Salpa!",
             docstring="The plaintext message to encrypt.",
         ),
         "shift": IntegerParameter(
@@ -72,7 +72,7 @@ class HelloEncrypt(Node):
 
             # Read parameters
             case_name = flow_vars["case_name"].get_value()
-            message = flow_vars["message"].get_value() or "Hello from BoCoFlow!"
+            message = flow_vars["message"].get_value() or "Hello from Salpa!"
             shift = flow_vars["shift"].get_value()
             if shift is None:
                 shift = 3

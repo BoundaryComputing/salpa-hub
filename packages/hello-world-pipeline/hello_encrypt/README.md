@@ -6,7 +6,7 @@ Part of the [hello-world-pipeline](../README.md) package.
 
 ## What it Does
 
-1. Takes a user-provided message (default: "Hello from BoCoFlow!")
+1. Takes a user-provided message (default: "Hello from Salpa!")
 2. Applies a Caesar cipher with a configurable shift (default: 3)
 3. Writes the encrypted message to `{case_name}_encrypted.txt` with structured markers
 
@@ -15,7 +15,7 @@ Part of the [hello-world-pipeline](../README.md) package.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | Case Name | String | `secret` | Identifier for output files; passed to downstream nodes |
-| Message | String | `Hello from BoCoFlow!` | The plaintext message to encrypt |
+| Message | String | `Hello from Salpa!` | The plaintext message to encrypt |
 | Cipher Shift | Integer | `3` | Number of positions to shift each letter (1-25) |
 | Output Directory | Folder | — | Where to write the encrypted file |
 | Include Timestamp | Boolean | `true` | Add timestamp to file header |
@@ -25,14 +25,14 @@ Part of the [hello-world-pipeline](../README.md) package.
 **File**: `{case_name}_encrypted.txt`
 
 ```
-=== BoCoFlow Secret Message (Encrypted) ===
+=== Salpa Secret Message (Encrypted) ===
 
 Case: demo
 Cipher: Caesar (shift=3)
 Time: 2026-03-26T10:00:00
 
 --- CIPHERTEXT ---
-Khoor iurp ErFrIorz!
+Khoor iurp Vdosd!
 --- END ---
 ```
 

@@ -26,14 +26,14 @@ Part of the [hello-world-pipeline](../README.md) package.
 **File**: `{case_name}_decrypted.txt`
 
 ```
-=== BoCoFlow Secret Message (Decrypted) ===
+=== Salpa Secret Message (Decrypted) ===
 
 Case: demo
 Cipher: Caesar (shift=3)
 Time: 2026-03-26T10:00:01
 
 --- PLAINTEXT ---
-Hello from BoCoFlow!
+Hello from Salpa!
 --- END ---
 ```
 
