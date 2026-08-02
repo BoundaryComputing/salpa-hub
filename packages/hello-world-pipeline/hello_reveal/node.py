@@ -134,10 +134,12 @@ class HelloReveal(Node):
         ),
         "input_dir": FolderParameter(
             "Input Directory",
+            default="rel:./",
             docstring="Directory where the encrypted and decrypted files are located.",
         ),
         "output_dir": FolderParameter(
             "Output Directory",
+            default="rel:./",
             docstring="Directory where the reveal report will be written.",
         ),
         "report_style": SelectParameter(

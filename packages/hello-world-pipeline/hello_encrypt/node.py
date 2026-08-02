@@ -60,6 +60,7 @@ class HelloEncrypt(Node):
         ),
         "output_dir": FolderParameter(
             "Output Directory",
+            default="rel:./",
             docstring="Directory where the encrypted file will be written.",
         ),
     }

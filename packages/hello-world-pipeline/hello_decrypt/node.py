@@ -58,10 +58,12 @@ class HelloDecrypt(Node):
         ),
         "input_dir": FolderParameter(
             "Input Directory",
+            default="rel:./",
             docstring="Directory where the encrypted file is located.",
         ),
         "output_dir": FolderParameter(
             "Output Directory",
+            default="rel:./",
             docstring="Directory where the decrypted file will be written.",
         ),
     }
