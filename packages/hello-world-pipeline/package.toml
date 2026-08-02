@@ -1,6 +1,6 @@
 [package]
 name = "hello-world-pipeline"
-version = "1.0.0"
+version = "1.0.1"
 description = "A 3-node hello-world workflow — encrypt, decrypt, and reveal messages using a Caesar cipher. The simplest multi-node pipeline for learning Salpa."
 author = "Boundary Computing"
 license = "MIT"

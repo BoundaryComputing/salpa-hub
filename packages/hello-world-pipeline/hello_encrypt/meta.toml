@@ -8,7 +8,7 @@
 
 [package]
 name = "hello-encrypt"
-version = "1.0.0"
+version = "1.0.1"
 description = "Encrypts a message using a Caesar cipher and writes the ciphertext to a file"
 author = "Boundary Computing"
 license = "MIT"

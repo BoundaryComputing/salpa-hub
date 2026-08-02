@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-08-02T12:05:38.317287+00:00",
+  "generated_at": "2026-08-02T12:08:23.354910+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
       "name": "hello-world-pipeline",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "A 3-node hello-world workflow \u2014 encrypt, decrypt, and reveal messages using a Caesar cipher. The simplest multi-node pipeline for learning Salpa.",
       "category": "Getting Started",
       "hashtags": [
