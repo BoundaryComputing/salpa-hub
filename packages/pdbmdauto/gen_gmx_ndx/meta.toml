@@ -2,7 +2,7 @@
 name = "gen-gmx-ndx"
 version = "1.0.1"
 description = "Generate GROMACS index groups for original vs modeled residues"
-author = "Boundary Computing"
+author = "BoundaryComputing"
 license = "MIT"
 
 [node]

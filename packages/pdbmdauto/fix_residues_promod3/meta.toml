@@ -2,7 +2,7 @@
 name = "fix-residues-promod3"
 version = "1.0.1"
 description = "Fix missing residues in PDB structures using ProMod3 homology modeling engine"
-author = "Boundary Computing"
+author = "BoundaryComputing"
 license = "MIT"
 
 [node]

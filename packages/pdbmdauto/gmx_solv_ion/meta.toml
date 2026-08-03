@@ -2,7 +2,7 @@
 name = "gmx-solv-ion"
 version = "1.0.1"
 description = "GROMACS solvation and ionization — add water box and neutralize with ions"
-author = "Boundary Computing"
+author = "BoundaryComputing"
 license = "MIT"
 
 [node]

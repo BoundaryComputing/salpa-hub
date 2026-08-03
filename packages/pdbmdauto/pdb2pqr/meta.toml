@@ -2,7 +2,7 @@
 name = "pdb2pqr"
 version = "2.0.1"
 description = "Converts PDB files to PQR format with protonation states, hydrogen addition, and charge assignment using PDB2PQR. Supports PROPKA pKa predictions and multiple force fields."
-author = "Boundary Computing"
+author = "BoundaryComputing"
 license = "MIT"
 
 [package.dependencies]

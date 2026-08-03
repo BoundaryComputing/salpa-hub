@@ -2,7 +2,7 @@
 name = "md-membrane-build"
 version = "1.0.1"
 description = "Embed a dry metallopeptide GROMACS topology in a DPPC bilayer (transmembrane) via packmol-memgen + ParmEd, and emit a solvated GROMACS topology for membrane MD. Like md_solvate_gmx, the solute topology is preserved bytewise — never re-derived by tleap — so fragment-fused residues survive."
-author = "Boundary Computing / MetalParm"
+author = "BoundaryComputing / MetalParm"
 license = "LGPL-2.1"
 
 [node]

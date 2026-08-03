@@ -2,7 +2,7 @@
 name = "gen-multi-chain-ali"
 version = "1.0.1"
 description = "Merge per-chain alignment files into a single multi-chain alignment for homology modeling"
-author = "Boundary Computing"
+author = "BoundaryComputing"
 license = "MIT"
 
 [node]

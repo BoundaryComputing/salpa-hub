@@ -2,7 +2,7 @@
 name = "ori-ndx-builder"
 version = "1.0.1"
 description = "Build GROMACS index groups (OriHeavy, OriBackBone) for original vs homology-modeled residues"
-author = "Boundary Computing"
+author = "BoundaryComputing"
 license = "MIT"
 
 [node]

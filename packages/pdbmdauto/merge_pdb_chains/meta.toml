@@ -2,7 +2,7 @@
 name = "merge-pdb-chains"
 version = "1.0.1"
 description = "Merge selected PDB chains into a single structure file for homology modeling"
-author = "Boundary Computing"
+author = "BoundaryComputing"
 license = "MIT"
 
 [node]

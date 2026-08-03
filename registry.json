@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-08-03T09:40:12.401029+00:00",
+  "generated_at": "2026-08-03T11:05:34.485428+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
       "name": "hello-world-pipeline",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "description": "A 3-node hello-world workflow \u2014 encrypt, decrypt, and reveal messages using a Caesar cipher. The simplest multi-node pipeline for learning Salpa.",
       "category": "Getting Started",
       "hashtags": [
@@ -15,7 +15,7 @@
         "beginner",
         "pipeline"
       ],
-      "author": "Boundary Computing",
+      "author": "BoundaryComputing",
       "license": "MIT",
       "download_url": "packages/hello-world-pipeline",
       "nodes": [
@@ -68,7 +68,7 @@
     },
     {
       "name": "metaldock-vwf",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "description": "Visual workflow nodes for metal-protein docking: the refactored MetalDock pipeline (protein prep, ligand prep, QM/ORCA CM5 charges, ligand PDBQT with metal-aware torsion tree, AutoDock4 docking, results analysis) wired as chainable BoCoFlow nodes. Each node wraps one src/metaldock_modules function; molecular graphs are serialized to JSON between nodes.",
       "category": "Metal Docking",
       "hashtags": [
@@ -88,7 +88,7 @@
         "transition-metal",
         "computational-chemistry"
       ],
-      "author": "Boundary Computing / MetalDock",
+      "author": "BoundaryComputing / MetalDock",
       "license": "LGPL-2.1 (non-commercial: MGLTools)",
       "download_url": "packages/metaldock-vwf",
       "nodes": [
@@ -193,7 +193,7 @@
     },
     {
       "name": "metalparm-vwf",
-      "version": "1.29.1",
+      "version": "1.29.2",
       "description": "Visual workflow nodes for metal force-field parameterization: EasyParm pipeline (bond detection, MOL2 generation, ORCA local/HPC, Seminario, FF assembly, library generation) + metallopeptide fragment builder, peptide builder, pure-geometry fragment alignment, two-step fragment fuser (topology + coord-applier), AMBER \u2192 GROMACS converter, packmol-memgen-based mixed-solvent box builder, and a GROMACS-side solvator (md_solvate_gmx) that uses raw packmol + ParmEd so non-standard residues are never re-derived.",
       "category": "Force Field Parameterization",
       "hashtags": [
@@ -219,7 +219,7 @@
         "format-conversion",
         "computational-chemistry"
       ],
-      "author": "Boundary Computing / MetalParm",
+      "author": "BoundaryComputing / MetalParm",
       "license": "LGPL-2.1",
       "download_url": "packages/metalparm-vwf",
       "nodes": [
@@ -560,7 +560,7 @@
     },
     {
       "name": "pdbmdauto",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "description": "Automated protein structure preparation for molecular dynamics \u2014 homology modeling, solvation, relaxation",
       "category": "Molecular Dynamics",
       "hashtags": [
@@ -572,7 +572,7 @@
         "pdb",
         "md-simulation"
       ],
-      "author": "Boundary Computing",
+      "author": "BoundaryComputing",
       "license": "MIT",
       "download_url": "packages/pdbmdauto",
       "nodes": [
@@ -849,7 +849,7 @@
         "hello-world-pipeline"
       ],
       "file": "packages/hello-world-pipeline/workflows/hello-world-pipeline.json",
-      "author": "Boundary Computing"
+      "author": "BoundaryComputing"
     },
     {
       "id": "pdbmdauto-pipeline",
@@ -873,7 +873,7 @@
         "pdbmdauto"
       ],
       "file": "packages/pdbmdauto/workflows/pdbmdauto-pipeline.json",
-      "author": "Boundary Computing"
+      "author": "BoundaryComputing"
     }
   ]
 }

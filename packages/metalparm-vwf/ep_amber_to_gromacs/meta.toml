@@ -2,7 +2,7 @@
 name = "ep-amber-to-gromacs"
 version = "1.1.1"
 description = "Convert AMBER prmtop+rst7 to GROMACS top+gro via ParmEd"
-author = "Boundary Computing / MetalParm"
+author = "BoundaryComputing / MetalParm"
 license = "LGPL-2.1"
 
 [node]

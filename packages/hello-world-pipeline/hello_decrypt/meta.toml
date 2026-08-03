@@ -10,7 +10,7 @@
 name = "hello-decrypt"
 version = "1.0.1"
 description = "Decrypts a Caesar-cipher message from a file and writes the plaintext"
-author = "Boundary Computing"
+author = "BoundaryComputing"
 license = "MIT"
 
 [node]

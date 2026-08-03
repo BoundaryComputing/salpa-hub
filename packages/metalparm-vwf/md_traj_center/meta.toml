@@ -2,7 +2,7 @@
 name = "md-traj-center"
 version = "1.0.1"
 description = "PBC-correct an MD trajectory before analysis: make the solute (metallopeptide) whole across periodic boundaries, centre it in the box, and wrap solvent/membrane back in. The MDAnalysis equivalent of 'gmx trjconv -pbc whole -center -pbc mol'; produces a clean .xtc for md_analysis_helix / md_analysis_distance."
-author = "Boundary Computing / MetalParm"
+author = "BoundaryComputing / MetalParm"
 license = "LGPL-2.1"
 
 [node]

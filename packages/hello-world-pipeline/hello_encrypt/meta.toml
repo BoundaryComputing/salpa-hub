@@ -10,7 +10,7 @@
 name = "hello-encrypt"
 version = "1.0.1"
 description = "Encrypts a message using a Caesar cipher and writes the ciphertext to a file"
-author = "Boundary Computing"
+author = "BoundaryComputing"
 license = "MIT"
 
 [node]

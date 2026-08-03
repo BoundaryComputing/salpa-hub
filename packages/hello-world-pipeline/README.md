@@ -151,4 +151,4 @@ Encrypt                    Decrypt                    Reveal
 - **Package**: `hello-world-pipeline`
 - **Version**: 1.0.0
 - **License**: MIT
-- **Author**: Boundary Computing
+- **Author**: BoundaryComputing

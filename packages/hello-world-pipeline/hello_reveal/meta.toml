@@ -11,7 +11,7 @@
 name = "hello-reveal"
 version = "1.0.1"
 description = "Generates a visual report comparing encrypted and decrypted messages"
-author = "Boundary Computing"
+author = "BoundaryComputing"
 license = "MIT"
 
 [node]

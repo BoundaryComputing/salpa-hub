@@ -2,7 +2,7 @@
 name = "gen-ali"
 version = "1.0.1"
 description = "Generate alignment files for homology modeling from PDB structure and FASTA sequences"
-author = "Boundary Computing"
+author = "BoundaryComputing"
 license = "MIT"
 
 [node]

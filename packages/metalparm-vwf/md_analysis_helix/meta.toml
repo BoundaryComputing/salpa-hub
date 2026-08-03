@@ -2,7 +2,7 @@
 name = "md-analysis-helix"
 version = "1.0.1"
 description = "Per-frame α-helix content of a peptide along an MD trajectory, via DSSP (MDAnalysis). Reads .xtc/.trr + .tpr/.gro and writes a CSV time series of helix fraction + a per-residue helix propensity."
-author = "Boundary Computing / MetalParm"
+author = "BoundaryComputing / MetalParm"
 license = "LGPL-2.1"
 
 [node]

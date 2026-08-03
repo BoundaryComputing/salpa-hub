@@ -2,7 +2,7 @@
 name = "gmx-md-relax"
 version = "1.0.1"
 description = "GROMACS multi-step relaxation — energy minimization and NVT equilibration"
-author = "Boundary Computing"
+author = "BoundaryComputing"
 license = "MIT"
 
 [node]
