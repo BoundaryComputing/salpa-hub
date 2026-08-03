@@ -1,8 +1,8 @@
 [package]
 name = "xtb-opt"
-version = "0.1.0"
+version = "0.1.1"
 description = "GFN-xTB geometry optimization (semi-empirical, local). Fast pre-optimizer for metal-containing fragments before the expensive ep_orca_run DFT step."
-author = "BoCoFlow / metalparm"
+author = "Boundary Computing / MetalParm"
 license = "LGPL-2.1"
 
 [node]

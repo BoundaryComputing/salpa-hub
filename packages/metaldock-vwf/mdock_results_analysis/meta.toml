@@ -1,6 +1,6 @@
 [package]
 name = "mdock-results-analysis"
-version = "0.1.0"
+version = "0.1.1"
 description = "Binding energies, ligand efficiency, interacting residues, and RMSD from docking output — MetalDock pipeline step 6"
 author = "BoCoFlow / MetalDock"
 license = "LGPL-2.1"

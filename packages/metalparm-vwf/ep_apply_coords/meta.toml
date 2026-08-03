@@ -1,6 +1,6 @@
 [package]
 name = "ep-apply-coords"
-version = "1.0.0"
+version = "1.0.1"
 description = "Place aligned source-PDB coordinates onto a topology-only complex.prmtop and write the final complex.rst7 + complex.pdb. Sister of ep_fragment_fuse_topology — together they replace the v1.11.0 monolithic ep_fragment_fuse."
 author = "BoCoFlow / metal-md"
 license = "LGPL-2.1"

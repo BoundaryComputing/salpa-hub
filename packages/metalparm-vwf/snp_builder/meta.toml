@@ -1,6 +1,6 @@
 [package]
 name = "snp-builder"
-version = "0.3.0"
+version = "0.3.1"
 description = "Build a capped Sn(IV)(OMe)2-porphyrin fragment from a YASARA-style Zn-porphyrin PDB (UNK residue). Outputs XYZ + PDB ready for EasyParm parameterization. Optionally extracts the peptide chain — whole, or a residue-number sub-span (e.g. 1-7) to carve a shorter peptide out of a longer one — and can ACE/NME-cap the extracted termini."
 author = "BoCoFlow / metal-md"
 license = "LGPL-2.1"

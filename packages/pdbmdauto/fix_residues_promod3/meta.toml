@@ -1,8 +1,8 @@
 [package]
 name = "fix-residues-promod3"
-version = "1.0.0"
+version = "1.0.1"
 description = "Fix missing residues in PDB structures using ProMod3 homology modeling engine"
-author = "BoCoFlow Team"
+author = "Boundary Computing"
 license = "MIT"
 
 [node]

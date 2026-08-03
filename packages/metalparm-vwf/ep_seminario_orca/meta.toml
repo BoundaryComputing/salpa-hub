@@ -1,6 +1,6 @@
 [package]
 name = "ep-seminario-orca"
-version = "1.0.0"
+version = "1.0.1"
 description = "Compute bond and angle force constants from ORCA Hessian using the Modified Seminario Method"
 author = "BoCoFlow / EasyParm"
 license = "LGPL-2.1"

@@ -1,6 +1,6 @@
 [package]
 name = "ep-fragment-fuse-topology"
-version = "1.1.0"
+version = "1.1.1"
 description = "Topology-only fuser: merge a standard ff19SB peptide library with a custom residue library (.lib + .frcmod) via user-specified interface bonds. Emits complex.prmtop only — coordinate assembly is handled by the sister ep_apply_coords node. Rebalances the non-integer net charge that interface-atom deletion leaves on the linkage residue so the complex total is an exact integer."
 author = "BoCoFlow / metal-md"
 license = "LGPL-2.1"

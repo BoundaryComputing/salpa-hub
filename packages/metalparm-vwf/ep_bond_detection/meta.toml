@@ -1,6 +1,6 @@
 [package]
 name = "ep-bond-detection"
-version = "1.0.0"
+version = "1.0.1"
 description = "Detect bonds, angles, and dihedrals from optimized XYZ geometry using covalent radii (easyPARM step 02)"
 author = "BoCoFlow / EasyParm"
 license = "LGPL-2.1"

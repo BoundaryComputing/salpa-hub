@@ -1,8 +1,8 @@
 [package]
 name = "pdb-fasta-biopython"
-version = "2.0.0"
+version = "2.0.1"
 description = "Parse PDB structures and extract FASTA sequences using BioPython. Supports RCSB PDB API fetching by ID and local file processing with chain splitting, HETATM handling, and missing residues analysis."
-author = "BoCoFlow Development Team"
+author = "Boundary Computing"
 license = "MIT"
 
 [package.dependencies]

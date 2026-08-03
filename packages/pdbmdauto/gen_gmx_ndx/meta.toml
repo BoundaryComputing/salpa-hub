@@ -1,8 +1,8 @@
 [package]
 name = "gen-gmx-ndx"
-version = "1.0.0"
+version = "1.0.1"
 description = "Generate GROMACS index groups for original vs modeled residues"
-author = "BoCoFlow Team"
+author = "Boundary Computing"
 license = "MIT"
 
 [node]

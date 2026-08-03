@@ -1,8 +1,8 @@
 [package]
 name = "ep-amber-to-gromacs"
-version = "1.1.0"
+version = "1.1.1"
 description = "Convert AMBER prmtop+rst7 to GROMACS top+gro via ParmEd"
-author = "BoCoFlow / metalparm"
+author = "Boundary Computing / MetalParm"
 license = "LGPL-2.1"
 
 [node]

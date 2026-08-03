@@ -1,8 +1,8 @@
 [package]
 name = "gen-ali"
-version = "1.0.0"
+version = "1.0.1"
 description = "Generate alignment files for homology modeling from PDB structure and FASTA sequences"
-author = "BoCoFlow Team"
+author = "Boundary Computing"
 license = "MIT"
 
 [node]

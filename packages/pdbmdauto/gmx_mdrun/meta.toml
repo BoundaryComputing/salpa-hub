@@ -4,7 +4,7 @@
 
 [package]
 name = "gmx-mdrun"
-version = "2.0.0"
+version = "2.0.1"
 description = "GROMACS MD simulation node with local and HPC/SLURM execution support"
 author = "BoCoFlow Community"
 license = "MIT"

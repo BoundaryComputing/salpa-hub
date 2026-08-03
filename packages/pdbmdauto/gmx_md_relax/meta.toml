@@ -1,8 +1,8 @@
 [package]
 name = "gmx-md-relax"
-version = "1.0.0"
+version = "1.0.1"
 description = "GROMACS multi-step relaxation — energy minimization and NVT equilibration"
-author = "BoCoFlow Team"
+author = "Boundary Computing"
 license = "MIT"
 
 [node]

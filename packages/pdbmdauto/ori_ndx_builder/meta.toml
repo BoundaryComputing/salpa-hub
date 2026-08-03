@@ -1,8 +1,8 @@
 [package]
 name = "ori-ndx-builder"
-version = "1.0.0"
+version = "1.0.1"
 description = "Build GROMACS index groups (OriHeavy, OriBackBone) for original vs homology-modeled residues"
-author = "BoCoFlow Team"
+author = "Boundary Computing"
 license = "MIT"
 
 [node]

@@ -1,6 +1,6 @@
 [package]
 name = "ep-charges"
-version = "1.0.0"
+version = "1.0.1"
 description = "Inject QM-derived (ORCA RESP / CHELPG) partial charges into the zero-charge MOL2 from antechamber — the EasyParm charge step the node refactor originally omitted."
 author = "BoCoFlow / EasyParm"
 license = "LGPL-2.1"

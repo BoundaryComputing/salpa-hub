@@ -1,6 +1,6 @@
 [package]
 name = "ep-orca-run"
-version = "0.1.0"
+version = "0.1.1"
 description = "Run ORCA (QM DFT opt+freq+CHELPG) locally or on a SLURM HPC cluster. Produces .out/.hess/.xyz artifacts consumed by ep_seminario_orca."
 author = "BoCoFlow / EasyParm"
 license = "LGPL-2.1"

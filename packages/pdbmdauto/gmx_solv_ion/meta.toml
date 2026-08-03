@@ -1,8 +1,8 @@
 [package]
 name = "gmx-solv-ion"
-version = "1.0.0"
+version = "1.0.1"
 description = "GROMACS solvation and ionization — add water box and neutralize with ions"
-author = "BoCoFlow Team"
+author = "Boundary Computing"
 license = "MIT"
 
 [node]

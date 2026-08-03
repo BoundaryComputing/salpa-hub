@@ -1,8 +1,8 @@
 [package]
 name = "metaldock-vwf"
-version = "0.2.1"
+version = "0.2.2"
 description = "Visual workflow nodes for metal-protein docking: the refactored MetalDock pipeline (protein prep, ligand prep, QM/ORCA CM5 charges, ligand PDBQT with metal-aware torsion tree, AutoDock4 docking, results analysis) wired as chainable BoCoFlow nodes. Each node wraps one src/metaldock_modules function; molecular graphs are serialized to JSON between nodes."
-author = "BoCoFlow / metaldock"
+author = "Boundary Computing / MetalDock"
 license = "LGPL-2.1 (non-commercial: MGLTools)"
 repository = "https://github.com/BoundaryComputing/salpa-hub"
 

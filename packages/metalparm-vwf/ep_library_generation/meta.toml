@@ -1,6 +1,6 @@
 [package]
 name = "ep-library-generation"
-version = "1.0.0"
+version = "1.0.1"
 description = "Generate AMBER library (.lib) file via tleap and fix atomic numbers/bond orders (easyPARM steps tleap + 12)"
 author = "BoCoFlow / EasyParm"
 license = "LGPL-2.1"

@@ -1,8 +1,8 @@
 [package]
 name = "metalparm-vwf"
-version = "1.29.0"
+version = "1.29.1"
 description = "Visual workflow nodes for metal force-field parameterization: EasyParm pipeline (bond detection, MOL2 generation, ORCA local/HPC, Seminario, FF assembly, library generation) + metallopeptide fragment builder, peptide builder, pure-geometry fragment alignment, two-step fragment fuser (topology + coord-applier), AMBER → GROMACS converter, packmol-memgen-based mixed-solvent box builder, and a GROMACS-side solvator (md_solvate_gmx) that uses raw packmol + ParmEd so non-standard residues are never re-derived."
-author = "BoCoFlow / metalparm"
+author = "Boundary Computing / MetalParm"
 license = "LGPL-2.1"
 repository = "https://github.com/BoundaryComputing/salpa-hub"
 

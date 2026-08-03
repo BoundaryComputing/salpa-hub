@@ -1,8 +1,8 @@
 [package]
 name = "pdbmdauto"
-version = "1.0.1"
+version = "1.0.2"
 description = "Automated protein structure preparation for molecular dynamics — homology modeling, solvation, relaxation"
-author = "BoCoFlow Team"
+author = "Boundary Computing"
 license = "MIT"
 repository = "https://github.com/BoundaryComputing/salpa-hub"
 

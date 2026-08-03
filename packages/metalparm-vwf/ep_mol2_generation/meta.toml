@@ -1,6 +1,6 @@
 [package]
 name = "ep-mol2-generation"
-version = "1.0.0"
+version = "1.0.1"
 description = "Generate MOL2 file via antechamber with atom type correction for metals (easyPARM antechamber step)"
 author = "BoCoFlow / EasyParm"
 license = "LGPL-2.1"

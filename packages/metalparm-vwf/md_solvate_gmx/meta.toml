@@ -1,8 +1,8 @@
 [package]
 name = "md-solvate-gmx"
-version = "1.0.0"
+version = "1.0.1"
 description = "Solvate a metallopeptide GROMACS topology (from ep_amber_to_gromacs) with OPC water + Cieplak methanol + ions, using raw packmol + ParmEd assembly. Bypasses packmol-memgen's internal tleap re-derivation, so non-standard residues (fragment-fused GLU, etc.) are preserved bytewise."
-author = "BoCoFlow / metalparm"
+author = "Boundary Computing / MetalParm"
 license = "LGPL-2.1"
 
 [node]

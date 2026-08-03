@@ -1,6 +1,6 @@
 [package]
 name = "ep-forcefield-assembly"
-version = "1.0.0"
+version = "1.0.1"
 description = "Assemble AMBER force field: MOL2 correction, parmchk2, ULS labeling, merge Seminario params, UFF fill, cleanup (easyPARM steps 03-13)"
 author = "BoCoFlow / EasyParm"
 license = "LGPL-2.1"

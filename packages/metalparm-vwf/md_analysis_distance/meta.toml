@@ -1,8 +1,8 @@
 [package]
 name = "md-analysis-distance"
-version = "1.0.0"
+version = "1.0.1"
 description = "Per-frame distance from a set of probe atoms (Tyr/His quenchers) to the metal centre (Sn) along an MD trajectory, via MDAnalysis. Minimum-image (PBC-aware); writes a CSV time series in Ångström + a closest-approach summary."
-author = "BoCoFlow / metalparm"
+author = "Boundary Computing / MetalParm"
 license = "LGPL-2.1"
 
 [node]
