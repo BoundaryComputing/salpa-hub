@@ -3,9 +3,9 @@
 
 [package]
 name = "cloud-gcp-proteinmpnn"
-version = "1.0.0"
+version = "1.0.1"
 description = "Protein sequence design from backbone structure using ProteinMPNN (GCP Cloud)"
-author = "BoCoFlow Team"
+author = "Boundary Computing"
 license = "MIT"
 
 [node]

@@ -4,9 +4,9 @@
 
 [package]
 name = "cloud-modal-diffdock"
-version = "1.0.0"
+version = "1.0.1"
 description = "Blind protein-ligand docking using DiffDock on Modal A10G GPU (BoCoFlow Credits)"
-author = "BoCoFlow Team"
+author = "Boundary Computing"
 license = "MIT"
 
 [node]

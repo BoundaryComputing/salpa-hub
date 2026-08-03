@@ -3,9 +3,9 @@
 
 [package]
 name = "cloud-gcp-evo2"
-version = "1.0.0"
+version = "1.0.1"
 description = "DNA sequence scoring, embeddings, and generation using Evo2 on GCP (L4 GPU)"
-author = "BoCoFlow Team"
+author = "Boundary Computing"
 license = "MIT"
 
 [node]

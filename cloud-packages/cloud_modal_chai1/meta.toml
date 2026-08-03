@@ -4,9 +4,9 @@
 
 [package]
 name = "cloud-modal-chai1"
-version = "1.0.0"
+version = "1.0.1"
 description = "Multi-modal structure prediction using Chai-1 on Modal H100 GPU (BoCoFlow Credits)"
-author = "BoCoFlow Team"
+author = "Boundary Computing"
 license = "MIT"
 
 [node]

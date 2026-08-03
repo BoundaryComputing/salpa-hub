@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-07-31T21:18:39.902437+00:00",
+  "generated_at": "2026-08-03T07:37:57.263799+00:00",
   "source_name": "Salpa Cloud",
   "packages": [
     {
       "name": "cloud-gcp-evo2",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "DNA sequence scoring, embeddings, and generation using Evo2 on GCP (L4 GPU)",
       "display_name": "Evo2 DNA Model (GCP)",
       "category": "Genomics",
@@ -21,13 +21,13 @@
         "ai",
         "generation"
       ],
-      "author": "BoCoFlow Team",
+      "author": "Boundary Computing",
       "license": "MIT",
       "download_url": "packages/cloud_gcp_evo2"
     },
     {
       "name": "cloud-gcp-proteinmpnn",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Protein sequence design from backbone structure using ProteinMPNN (GCP Cloud)",
       "display_name": "ProteinMPNN Design (GCP)",
       "category": "Protein Design",
@@ -42,13 +42,13 @@
         "pdb",
         "fasta-output"
       ],
-      "author": "BoCoFlow Team",
+      "author": "Boundary Computing",
       "license": "MIT",
       "download_url": "packages/cloud_gcp_proteinmpnn"
     },
     {
       "name": "cloud-modal-boltz2",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Protein structure prediction using Boltz-2 on Modal H100 GPU (BoCoFlow Credits)",
       "display_name": "Boltz-2 Prediction (Modal)",
       "category": "cloud",
@@ -61,13 +61,13 @@
         "ai",
         "h100"
       ],
-      "author": "BoCoFlow Team",
+      "author": "Boundary Computing",
       "license": "MIT",
       "download_url": "packages/cloud_modal_boltz2"
     },
     {
       "name": "cloud-modal-chai1",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Multi-modal structure prediction using Chai-1 on Modal H100 GPU (BoCoFlow Credits)",
       "display_name": "Chai-1 Prediction (Modal)",
       "category": "cloud",
@@ -82,13 +82,13 @@
         "ligand",
         "complex"
       ],
-      "author": "BoCoFlow Team",
+      "author": "Boundary Computing",
       "license": "MIT",
       "download_url": "packages/cloud_modal_chai1"
     },
     {
       "name": "cloud-modal-diffdock",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Blind protein-ligand docking using DiffDock on Modal A10G GPU (BoCoFlow Credits)",
       "display_name": "DiffDock Docking (Modal)",
       "category": "cloud",
@@ -103,7 +103,7 @@
         "a10g",
         "molecular-docking"
       ],
-      "author": "BoCoFlow Team",
+      "author": "Boundary Computing",
       "license": "MIT",
       "download_url": "packages/cloud_modal_diffdock"
     }
