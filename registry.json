@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-08-03T09:08:13.156293+00:00",
+  "generated_at": "2026-08-03T09:40:12.401029+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
@@ -560,7 +560,7 @@
     },
     {
       "name": "pdbmdauto",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "description": "Automated protein structure preparation for molecular dynamics \u2014 homology modeling, solvation, relaxation",
       "category": "Molecular Dynamics",
       "hashtags": [
@@ -853,7 +853,7 @@
     },
     {
       "id": "pdbmdauto-pipeline",
-      "name": "PDBmdAuto Full 265915",
+      "name": "PDBmdAuto Full Pipeline",
       "description": "Automated 11-node MD preparation pipeline: PDB fetch, homology modeling (ProMod3), protonation, GROMACS topology, solvation, vacuum & solvated relaxation, and production MD. Demo: protein 4Z8J (SNX27 PDZ + PTHR peptide, 2 chains, 5 missing residues).",
       "category": "molecular-dynamics",
       "difficulty": "advanced",

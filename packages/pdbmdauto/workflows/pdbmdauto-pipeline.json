@@ -2,7 +2,7 @@
   "version": "2.0",
   "template_info": {
     "id": "pdbmdauto-pipeline",
-    "name": "PDBmdAuto Full 265915",
+    "name": "PDBmdAuto Full Pipeline",
     "description": "Automated 11-node MD preparation pipeline: PDB fetch, homology modeling (ProMod3), protonation, GROMACS topology, solvation, vacuum & solvated relaxation, and production MD. Demo: protein 4Z8J (SNX27 PDZ + PTHR peptide, 2 chains, 5 missing residues).",
     "required_packages": [
       "pdbmdauto"
@@ -24,7 +24,7 @@
     "estimated_time": "5 minutes"
   },
   "metadata": {
-    "name": "PDBmdAuto Full 265915",
+    "name": "PDBmdAuto Full Pipeline",
     "environment": "local",
     "status": "draft",
     "nodeCount": 11,
