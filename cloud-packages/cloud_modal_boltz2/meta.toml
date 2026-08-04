@@ -5,7 +5,7 @@
 [package]
 name = "cloud-modal-boltz2"
 version = "1.0.2"
-description = "Protein structure prediction using Boltz-2 on Modal H100 GPU (BoCoFlow Credits)"
+description = "Protein structure prediction using Boltz-2 on Modal H100 GPU"
 author = "BoundaryComputing"
 license = "MIT"
 
