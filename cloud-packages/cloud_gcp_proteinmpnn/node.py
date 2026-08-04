@@ -24,7 +24,7 @@ from bocoflow_core.parameters import (
     StringParameter,
     TextParameter,
 )
-from bocoflow_core.stream_logger import stream_log
+from bocoflow_core.stream_logger import post_with_progress, stream_log
 
 
 class CloudGcpProteinmpnn(Node):
@@ -216,11 +216,20 @@ class CloudGcpProteinmpnn(Node):
             )
 
             # ── Call API Gateway ─────────────────────────────────────────
-            response = requests.post(
-                self.API_ENDPOINT,
+            # `requests` stays imported — the except clauses below still catch
+            # requests.Timeout / requests.RequestException, which post_with_progress
+            # re-raises from its worker thread.
+            response = post_with_progress(
+                url=self.API_ENDPOINT,
                 json=payload,
                 headers=headers,
                 timeout=300,
+                node_id=self.node_id,
+                service_name="ProteinMPNN",
+                # No minutes figure here on purpose: this is the CPU service with a ~7 MB
+                # model and 1-30 s inference, so evo2's "2-5 min" would be wrong, and
+                # nothing in the repo measures what it actually is. Say the true thing.
+                cold_start_hint="the first call may need to start the service",
             )
 
             # ── Handle response ──────────────────────────────────────────

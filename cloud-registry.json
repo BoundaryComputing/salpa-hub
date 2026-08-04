@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-08-04T19:08:32.209377+00:00",
+  "generated_at": "2026-08-04T19:26:11.397585+00:00",
   "source_name": "Salpa Compute",
   "packages": [
     {
@@ -27,7 +27,7 @@
     },
     {
       "name": "cloud-gcp-proteinmpnn",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "description": "Protein sequence design from backbone structure using ProteinMPNN (GCP Cloud)",
       "display_name": "ProteinMPNN Design (GCP)",
       "category": "Protein Design",
