@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-08-03T11:06:49.026661+00:00",
+  "generated_at": "2026-08-04T17:12:16.943308+00:00",
   "source_name": "Salpa Cloud",
   "packages": [
     {
@@ -23,7 +23,7 @@
       ],
       "author": "BoundaryComputing",
       "license": "MIT",
-      "download_url": "packages/cloud_gcp_evo2"
+      "download_url": "cloud-packages/cloud_gcp_evo2"
     },
     {
       "name": "cloud-gcp-proteinmpnn",
@@ -44,7 +44,7 @@
       ],
       "author": "BoundaryComputing",
       "license": "MIT",
-      "download_url": "packages/cloud_gcp_proteinmpnn"
+      "download_url": "cloud-packages/cloud_gcp_proteinmpnn"
     },
     {
       "name": "cloud-modal-boltz2",
@@ -63,7 +63,7 @@
       ],
       "author": "BoundaryComputing",
       "license": "MIT",
-      "download_url": "packages/cloud_modal_boltz2"
+      "download_url": "cloud-packages/cloud_modal_boltz2"
     },
     {
       "name": "cloud-modal-chai1",
@@ -84,7 +84,7 @@
       ],
       "author": "BoundaryComputing",
       "license": "MIT",
-      "download_url": "packages/cloud_modal_chai1"
+      "download_url": "cloud-packages/cloud_modal_chai1"
     },
     {
       "name": "cloud-modal-diffdock",
@@ -105,7 +105,7 @@
       ],
       "author": "BoundaryComputing",
       "license": "MIT",
-      "download_url": "packages/cloud_modal_diffdock"
+      "download_url": "cloud-packages/cloud_modal_diffdock"
     }
   ]
 }
