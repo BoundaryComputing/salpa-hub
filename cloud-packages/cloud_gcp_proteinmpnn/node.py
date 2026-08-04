@@ -4,18 +4,16 @@ cloud-gcp-proteinmpnn — BoCoFlow cloud client stub for GCP Cloud Run.
 Designs amino acid sequences from protein backbone structures using ProteinMPNN.
 CPU-only cloud service — lightweight model (~7 MB), fast inference (1-30s).
 
-Pattern: Standard Node class with PIXI_SUBPROCESS + shared cloud-client env.
-Same architecture as cloud-gcp/hello_world.
+Pattern: Standard Node class with pixi.toml for auto-detected PIXI_SUBPROCESS.
+Same architecture as cloud-gcp-hello-world.
 
 Reference: Dauparas et al., Science 378:49-56 (2022)
 """
 
 import os
 from datetime import datetime
-from pathlib import Path
 
 import requests
-from bocoflow_core.execution_strategy import ExecutionStrategy
 from bocoflow_core.node import Node, NodeException, NodeResult
 from bocoflow_core.parameters import (
     FileParameterEdit,
@@ -42,21 +40,7 @@ class CloudGcpProteinmpnn(Node):
 
     # NOTE: Metadata (name, hashtags, num_in, num_out) comes from meta.toml.
     # NOTE: force_to_run is inherited from Node.BASE_OPTIONS — do NOT add it here.
-
-    # Execute in separate pixi subprocess to avoid macOS fork() issues with SSL
-    EXECUTION_STRATEGY = ExecutionStrategy.PIXI_SUBPROCESS
-
-    # Shared cloud-client environment (only needs requests + redis-py)
-    ENVIRONMENT = {
-        "type": "pixi",
-        "name": "cloud-client",
-        "pixi_toml": str(
-            Path(__file__).parent.parent
-            / "shared_environments"
-            / "cloud-client"
-            / "pixi.toml"
-        ),
-    }
+    # NOTE: EXECUTION_STRATEGY and ENVIRONMENT are auto-detected via shared_environment in meta.toml.
 
     # Cloud API endpoint — configurable via environment
     API_ENDPOINT = (
