@@ -54,6 +54,18 @@ def _merge_predecessors(predecessor_data):
     return merged
 
 
+# The values that make this node run against its own demo_data, declared once and
+# read by `salpa smoke` and the shipped 1JZI workflow template alike. A parameter's
+# type gives its shape and never its value: nothing can infer that the metal here is
+# Re, or that the docking box belongs at the metal's coordinates.
+DEMO_CONFIG = {
+    "case_name": "1jzi_re",
+    "xyz_file": "demo_data/1jzi_D_REP.xyz",   # Re(phen)(CO)3(His83), 29 atoms
+    "output_dir": "ligand",
+    "metal_symbol": "Re",
+}
+
+
 class MdockLigandPrep(Node):
     """Canonicalize ligand XYZ (OpenBabel) → build molecular graph (JSON)."""
 

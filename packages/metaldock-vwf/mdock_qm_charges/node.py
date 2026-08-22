@@ -1,9 +1,16 @@
 """MetalDock QM Charges — wraps metaldock_modules.qm_charges.run_qm_and_enrich_graph.
 
-Run a DFT calculation (ORCA primary; Gaussian/ADF supported) on the metal
-complex and enrich the molecular graph with CM5 partial charges + Mayer bond
-orders. Reloads the graph from the ``graph_json`` produced by mdock_ligand_prep,
-re-saves the enriched graph, and forwards the new ``graph_json`` downstream.
+Compute CM5 partial charges and bond orders on the metal complex and enrich the
+molecular graph with them. Reloads the graph from the ``graph_json`` produced by
+mdock_ligand_prep, re-saves the enriched graph, and forwards the new
+``graph_json`` downstream.
+
+Four engines. ``xtb`` (GFN1) is the default because it is the only one that
+needs no user-supplied binary: it installs from conda-forge with the node and
+finishes in seconds. ORCA is the DFT accuracy reference and is what published
+numbers should come from, but it must be downloaded and registered for
+separately; Gaussian and ADF are commercial. Selecting anything other than xtb
+means supplying that program yourself.
 """
 
 import os
@@ -51,6 +58,29 @@ def _merge_predecessors(predecessor_data):
     return merged
 
 
+# The values that make this node run against its own demo_data, declared once and
+# read by `salpa smoke` and the shipped 1JZI workflow template alike. A parameter's
+# type gives its shape and never its value: nothing can infer that the metal here is
+# Re, or that the docking box belongs at the metal's coordinates.
+DEMO_CONFIG = {
+    "case_name": "1jzi_re",
+    "output_dir": "qm",
+    # Normally inherited from mdock_ligand_prep; declared so this node can also
+    # be run — and smoke-tested — on its own.
+    "graph_json": "demo_data/1jzi_re_mol_graph.json",
+    "xyz_file": "demo_data/1jzi_D_REP_c.xyz",
+    # xtb, not orca: it is the only engine that needs no user-supplied binary, so
+    # this is the only setting under which the demo runs unattended. Its CM5
+    # charges land within 0.05 e of the ORCA reference on the metal — the stored
+    # comparison is demo_data/1jzi_re_orca_reference_graph.json.
+    "engine": "xtb",
+    "geom_opt": False,       # single point; geometry optimization is far slower
+    "charge": 1,             # the Re complex is a cation
+    "spin": 0.0,             # closed shell
+    "ncpu": 4,
+}
+
+
 class MdockQmCharges(Node):
     """DFT (ORCA/Gaussian/ADF) → CM5 charges + bond orders → enrich graph."""
 
@@ -75,8 +105,12 @@ class MdockQmCharges(Node):
             optional=True,
         ),
         "engine": SelectParameter(
-            "QM Engine", options=["orca", "gaussian", "adf"], default="orca",
-            docstring="DFT backend. ORCA is recommended for transition metals.",
+            "QM Engine", options=["xtb", "orca", "gaussian", "adf"], default="xtb",
+            docstring="Charge backend. 'xtb' (GFN1, semi-empirical) ships with "
+                      "this node and runs in seconds — use it to get a pipeline "
+                      "working and to screen. 'orca' is DFT and the accuracy "
+                      "reference for transition metals, but you must download "
+                      "ORCA yourself. Gaussian/ADF are commercial.",
         ),
         "geom_opt": BooleanParameter(
             "Geometry Optimization", default=False,
@@ -90,6 +124,22 @@ class MdockQmCharges(Node):
             docstring="Number of unpaired electrons.",
         ),
         "ncpu": IntegerParameter("CPU Cores", default=4),
+        # ── xTB ───────────────────────────────────────────────────────
+        "xtb_path": FolderParameter(
+            "xtb Directory (optional)", default="",
+            docstring="xtb install dir. Leave empty to use the xtb that ships "
+                      "in this node's environment.",
+            optional=True,
+        ),
+        "xtb_solvent": StringParameter(
+            "xtb Solvent (optional)", default="",
+            docstring="ALPB implicit solvent, e.g. 'water'. Empty = gas phase.",
+            optional=True,
+        ),
+        "xtb_accuracy": FloatParameter(
+            "xtb Accuracy", default=1.0,
+            docstring="xtb SCC accuracy; lower is tighter (default 1.0).",
+        ),
         # ── ORCA ──────────────────────────────────────────────────────
         "orca_path": FolderParameter(
             "ORCA Directory (optional)", default="",
@@ -143,7 +193,7 @@ class MdockQmCharges(Node):
             graph_json = self.resolve_path(graph_ref)
             xyz_file = self.resolve_path(xyz_ref)
 
-            engine = (flow_vars["engine"].get_value() or "orca").lower()
+            engine = (flow_vars["engine"].get_value() or "xtb").lower()
             geom_opt = bool(flow_vars["geom_opt"].get_value())
             charge = int(flow_vars["charge"].get_value() or 0)
             spin = float(flow_vars["spin"].get_value() or 0.0)
@@ -151,6 +201,9 @@ class MdockQmCharges(Node):
 
             orca_path = flow_vars["orca_path"].get_value()
             orca_path = self.resolve_path(orca_path) if orca_path else None
+
+            xtb_path = flow_vars["xtb_path"].get_value()
+            xtb_path = self.resolve_path(xtb_path) if xtb_path else None
 
             graph = load_graph(Path(graph_json))
 
@@ -172,6 +225,9 @@ class MdockQmCharges(Node):
                 functional=flow_vars["functional"].get_value() or "PBE",
                 basis_set=flow_vars["basis_set"].get_value() or "def2-TZVP",
                 solvent=flow_vars["solvent"].get_value() or "",
+                xtb_path=xtb_path,
+                xtb_accuracy=float(flow_vars["xtb_accuracy"].get_value() or 1.0),
+                xtb_solvent=flow_vars["xtb_solvent"].get_value() or "",
             )
 
             enriched_json = Path(output_dir) / "enriched_graph.json"

@@ -1,6 +1,6 @@
 [workspace]
 name = "metaldock_vwf"
-version = "0.1.0"
+version = "0.2.0"
 description = "Shared environment for metaldock_vwf nodes (refactored MetalDock docking pipeline)"
 channels = ["conda-forge", "bioconda"]
 # Legacy docking toolchain (mgltools/autodock/autogrid) ships osx-64 + linux-64
@@ -8,20 +8,63 @@ channels = ["conda-forge", "bioconda"]
 # Apple-Silicon users run this env under Rosetta (osx-64).
 platforms = ["linux-64", "osx-64"]
 
+# ---------------------------------------------------------------------------
+# Default environment — this is the one BoCoFlow runs nodes in, so it must be
+# a clean Python 3. MGLTools is deliberately NOT here; see [feature.mgltools].
+# ---------------------------------------------------------------------------
 [dependencies]
 python = ">=3.11,<3.13"
 networkx = ">=3.0"
 numpy = ">=1.24"
 scipy = ">=1.10"
+pandas = ">=2.0"       # qm_charges imports it at module level — not optional
 redis-py = ">=5.0.0"   # bocoflow stream logging
-# Docking / prep toolchain (mirrors the project's `docking` pixi env)
+# Docking / prep toolchain
 openbabel = ">=3.1"
 pdb2pqr = ">=3.6"
 autogrid = ">=4.2"
 autodock = ">=4.2"
-mgltools = ">=1.5"
 ase = ">=3.22"         # QM engine interface (ORCA/Gaussian/ADF via ASE)
+xtb = ">=6.6"          # default QM engine: GFN1-xTB CM5 charges, no download
 
-# ORCA is NOT a conda package — download separately (free for academic use)
-# from https://orcaforum.kofo.mpg.de and pass its path to mdock_qm_charges
-# via the `orca_path` parameter (or set ASE_ORCA_COMMAND / put orca on PATH).
+# ---------------------------------------------------------------------------
+# MGLTools lives in its own environment. This is not tidiness — it is the
+# difference between the nodes running and not running at all.
+#
+# The mgltools 1.5.7 conda package ships `bin/python` and `bin/python2.7`, and
+# its `bin/python` CLOBBERS the one conda's own python package installs. In a
+# single shared environment `$PREFIX/bin/python` therefore becomes Python 2.7,
+# and BoCoFlow launches every node as `pixi run python -m
+# bocoflow_core.node_runner` (bocoflow_core/node_executor.py) — Python 3 code
+# that cannot even be imported by 2.7. The same `python` is used to
+# `pip install -e bocoflow_core` during environment creation, so that step
+# silently failed too and left the environment without bocoflow_core at all.
+# Every node in this package failed at launch, before any science ran.
+#
+# It also drags in a libcairo built on someone's 2012 machine, hard-coding that
+# machine's own libpng12 location, which makes OpenBabel print a dlopen error on
+# every single invocation.
+#
+# Splitting it out gives `default` a real python3 and a quiet OpenBabel, while
+# MGLTools keeps the Python 2.7 its AutoDockTools scripts genuinely require.
+# `no-default-feature` keeps the two solves independent — MGLTools must not
+# constrain the python version the nodes run under.
+#
+# The nodes locate this environment as a sibling of their own prefix; see
+# `_find_mgltools_dir()` in mdock_protein_prep/node.py.
+# ---------------------------------------------------------------------------
+[feature.mgltools.dependencies]
+mgltools = ">=1.5"
+
+[environments]
+default = { solve-group = "default" }
+mgltools = { features = ["mgltools"], no-default-feature = true }
+
+# QM engines, in the order a user meets them:
+#   xtb      — semi-empirical GFN1, installed above, runs unattended. The
+#              default, and what the bundled demo workflow uses.
+#   ORCA     — DFT, the accuracy reference. NOT a conda package: download it
+#              separately (free for academic use) from orcaforum.kofo.mpg.de
+#              and pass its directory to mdock_qm_charges via `orca_path`
+#              (or set ASE_ORCA_COMMAND / put orca on PATH).
+#   Gaussian/ADF — commercial; supported, user-supplied.

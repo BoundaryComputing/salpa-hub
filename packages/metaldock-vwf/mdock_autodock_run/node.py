@@ -52,16 +52,55 @@ def _merge_predecessors(predecessor_data):
     return merged
 
 
+def _mgltools_env_prefix():
+    """The sibling pixi environment holding MGLTools, or None.
+
+    MGLTools is installed into its OWN environment (see the package pixi.toml):
+    its conda package replaces `bin/python` with Python 2.7, and BoCoFlow
+    launches nodes as `pixi run python -m bocoflow_core.node_runner`, so sharing
+    one environment stops every node in this package from starting at all.
+
+    Node code therefore runs in `default`, and MGLTools sits beside it:
+
+        <env root>/.pixi/envs/default    <- sys.prefix, where this code runs
+        <env root>/.pixi/envs/mgltools   <- what we are looking for
+    """
+    sibling = os.path.join(os.path.dirname(sys.prefix), "mgltools")
+    return sibling if os.path.isdir(sibling) else None
+
+
+def _find_pythonsh():
+    """MGLTools' launcher, which runs the Python 2.7 its scripts need.
+
+    Not on PATH once MGLTools lives in its own environment, so look there first
+    and only then fall back to PATH (covers a hand-rolled MGLTools install).
+    """
+    env = _mgltools_env_prefix()
+    if env:
+        candidate = os.path.join(env, "bin", "pythonsh")
+        if os.path.isfile(candidate):
+            return candidate
+    return shutil.which("pythonsh") or "pythonsh"
+
+
 def _find_mgltools_dir():
-    candidates = [
-        os.path.join(sys.prefix, "MGLToolsPckgs", "AutoDockTools", "Utilities24"),
-        os.path.join(sys.prefix, "lib", "python2.7", "site-packages",
-                     "AutoDockTools", "Utilities24"),
-    ]
-    for c in candidates:
-        if os.path.isfile(os.path.join(c, "prepare_gpf4.py")):
-            return c
-    p = shutil.which("prepare_gpf4.py")
+    """Locate the MGLTools AutoDockTools/Utilities24 directory.
+
+    Checks the dedicated MGLTools environment first, then this node's own
+    prefix — the latter still works for anyone who installed MGLTools into the
+    single shared environment the older layout used.
+    """
+    roots = [r for r in (_mgltools_env_prefix(), sys.prefix) if r]
+    for root in roots:
+        candidates = [
+            os.path.join(root, "MGLToolsPckgs", "AutoDockTools", "Utilities24"),
+            os.path.join(root, "lib", "python2.7", "site-packages",
+                         "AutoDockTools", "Utilities24"),
+        ]
+        for c in candidates:
+            if os.path.isfile(os.path.join(c, 'prepare_gpf4.py')):
+                return c
+    p = shutil.which('prepare_gpf4.py')
     return os.path.dirname(p) if p else None
 
 
@@ -73,6 +112,27 @@ def _parse_vec3(text):
     if len(parts) != 3:
         raise NodeException("setup", f"Expected 3 comma-separated numbers, got: {text!r}")
     return [float(p) for p in parts]
+
+
+# The values that make this node run against its own demo_data, declared once and
+# read by `salpa smoke` and the shipped 1JZI workflow template alike. A parameter's
+# type gives its shape and never its value: nothing can infer that the metal here is
+# Re, or that the docking box belongs at the metal's coordinates.
+DEMO_CONFIG = {
+    "case_name": "1jzi_re",
+    "output_dir": "docking",
+    "num_poses": 10,
+    # All three are inherited from upstream in the pipeline. Declared so the
+    # docking step — the one with the longest setup chain — can be tried alone.
+    "ligand_pdbqt": "demo_data/1jzi_re_ligand.pdbqt",
+    "receptor_pdbqt": "demo_data/clean_1jzi.pdbqt",
+    "graph_json": "demo_data/1jzi_re_enriched_graph.json",
+    "metal_symbol": "Re",
+    # Centred on the crystallographic Re position. Left empty the box would centre
+    # itself on the metal, which is nearly the same thing but not reproducible.
+    "box_center": "1.65,-7.803,27.176",
+    "box_size": "20,20,20",
+}
 
 
 class MdockAutodockRun(Node):
@@ -187,6 +247,9 @@ class MdockAutodockRun(Node):
             box_size = _parse_vec3(flow_vars["box_size"].get_value() or "20,20,20")
 
             python_path = flow_vars["python_path"].get_value() or "pythonsh"
+            if python_path == "pythonsh":
+                # the shown default, not a real PATH entry — resolve it
+                python_path = _find_pythonsh()
             mgltools_dir = flow_vars["mgltools_dir"].get_value()
             mgltools_dir = self.resolve_path(mgltools_dir) if mgltools_dir else None
             if not mgltools_dir:

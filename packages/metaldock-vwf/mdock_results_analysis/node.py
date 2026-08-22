@@ -52,6 +52,19 @@ def _merge_predecessors(predecessor_data):
     return merged
 
 
+# The values that make this node run against its own demo_data, declared once and
+# read by `salpa smoke` and the shipped 1JZI workflow template alike. A parameter's
+# type gives its shape and never its value: nothing can infer that the metal here is
+# Re, or that the docking box belongs at the metal's coordinates.
+DEMO_CONFIG = {
+    "case_name": "1jzi_re",
+    "output_dir": "analysis",
+    # The crystallographic pose, so the reported RMSD means something.
+    "reference_xyz": "demo_data/1jzi_D_REP.xyz",
+    "cutoff": 4.0,
+}
+
+
 class MdockResultsAnalysis(Node):
     """Binding energies, ligand efficiency, interacting residues, RMSD."""
 

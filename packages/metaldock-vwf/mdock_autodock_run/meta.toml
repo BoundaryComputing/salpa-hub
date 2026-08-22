@@ -1,6 +1,6 @@
 [package]
 name = "mdock-autodock-run"
-version = "0.1.1"
+version = "0.2.0"
 description = "Generate GPF/DPF, run autogrid4 + autodock4, and extract docked poses — MetalDock pipeline step 5"
 author = "BoCoFlow / MetalDock"
 license = "LGPL-2.1"

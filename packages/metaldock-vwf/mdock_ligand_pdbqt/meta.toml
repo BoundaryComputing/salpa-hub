@@ -1,6 +1,6 @@
 [package]
 name = "mdock-ligand-pdbqt"
-version = "0.1.1"
+version = "0.2.0"
 description = "Convert a charge-enriched molecular graph into an AutoDock PDBQT with ROOT/BRANCH torsion tree (metal-aware freezing) — MetalDock pipeline step 4"
 author = "BoCoFlow / MetalDock"
 license = "LGPL-2.1"

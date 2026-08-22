@@ -51,6 +51,23 @@ def _merge_predecessors(predecessor_data):
     return merged
 
 
+# The values that make this node run against its own demo_data, declared once and
+# read by `salpa smoke` and the shipped 1JZI workflow template alike. A parameter's
+# type gives its shape and never its value: nothing can infer that the metal here is
+# Re, or that the docking box belongs at the metal's coordinates.
+DEMO_CONFIG = {
+    "case_name": "1jzi_re",
+    "output_dir": "pdbqt",
+    # Inherited from mdock_qm_charges in the pipeline; declared so this node can
+    # be run alone. This is a real GFN1-xTB run's output, not a fabricated graph.
+    "graph_json": "demo_data/1jzi_re_enriched_graph.json",
+    "metal_symbol": "Re",
+    "vacant_site": True,           # 1JZI is the vacant-coordination-sphere case
+    "max_torsions": 32,
+    "freeze_coordination_sphere": True,
+}
+
+
 class MdockLigandPdbqt(Node):
     """Enriched graph → ROOT/BRANCH PDBQT with metal-aware torsion freezing."""
 

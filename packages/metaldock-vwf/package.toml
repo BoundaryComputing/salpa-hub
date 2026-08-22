@@ -1,6 +1,6 @@
 [package]
 name = "metaldock-vwf"
-version = "0.2.3"
+version = "0.3.0"
 description = "Visual workflow nodes for metal-protein docking: the refactored MetalDock pipeline (protein prep, ligand prep, QM/ORCA CM5 charges, ligand PDBQT with metal-aware torsion tree, AutoDock4 docking, results analysis) wired as chainable Salpa nodes. Each node wraps one src/metaldock_modules function; molecular graphs are serialized to JSON between nodes."
 author = "BoundaryComputing / MetalDock"
 license = "LGPL-2.1 (non-commercial: MGLTools)"
@@ -49,16 +49,20 @@ hashtags = [
     "transition-metal",
     "computational-chemistry",
 ]
-platform_note = "Requires AutoDock4/AutoGrid4 + MGLTools (conda-forge). ORCA is downloaded separately (free for academic use) and its path passed to mdock_qm_charges. Windows users should use WSL2/Docker."
+platform_note = "linux-64 and osx-64 only — MGLTools and AutoDock4 have no osx-arm64 or win-64 conda builds (Apple Silicon runs the environment under Rosetta; Windows needs WSL2/Docker). Everything the bundled demo needs is installed for you, QM charges included: the default engine is GFN1-xTB. ORCA remains the DFT accuracy reference and is downloaded separately (free for academic use), then pointed at via mdock_qm_charges' orca_path."
 
 [package.documentation]
 readme = "README.md"
+# Two registers, deliberately separate: README.md is the formal reference (scope,
+# methodology, node table, references); TUTORIAL.md is the plain-language lesson for
+# a wet-lab audience with no simulation background. Mixing them serves neither.
+tutorial = "TUTORIAL.md"
 
-# No installable workflow templates yet. The 1jzi showcase lives under
-# workflows/ as reference docs + a saved .bcflow, but neither is a registry
-# template_info JSON, so they are intentionally NOT listed here (listing them
-# makes generate_registry.py emit parse warnings and register nothing). To
-# ship an installable example, add a template_info workflow JSON with portable
-# (relative / node:demo_data) paths and reference it here.
+# The installable example. Produced by the app's own
+# /api/workflow/{id}/export-template endpoint from a workflow that was built,
+# configured and RUN in the UI — not hand-written JSON, which imports but whose
+# edges never paint (see CHANGELOG 0.2.1). Every input is a `node:` path into a
+# node's own demo_data and every output a `rel:` path under the workflow's
+# working directory, so it carries no trace of the machine that made it.
 [package.workflows]
-examples = []
+examples = ["workflows/metaldock-1jzi-re-pipeline.json"]

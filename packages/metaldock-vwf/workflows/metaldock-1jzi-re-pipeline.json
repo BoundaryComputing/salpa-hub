@@ -1,0 +1,1566 @@
+{
+  "version": "2.0",
+  "template_info": {
+    "id": "metaldock-1jzi-re-pipeline",
+    "name": "MetalDock 1JZI Re Pipeline",
+    "description": "Metal-aware docking of the Re(phen)(CO)3 complex into azurin (PDB 1JZI) \u2014 the vacancy-coordination-sphere case from the MetalDock paper. Receptor preparation, ligand molecular graph, GFN1-xTB CM5 charges, metal-aware ligand PDBQT, AutoDock4 search and pose analysis. The inputs ship inside the nodes and the charge engine installs with them, so it runs as loaded with nothing to download.",
+    "required_packages": [
+      "metaldock-vwf"
+    ],
+    "category": "molecular-docking",
+    "difficulty": "advanced",
+    "tags": [
+      "molecular-docking",
+      "metal-complex",
+      "metalloprotein",
+      "autodock4",
+      "autogrid4",
+      "qm-charges",
+      "cm5-charges",
+      "xtb",
+      "pdbqt",
+      "metaldock"
+    ],
+    "author": "BoundaryComputing",
+    "estimated_time": "5 minutes"
+  },
+  "metadata": {
+    "id": "bacfa2f8-65b4-4c7a-b3a2-747b90ff8f9e",
+    "name": "MetalDock 1JZI Re Pipeline",
+    "description": "Metal-aware docking of the Re(phen)(CO)3 complex into azurin (PDB 1JZI), reproducing the vacancy-coordination-sphere case from the MetalDock paper. Inputs are bundled with the nodes and charges come from GFN1-xTB, so it runs as loaded.",
+    "environment": "local",
+    "status": "draft",
+    "nodeCount": 6,
+    "edgeCount": 5,
+    "createdAt": "2026-06-23T09:09:22.946521Z",
+    "updatedAt": "2026-06-23T09:10:51.803788Z",
+    "path": ""
+  },
+  "react": {
+    "id": "bacfa2f8-65b4-4c7a-b3a2-747b90ff8f9e",
+    "offsetX": 0,
+    "offsetY": 0,
+    "zoom": 100,
+    "gridSize": 20,
+    "layers": [
+      {
+        "id": "022e1b24-1156-4afb-b34f-9d32a880d34b",
+        "type": "diagram-links",
+        "isSvg": true,
+        "transformed": true,
+        "models": {
+          "348f0153-ba51-4608-9f5b-81cbb49c6fae": {
+            "id": "348f0153-ba51-4608-9f5b-81cbb49c6fae",
+            "type": "vp-link",
+            "selected": false,
+            "source": "5fdda80b-e01e-45b1-93f0-9f3c9ecbc7af",
+            "sourcePort": "477f37c3-527c-4a2d-8efe-433e3233de3e",
+            "target": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+            "targetPort": "4a7f65bf-1e7e-4a4e-a0eb-0be3d1d491b8",
+            "points": [
+              {
+                "id": "2b932c1c-327d-4af1-b8c3-1f15c4e08e2d",
+                "type": "point",
+                "x": 629.0001,
+                "y": 205
+              },
+              {
+                "id": "9327bfc8-e47f-42ba-9de1-9b765a3ee717",
+                "type": "point",
+                "x": 601.0001,
+                "y": 295
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "d91e5dc0-6ad4-4947-8a58-3446cabe88a7": {
+            "id": "d91e5dc0-6ad4-4947-8a58-3446cabe88a7",
+            "type": "vp-link",
+            "selected": false,
+            "source": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+            "sourcePort": "39f22592-afed-4a23-bced-d4d65b9b3935",
+            "target": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+            "targetPort": "5ad93470-d269-445a-8817-61d9f9a5cdd4",
+            "points": [
+              {
+                "id": "95757eed-1e70-4486-bbf5-828d78a0bc02",
+                "type": "point",
+                "x": 759.0001,
+                "y": 295
+              },
+              {
+                "id": "bfa69a87-7429-44f3-a6dc-1db50bf74416",
+                "type": "point",
+                "x": 731.0001,
+                "y": 385
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "f98b1a97-7c21-4ca9-ac57-0069920e190f": {
+            "id": "f98b1a97-7c21-4ca9-ac57-0069920e190f",
+            "type": "vp-link",
+            "selected": false,
+            "source": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+            "sourcePort": "de45c409-fa94-4c79-9089-f7d7e54e4cfe",
+            "target": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+            "targetPort": "364eb4b6-7700-4de2-b280-08c7437b3342",
+            "points": [
+              {
+                "id": "c0b9bf8e-d2df-44c2-9f77-4dd1eef547a8",
+                "type": "point",
+                "x": 889.0001,
+                "y": 385
+              },
+              {
+                "id": "04ce8c23-505c-4154-a6a3-439ad40748c0",
+                "type": "point",
+                "x": 861.0001,
+                "y": 475
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "2cf0dfd5-efc0-46e9-a0a0-32794fc54fab": {
+            "id": "2cf0dfd5-efc0-46e9-a0a0-32794fc54fab",
+            "type": "vp-link",
+            "selected": false,
+            "source": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+            "sourcePort": "1cc14426-d3b9-4692-b955-70dfd5ae80c3",
+            "target": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+            "targetPort": "bb0003c6-6f0a-41a0-b134-be45f6cd3877",
+            "points": [
+              {
+                "id": "8725a4a9-2875-4470-890d-0df525985f47",
+                "type": "point",
+                "x": 1019.0001,
+                "y": 475
+              },
+              {
+                "id": "42573e17-093f-413b-ad97-f91e0d20c12e",
+                "type": "point",
+                "x": 991.0001,
+                "y": 565
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          },
+          "a4d67a36-f0c9-489c-b68d-24402db8a3d5": {
+            "id": "a4d67a36-f0c9-489c-b68d-24402db8a3d5",
+            "type": "vp-link",
+            "selected": false,
+            "source": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+            "sourcePort": "deb5206e-94ef-4e47-824c-edbe06f8234c",
+            "target": "58c8f421-764b-43ec-96b8-76305231e11a",
+            "targetPort": "6282cb21-84d4-4e69-94d2-9dcb55d1e4e2",
+            "points": [
+              {
+                "id": "68139d97-453e-4249-9208-3217c95ab008",
+                "type": "point",
+                "x": 1149.0001000000002,
+                "y": 565
+              },
+              {
+                "id": "24cf3db3-ef61-461f-bfef-f57733c8c375",
+                "type": "point",
+                "x": 1121.0001000000002,
+                "y": 655
+              }
+            ],
+            "labels": [],
+            "width": 1.5,
+            "color": "rgb(128, 134, 146)",
+            "curvyness": 50,
+            "selectedColor": "rgb(99, 102, 241)"
+          }
+        }
+      },
+      {
+        "id": "353bcc9a-f3d0-47c1-8542-2c7c7ae5a1f5",
+        "type": "diagram-nodes",
+        "isSvg": false,
+        "transformed": true,
+        "models": {
+          "5fdda80b-e01e-45b1-93f0-9f3c9ecbc7af": {
+            "id": "5fdda80b-e01e-45b1-93f0-9f3c9ecbc7af",
+            "type": "custom-node",
+            "selected": false,
+            "x": 470.0001,
+            "y": 180,
+            "ports": [
+              {
+                "id": "a8bb8c95-e65f-4907-9a75-1af5c921f9d0",
+                "type": "vp-port",
+                "x": 470.0001,
+                "y": 180,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "5fdda80b-e01e-45b1-93f0-9f3c9ecbc7af",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "477f37c3-527c-4a2d-8efe-433e3233de3e",
+                "type": "vp-port",
+                "x": 625.0001,
+                "y": 201,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "5fdda80b-e01e-45b1-93f0-9f3c9ecbc7af",
+                "links": [
+                  "348f0153-ba51-4608-9f5b-81cbb49c6fae"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "5fdda80b-e01e-45b1-93f0-9f3c9ecbc7af",
+              "node_key": "MdockProteinPrep",
+              "name": "Protein Prep",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Clean a protein PDB, protonate with pdb2pqr, and convert to PDBQT (prepare_receptor4) \u2014 MetalDock pipeline step 1",
+              "num_in": 0,
+              "num_out": 1,
+              "category": "Metal Docking",
+              "tags": [],
+              "package_name": "mdock-protein-prep",
+              "hashtags": [
+                "metaldock",
+                "protein-prep",
+                "pdb2pqr",
+                "pdbqt",
+                "mgltools",
+                "receptor",
+                "molecular-docking",
+                "computational-chemistry"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "\ud83d\udce6"
+              },
+              "doc": "Clean \u2192 protonate (pdb2pqr) \u2192 PDBQT (prepare_receptor4) a protein.",
+              "options": {
+                "case_name": "complex",
+                "pdb_file": null,
+                "output_dir": null,
+                "ph": 7.4,
+                "clean": true,
+                "pdb2pqr_path": "pdb2pqr30",
+                "python_path": "pythonsh",
+                "mgltools_dir": null,
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "complex",
+                  "docstring": "Name for this docking case (forwarded downstream)."
+                },
+                "pdb_file": {
+                  "type": "file_edit",
+                  "label": "Protein PDB",
+                  "value": "node:demo_data/1jzi.pdb",
+                  "docstring": "Input protein structure (.pdb).",
+                  "manual_input": ""
+                },
+                "output_dir": {
+                  "type": "folder",
+                  "label": "Output Directory",
+                  "value": "rel:protein",
+                  "docstring": "Working dir for protonated/cleaned PDB + receptor PDBQT."
+                },
+                "ph": {
+                  "type": "float",
+                  "label": "Protonation pH",
+                  "value": 7.0,
+                  "docstring": "pH used by pdb2pqr for protonation."
+                },
+                "clean": {
+                  "type": "boolean",
+                  "label": "Remove HETATM",
+                  "value": true,
+                  "docstring": "Strip ligands/cofactors/waters (HETATM lines) before PDBQT."
+                },
+                "pdb2pqr_path": {
+                  "type": "string",
+                  "label": "pdb2pqr Executable",
+                  "value": "pdb2pqr30",
+                  "docstring": "pdb2pqr binary name or path."
+                },
+                "python_path": {
+                  "type": "string",
+                  "label": "MGLTools Python",
+                  "value": "pythonsh",
+                  "docstring": "Interpreter for prepare_receptor4.py (MGLTools' pythonsh)."
+                },
+                "mgltools_dir": {
+                  "type": "folder",
+                  "label": "MGLTools Dir (optional)",
+                  "value": null,
+                  "docstring": "AutoDockTools/Utilities24 dir. Leave empty to auto-detect from the active environment."
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "default_timeout": null,
+              "type": "custom-node",
+              "node_id": "5fdda80b-e01e-45b1-93f0-9f3c9ecbc7af",
+              "status": "configured",
+              "selected": false,
+              "config": {
+                "case_name": "1jzi_re",
+                "pdb_file": "node:demo_data/1jzi.pdb",
+                "output_dir": "rel:protein",
+                "ph": 7.0,
+                "clean": true,
+                "pdb2pqr_path": "pdb2pqr30",
+                "python_path": "pythonsh",
+                "mgltools_dir": null,
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "1jzi_re",
+              "pdb_file": "node:demo_data/1jzi.pdb",
+              "output_dir": "rel:protein",
+              "ph": 7.0,
+              "clean": true,
+              "pdb2pqr_path": "pdb2pqr30",
+              "python_path": "pythonsh",
+              "mgltools_dir": null,
+              "force_to_run": false
+            }
+          },
+          "5d602e31-b031-4791-a61a-724ee1d5b36c": {
+            "id": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+            "type": "custom-node",
+            "selected": false,
+            "x": 600.0001,
+            "y": 270,
+            "ports": [
+              {
+                "id": "2ee17473-ca2c-4d6e-beae-aac9d08c01f3",
+                "type": "vp-port",
+                "x": 600.0001,
+                "y": 270,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "4a7f65bf-1e7e-4a4e-a0eb-0be3d1d491b8",
+                "type": "vp-port",
+                "x": 597.0001,
+                "y": 291,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+                "links": [
+                  "348f0153-ba51-4608-9f5b-81cbb49c6fae"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "39f22592-afed-4a23-bced-d4d65b9b3935",
+                "type": "vp-port",
+                "x": 755.0001,
+                "y": 291,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+                "links": [
+                  "d91e5dc0-6ad4-4947-8a58-3446cabe88a7"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+              "node_key": "MdockLigandPrep",
+              "name": "Ligand Prep",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Canonicalize a metal-complex XYZ (OpenBabel) and build its molecular graph \u2014 MetalDock pipeline step 2",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Metal Docking",
+              "tags": [],
+              "package_name": "mdock-ligand-prep",
+              "hashtags": [
+                "metaldock",
+                "ligand-prep",
+                "openbabel",
+                "molecular-graph",
+                "metal-complex",
+                "xyz",
+                "molecular-docking",
+                "computational-chemistry"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "\ud83d\udce6"
+              },
+              "doc": "Canonicalize ligand XYZ (OpenBabel) \u2192 build molecular graph (JSON).",
+              "options": {
+                "case_name": "complex",
+                "xyz_file": null,
+                "output_dir": null,
+                "metal_symbol": "",
+                "obabel_path": "obabel",
+                "use_openbabel_python_api": false,
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "complex",
+                  "docstring": "Case name. Leave default to inherit from a predecessor."
+                },
+                "xyz_file": {
+                  "type": "file_edit",
+                  "label": "Ligand XYZ",
+                  "value": "node:demo_data/1jzi_D_REP.xyz",
+                  "docstring": "Metal-complex geometry (.xyz).",
+                  "manual_input": ""
+                },
+                "output_dir": {
+                  "type": "folder",
+                  "label": "Output Directory",
+                  "value": "rel:ligand",
+                  "docstring": "Working dir for canonical XYZ + molecular-graph JSON."
+                },
+                "metal_symbol": {
+                  "type": "string",
+                  "label": "Metal Symbol",
+                  "value": "",
+                  "docstring": "Metal element symbol (e.g. Re, Ru, Cu). Forwarded downstream."
+                },
+                "obabel_path": {
+                  "type": "string",
+                  "label": "obabel Executable",
+                  "value": "obabel",
+                  "docstring": "OpenBabel CLI binary (used unless the API fallback is forced)."
+                },
+                "use_openbabel_python_api": {
+                  "type": "boolean",
+                  "label": "Force OpenBabel Python API",
+                  "value": false,
+                  "docstring": "Skip the obabel CLI and use the Python API directly. Useful when mgltools shadows the conda-forge obabel binary."
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "default_timeout": null,
+              "type": "custom-node",
+              "node_id": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+              "status": "configured",
+              "selected": false,
+              "config": {
+                "case_name": "1jzi_re",
+                "xyz_file": "node:demo_data/1jzi_D_REP.xyz",
+                "output_dir": "rel:ligand",
+                "metal_symbol": "Re",
+                "obabel_path": "obabel",
+                "use_openbabel_python_api": false,
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "1jzi_re",
+              "xyz_file": "node:demo_data/1jzi_D_REP.xyz",
+              "output_dir": "rel:ligand",
+              "metal_symbol": "Re",
+              "obabel_path": "obabel",
+              "use_openbabel_python_api": false,
+              "force_to_run": false
+            }
+          },
+          "2998b1e2-ae42-4859-a8d7-7a5c87793ffc": {
+            "id": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+            "type": "custom-node",
+            "selected": false,
+            "x": 730.0001,
+            "y": 360,
+            "ports": [
+              {
+                "id": "114f4f95-baa9-4450-af09-3f14791ddc81",
+                "type": "vp-port",
+                "x": 730.0001,
+                "y": 360,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "5ad93470-d269-445a-8817-61d9f9a5cdd4",
+                "type": "vp-port",
+                "x": 727.0001,
+                "y": 381,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+                "links": [
+                  "d91e5dc0-6ad4-4947-8a58-3446cabe88a7"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "de45c409-fa94-4c79-9089-f7d7e54e4cfe",
+                "type": "vp-port",
+                "x": 885.0001,
+                "y": 381,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+                "links": [
+                  "f98b1a97-7c21-4ca9-ac57-0069920e190f"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+              "node_key": "MdockQmCharges",
+              "name": "QM Charges",
+              "filename": "node",
+              "node_type": "default",
+              "description": "DFT (ORCA/Gaussian/ADF) \u2192 CM5 partial charges + Mayer bond orders \u2192 enrich molecular graph \u2014 MetalDock pipeline step 3",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Metal Docking",
+              "tags": [],
+              "package_name": "mdock-qm-charges",
+              "hashtags": [
+                "metaldock",
+                "qm-charges",
+                "cm5-charges",
+                "orca",
+                "dft",
+                "mayer-bond-order",
+                "metal-complex",
+                "computational-chemistry"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "\ud83d\udce6"
+              },
+              "doc": "DFT (ORCA/Gaussian/ADF) \u2192 CM5 charges + bond orders \u2192 enrich graph.",
+              "options": {
+                "case_name": "complex",
+                "output_dir": null,
+                "graph_json": "",
+                "xyz_file": "",
+                "engine": "orca",
+                "geom_opt": false,
+                "charge": 0,
+                "spin": 0,
+                "ncpu": 4,
+                "orca_path": "",
+                "orcasimpleinput": "PBE def2-TZVP CPCM(Water)",
+                "orcablocks": "",
+                "functional": "PBE",
+                "basis_set": "def2-TZVP",
+                "solvent": "",
+                "force_to_run": false,
+                "xtb_path": "",
+                "xtb_solvent": "",
+                "xtb_accuracy": 1.0
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "complex",
+                  "docstring": null
+                },
+                "output_dir": {
+                  "type": "folder",
+                  "label": "Output Directory",
+                  "value": "rel:qm",
+                  "docstring": "Working dir for QM scratch + enriched graph."
+                },
+                "graph_json": {
+                  "type": "file_edit",
+                  "label": "Molecular Graph (.json)",
+                  "value": "",
+                  "docstring": "Graph from mdock_ligand_prep. Leave empty to auto-discover `graph_json` from a predecessor.",
+                  "manual_input": ""
+                },
+                "xyz_file": {
+                  "type": "file_edit",
+                  "label": "Canonical XYZ",
+                  "value": "",
+                  "docstring": "Canonicalized geometry. Leave empty to auto-discover `canonical_xyz` from a predecessor.",
+                  "manual_input": ""
+                },
+                "engine": {
+                  "type": "select",
+                  "label": "QM Engine",
+                  "value": "xtb",
+                  "docstring": "DFT backend. ORCA is recommended for transition metals.",
+                  "options": [
+                    "orca",
+                    "gaussian",
+                    "adf"
+                  ]
+                },
+                "geom_opt": {
+                  "type": "boolean",
+                  "label": "Geometry Optimization",
+                  "value": false,
+                  "docstring": "Optimize geometry before charges (expensive). Off = single-point."
+                },
+                "charge": {
+                  "type": "int",
+                  "label": "Total Charge",
+                  "value": 1,
+                  "docstring": "Net charge of the complex."
+                },
+                "spin": {
+                  "type": "float",
+                  "label": "Spin (unpaired e\u207b)",
+                  "value": 0,
+                  "docstring": "Number of unpaired electrons."
+                },
+                "ncpu": {
+                  "type": "int",
+                  "label": "CPU Cores",
+                  "value": 4,
+                  "docstring": null
+                },
+                "orca_path": {
+                  "type": "folder",
+                  "label": "ORCA Directory (optional)",
+                  "value": "",
+                  "docstring": "ORCA install dir. Leave empty if orca is on PATH or ASE_ORCA_COMMAND is set."
+                },
+                "orcasimpleinput": {
+                  "type": "string",
+                  "label": "ORCA Simple Input",
+                  "value": "PBE def2-TZVP CPCM(Water)",
+                  "docstring": "ORCA `! ...` keyword line."
+                },
+                "orcablocks": {
+                  "type": "text",
+                  "label": "ORCA Blocks",
+                  "value": "",
+                  "docstring": "Extra ORCA `%...end` blocks (optional)."
+                },
+                "functional": {
+                  "type": "string",
+                  "label": "Functional (Gaussian/ADF)",
+                  "value": "PBE",
+                  "docstring": null
+                },
+                "basis_set": {
+                  "type": "string",
+                  "label": "Basis Set (Gaussian/ADF)",
+                  "value": "def2-TZVP",
+                  "docstring": null
+                },
+                "solvent": {
+                  "type": "string",
+                  "label": "Solvent (Gaussian/ADF)",
+                  "value": "",
+                  "docstring": null
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                },
+                "xtb_path": {
+                  "type": "folder",
+                  "label": "xtb Directory (optional)",
+                  "value": "",
+                  "docstring": "xtb install dir. Leave empty to use the xtb that ships in this node's environment."
+                },
+                "xtb_solvent": {
+                  "type": "string",
+                  "label": "xtb Solvent (optional)",
+                  "value": "",
+                  "docstring": "ALPB implicit solvent, e.g. 'water'. Empty = gas phase."
+                },
+                "xtb_accuracy": {
+                  "type": "float",
+                  "label": "xtb Accuracy",
+                  "value": 1.0,
+                  "docstring": "xtb SCC accuracy; lower is tighter (default 1.0)."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "default_timeout": null,
+              "type": "custom-node",
+              "node_id": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+              "status": "configured",
+              "selected": false,
+              "config": {
+                "case_name": "1jzi_re",
+                "output_dir": "rel:qm",
+                "graph_json": "",
+                "xyz_file": "",
+                "engine": "xtb",
+                "geom_opt": false,
+                "charge": 1,
+                "spin": 0,
+                "ncpu": 4,
+                "orca_path": "",
+                "orcasimpleinput": "B3LYP def2-SVP",
+                "orcablocks": "",
+                "functional": "PBE",
+                "basis_set": "def2-TZVP",
+                "solvent": "",
+                "force_to_run": false,
+                "xtb_path": "",
+                "xtb_solvent": "",
+                "xtb_accuracy": 1.0
+              }
+            },
+            "config": {
+              "case_name": "1jzi_re",
+              "output_dir": "rel:qm",
+              "graph_json": "",
+              "xyz_file": "",
+              "engine": "xtb",
+              "geom_opt": false,
+              "charge": 1,
+              "spin": 0,
+              "ncpu": 4,
+              "orca_path": "",
+              "orcasimpleinput": "B3LYP def2-SVP",
+              "orcablocks": "",
+              "functional": "PBE",
+              "basis_set": "def2-TZVP",
+              "solvent": "",
+              "force_to_run": false,
+              "xtb_path": "",
+              "xtb_solvent": "",
+              "xtb_accuracy": 1.0
+            }
+          },
+          "4e4be94c-cc9b-4813-8678-1b8824d42589": {
+            "id": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+            "type": "custom-node",
+            "selected": false,
+            "x": 860.0001,
+            "y": 450,
+            "ports": [
+              {
+                "id": "51b48028-d901-495f-97ca-938944613247",
+                "type": "vp-port",
+                "x": 860.0001,
+                "y": 450,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "364eb4b6-7700-4de2-b280-08c7437b3342",
+                "type": "vp-port",
+                "x": 857.0001,
+                "y": 471,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+                "links": [
+                  "f98b1a97-7c21-4ca9-ac57-0069920e190f"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "1cc14426-d3b9-4692-b955-70dfd5ae80c3",
+                "type": "vp-port",
+                "x": 1015.0001,
+                "y": 471,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+                "links": [
+                  "2cf0dfd5-efc0-46e9-a0a0-32794fc54fab"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+              "node_key": "MdockLigandPdbqt",
+              "name": "Ligand PDBQT",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Convert a charge-enriched molecular graph into an AutoDock PDBQT with ROOT/BRANCH torsion tree (metal-aware freezing) \u2014 MetalDock pipeline step 4",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Metal Docking",
+              "tags": [],
+              "package_name": "mdock-ligand-pdbqt",
+              "hashtags": [
+                "metaldock",
+                "pdbqt",
+                "torsion-tree",
+                "rotatable-bonds",
+                "metal-complex",
+                "autodock",
+                "molecular-docking",
+                "computational-chemistry"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "\ud83d\udce6"
+              },
+              "doc": "Enriched graph \u2192 ROOT/BRANCH PDBQT with metal-aware torsion freezing.",
+              "options": {
+                "case_name": "complex",
+                "output_dir": null,
+                "graph_json": "",
+                "metal_symbol": "",
+                "vacant_site": true,
+                "max_torsions": 32,
+                "freeze_coordination_sphere": true,
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "complex",
+                  "docstring": null
+                },
+                "output_dir": {
+                  "type": "folder",
+                  "label": "Output Directory",
+                  "value": "rel:pdbqt",
+                  "docstring": "Working dir for the ligand PDBQT."
+                },
+                "graph_json": {
+                  "type": "file_edit",
+                  "label": "Enriched Graph (.json)",
+                  "value": "",
+                  "docstring": "Charge-enriched graph from mdock_qm_charges. Leave empty to auto-discover `graph_json` from a predecessor.",
+                  "manual_input": ""
+                },
+                "metal_symbol": {
+                  "type": "string",
+                  "label": "Metal Symbol",
+                  "value": "",
+                  "docstring": "Metal element symbol. Leave empty to inherit from a predecessor."
+                },
+                "vacant_site": {
+                  "type": "boolean",
+                  "label": "Add Vacant-Site Dummy",
+                  "value": true,
+                  "docstring": "Add a dummy atom (DD) at the vacant coordination site."
+                },
+                "max_torsions": {
+                  "type": "int",
+                  "label": "Max Active Torsions",
+                  "value": 32,
+                  "docstring": "AutoDock4 hard limit is 32. Excess bonds nearest the metal are frozen first."
+                },
+                "freeze_coordination_sphere": {
+                  "type": "boolean",
+                  "label": "Freeze Coordination Sphere",
+                  "value": true,
+                  "docstring": "Freeze bonds within 2 bonds of the metal (rigid cage for chelators like DOTA when the metal is bound)."
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "default_timeout": null,
+              "type": "custom-node",
+              "node_id": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+              "status": "configured",
+              "selected": false,
+              "config": {
+                "case_name": "1jzi_re",
+                "output_dir": "rel:pdbqt",
+                "graph_json": "",
+                "metal_symbol": "",
+                "vacant_site": true,
+                "max_torsions": 32,
+                "freeze_coordination_sphere": true,
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "1jzi_re",
+              "output_dir": "rel:pdbqt",
+              "graph_json": "",
+              "metal_symbol": "",
+              "vacant_site": true,
+              "max_torsions": 32,
+              "freeze_coordination_sphere": true,
+              "force_to_run": false
+            }
+          },
+          "33904816-686f-4ca2-85d1-a9d4438aa2d2": {
+            "id": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+            "type": "custom-node",
+            "selected": false,
+            "x": 990.0001,
+            "y": 540,
+            "ports": [
+              {
+                "id": "0858fb2b-4343-4df3-8900-fd447d3287c8",
+                "type": "vp-port",
+                "x": 990.0001,
+                "y": 540,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "bb0003c6-6f0a-41a0-b134-be45f6cd3877",
+                "type": "vp-port",
+                "x": 987.0001,
+                "y": 561,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+                "links": [
+                  "2cf0dfd5-efc0-46e9-a0a0-32794fc54fab"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "deb5206e-94ef-4e47-824c-edbe06f8234c",
+                "type": "vp-port",
+                "x": 1145.0001000000002,
+                "y": 561,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+                "links": [
+                  "a4d67a36-f0c9-489c-b68d-24402db8a3d5"
+                ],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+              "node_key": "MdockAutodockRun",
+              "name": "AutoDock Run",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Generate GPF/DPF, run autogrid4 + autodock4, and extract docked poses \u2014 MetalDock pipeline step 5",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Metal Docking",
+              "tags": [],
+              "package_name": "mdock-autodock-run",
+              "hashtags": [
+                "metaldock",
+                "autodock4",
+                "autogrid4",
+                "docking",
+                "genetic-algorithm",
+                "metal-complex",
+                "pose-prediction",
+                "computational-chemistry"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "\ud83d\udce6"
+              },
+              "doc": "GPF/DPF \u2192 autogrid4 \u2192 autodock4 \u2192 extract poses.",
+              "options": {
+                "case_name": "complex",
+                "output_dir": null,
+                "ligand_pdbqt": "",
+                "receptor_pdbqt": "",
+                "graph_json": "",
+                "metal_symbol": "",
+                "parameter_file": "",
+                "num_poses": 10,
+                "box_center": "",
+                "box_size": "20,20,20",
+                "python_path": "pythonsh",
+                "mgltools_dir": "",
+                "autogrid4_path": "autogrid4",
+                "autodock4_path": "autodock4",
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "complex",
+                  "docstring": null
+                },
+                "output_dir": {
+                  "type": "folder",
+                  "label": "Output Directory",
+                  "value": "rel:docking",
+                  "docstring": "Working dir for grid/docking files + poses."
+                },
+                "ligand_pdbqt": {
+                  "type": "file_edit",
+                  "label": "Ligand PDBQT",
+                  "value": "",
+                  "docstring": "Leave empty to auto-discover `ligand_pdbqt` from a predecessor.",
+                  "manual_input": ""
+                },
+                "receptor_pdbqt": {
+                  "type": "file_edit",
+                  "label": "Receptor PDBQT",
+                  "value": "",
+                  "docstring": "Leave empty to auto-discover `receptor_pdbqt` from a predecessor.",
+                  "manual_input": ""
+                },
+                "graph_json": {
+                  "type": "file_edit",
+                  "label": "Molecular Graph (.json)",
+                  "value": "",
+                  "docstring": "Used for the box center (metal position). Leave empty to auto-discover `graph_json`.",
+                  "manual_input": ""
+                },
+                "metal_symbol": {
+                  "type": "string",
+                  "label": "Metal Symbol",
+                  "value": "",
+                  "docstring": "Leave empty to inherit from a predecessor."
+                },
+                "parameter_file": {
+                  "type": "file_edit",
+                  "label": "AutoDock4 Parameter File",
+                  "value": "",
+                  "docstring": "metal_dock.dat. Leave empty to use the bundled default.",
+                  "manual_input": ""
+                },
+                "num_poses": {
+                  "type": "int",
+                  "label": "Number of Poses",
+                  "value": 10,
+                  "docstring": null
+                },
+                "box_center": {
+                  "type": "string",
+                  "label": "Box Center (x,y,z)",
+                  "value": "",
+                  "docstring": "Grid box center in \u00c5. Leave empty to center on the metal atom."
+                },
+                "box_size": {
+                  "type": "string",
+                  "label": "Box Size (x,y,z)",
+                  "value": "20,20,20",
+                  "docstring": "Grid box dimensions in \u00c5."
+                },
+                "python_path": {
+                  "type": "string",
+                  "label": "MGLTools Python",
+                  "value": "pythonsh",
+                  "docstring": null
+                },
+                "mgltools_dir": {
+                  "type": "folder",
+                  "label": "MGLTools Dir (optional)",
+                  "value": "",
+                  "docstring": "AutoDockTools/Utilities24. Leave empty to auto-detect."
+                },
+                "autogrid4_path": {
+                  "type": "string",
+                  "label": "autogrid4 Executable",
+                  "value": "autogrid4",
+                  "docstring": null
+                },
+                "autodock4_path": {
+                  "type": "string",
+                  "label": "autodock4 Executable",
+                  "value": "autodock4",
+                  "docstring": null
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "default_timeout": null,
+              "type": "custom-node",
+              "node_id": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+              "status": "configured",
+              "selected": false,
+              "config": {
+                "case_name": "1jzi_re",
+                "output_dir": "rel:docking",
+                "ligand_pdbqt": "",
+                "receptor_pdbqt": "",
+                "graph_json": "",
+                "metal_symbol": "",
+                "parameter_file": "",
+                "num_poses": 10,
+                "box_center": "1.65,-7.803,27.176",
+                "box_size": "20,20,20",
+                "python_path": "pythonsh",
+                "mgltools_dir": "",
+                "autogrid4_path": "autogrid4",
+                "autodock4_path": "autodock4",
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "1jzi_re",
+              "output_dir": "rel:docking",
+              "ligand_pdbqt": "",
+              "receptor_pdbqt": "",
+              "graph_json": "",
+              "metal_symbol": "",
+              "parameter_file": "",
+              "num_poses": 10,
+              "box_center": "1.65,-7.803,27.176",
+              "box_size": "20,20,20",
+              "python_path": "pythonsh",
+              "mgltools_dir": "",
+              "autogrid4_path": "autogrid4",
+              "autodock4_path": "autodock4",
+              "force_to_run": false
+            }
+          },
+          "58c8f421-764b-43ec-96b8-76305231e11a": {
+            "id": "58c8f421-764b-43ec-96b8-76305231e11a",
+            "type": "custom-node",
+            "selected": false,
+            "x": 1120.0001,
+            "y": 630,
+            "ports": [
+              {
+                "id": "f2762d96-7644-4d31-b7f3-cf45f77215e4",
+                "type": "vp-port",
+                "x": 1120.0001000000002,
+                "y": 630,
+                "name": "flow-in",
+                "alignment": "left",
+                "parentNode": "58c8f421-764b-43ec-96b8-76305231e11a",
+                "links": [],
+                "in": true,
+                "label": "flow-in"
+              },
+              {
+                "id": "6282cb21-84d4-4e69-94d2-9dcb55d1e4e2",
+                "type": "vp-port",
+                "x": 1117.0001000000002,
+                "y": 651,
+                "name": "in-0",
+                "alignment": "left",
+                "parentNode": "58c8f421-764b-43ec-96b8-76305231e11a",
+                "links": [
+                  "a4d67a36-f0c9-489c-b68d-24402db8a3d5"
+                ],
+                "in": true,
+                "label": "in-0"
+              },
+              {
+                "id": "1e3ba409-a12b-4151-ba63-14320957fabb",
+                "type": "vp-port",
+                "x": 1278.4532250000002,
+                "y": 651,
+                "name": "out-0",
+                "alignment": "right",
+                "parentNode": "58c8f421-764b-43ec-96b8-76305231e11a",
+                "links": [],
+                "in": false,
+                "label": "out-0"
+              }
+            ],
+            "options": {
+              "id": "58c8f421-764b-43ec-96b8-76305231e11a",
+              "node_key": "MdockResultsAnalysis",
+              "name": "Results Analysis",
+              "filename": "node",
+              "node_type": "default",
+              "description": "Binding energies, ligand efficiency, interacting residues, and RMSD from docking output \u2014 MetalDock pipeline step 6",
+              "num_in": 1,
+              "num_out": 1,
+              "category": "Metal Docking",
+              "tags": [],
+              "package_name": "mdock-results-analysis",
+              "hashtags": [
+                "metaldock",
+                "analysis",
+                "binding-energy",
+                "ligand-efficiency",
+                "interacting-residues",
+                "rmsd",
+                "molecular-docking",
+                "computational-chemistry"
+              ],
+              "from_registry": true,
+              "icon": {
+                "type": "emoji",
+                "data": "\ud83d\udce6"
+              },
+              "doc": "Binding energies, ligand efficiency, interacting residues, RMSD.",
+              "options": {
+                "case_name": "complex",
+                "output_dir": null,
+                "dlg_path": "",
+                "protein_pdb": "",
+                "reference_xyz": "",
+                "n_heavy_atoms": 0,
+                "cutoff": 4,
+                "num_poses": 0,
+                "force_to_run": false
+              },
+              "option_types": {
+                "case_name": {
+                  "type": "string",
+                  "label": "Case Name",
+                  "value": "complex",
+                  "docstring": null
+                },
+                "output_dir": {
+                  "type": "folder",
+                  "label": "Output Directory",
+                  "value": "rel:analysis",
+                  "docstring": "Working dir for the analysis summary JSON."
+                },
+                "dlg_path": {
+                  "type": "file_edit",
+                  "label": "Docking Log (.dlg)",
+                  "value": "",
+                  "docstring": "Leave empty to auto-discover `dlg_path` from a predecessor.",
+                  "manual_input": ""
+                },
+                "protein_pdb": {
+                  "type": "file_edit",
+                  "label": "Protein PDB",
+                  "value": "",
+                  "docstring": "Cleaned protein for residue contacts. Leave empty to inherit `cleaned_pdb` from a predecessor.",
+                  "manual_input": ""
+                },
+                "reference_xyz": {
+                  "type": "file_edit",
+                  "label": "Reference XYZ (optional)",
+                  "value": "node:demo_data/1jzi_D_REP.xyz",
+                  "docstring": "Crystal/reference geometry; if set, RMSD is computed per pose.",
+                  "manual_input": ""
+                },
+                "n_heavy_atoms": {
+                  "type": "int",
+                  "label": "Heavy Atom Count",
+                  "value": 0,
+                  "docstring": "Heavy atoms in the complex (for ligand efficiency). Leave 0 to inherit `n_heavy_atoms` from a predecessor."
+                },
+                "cutoff": {
+                  "type": "float",
+                  "label": "Contact Cutoff (\u00c5)",
+                  "value": 4.0,
+                  "docstring": "Distance cutoff for interacting-residue detection."
+                },
+                "num_poses": {
+                  "type": "int",
+                  "label": "Poses to Analyze",
+                  "value": 0,
+                  "docstring": "Max poses to analyze. Leave 0 for all available poses."
+                },
+                "force_to_run": {
+                  "type": "boolean",
+                  "label": "Force to Run",
+                  "value": false,
+                  "docstring": "Execute regardless of previous results. When enabled, the node will always run even if the configuration hasn't changed."
+                }
+              },
+              "node_dir": "",
+              "has_demo_data": false,
+              "is_hpc_capable": false,
+              "default_timeout": null,
+              "type": "custom-node",
+              "node_id": "58c8f421-764b-43ec-96b8-76305231e11a",
+              "status": "configured",
+              "selected": true,
+              "config": {
+                "case_name": "1jzi_re",
+                "output_dir": "rel:analysis",
+                "dlg_path": "",
+                "protein_pdb": "",
+                "reference_xyz": "node:demo_data/1jzi_D_REP.xyz",
+                "n_heavy_atoms": 0,
+                "cutoff": 4.0,
+                "num_poses": 0,
+                "force_to_run": false
+              }
+            },
+            "config": {
+              "case_name": "1jzi_re",
+              "output_dir": "rel:analysis",
+              "dlg_path": "",
+              "protein_pdb": "",
+              "reference_xyz": "node:demo_data/1jzi_D_REP.xyz",
+              "n_heavy_atoms": 0,
+              "cutoff": 4.0,
+              "num_poses": 0,
+              "force_to_run": false
+            }
+          }
+        }
+      }
+    ]
+  },
+  "settings": {
+    "workingPath": ""
+  },
+  "graph": {
+    "directed": true,
+    "multigraph": false,
+    "nodes": [
+      {
+        "name": "Protein Prep",
+        "node_id": "5fdda80b-e01e-45b1-93f0-9f3c9ecbc7af",
+        "node_key": "MdockProteinPrep",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "1jzi_re",
+          "pdb_file": "node:demo_data/1jzi.pdb",
+          "output_dir": "rel:protein",
+          "ph": 7.0,
+          "clean": true,
+          "pdb2pqr_path": "pdb2pqr30",
+          "python_path": "pythonsh",
+          "mgltools_dir": null,
+          "force_to_run": false
+        },
+        "package_name": "mdock-protein-prep",
+        "from_registry": true,
+        "id": "5fdda80b-e01e-45b1-93f0-9f3c9ecbc7af",
+        "status": "unconfigured",
+        "data": null,
+        "_node_dir": ""
+      },
+      {
+        "name": "Ligand Prep",
+        "node_id": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+        "node_key": "MdockLigandPrep",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "1jzi_re",
+          "xyz_file": "node:demo_data/1jzi_D_REP.xyz",
+          "output_dir": "rel:ligand",
+          "metal_symbol": "Re",
+          "obabel_path": "obabel",
+          "use_openbabel_python_api": false,
+          "force_to_run": false
+        },
+        "package_name": "mdock-ligand-prep",
+        "from_registry": true,
+        "id": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+        "status": "unconfigured",
+        "data": null,
+        "_node_dir": ""
+      },
+      {
+        "name": "QM Charges",
+        "node_id": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+        "node_key": "MdockQmCharges",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "1jzi_re",
+          "output_dir": "rel:qm",
+          "graph_json": "",
+          "xyz_file": "",
+          "engine": "xtb",
+          "geom_opt": false,
+          "charge": 1,
+          "spin": 0,
+          "ncpu": 4,
+          "orca_path": "",
+          "orcasimpleinput": "B3LYP def2-SVP",
+          "orcablocks": "",
+          "functional": "PBE",
+          "basis_set": "def2-TZVP",
+          "solvent": "",
+          "force_to_run": false,
+          "xtb_path": "",
+          "xtb_solvent": "",
+          "xtb_accuracy": 1.0
+        },
+        "package_name": "mdock-qm-charges",
+        "from_registry": true,
+        "id": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+        "status": "unconfigured",
+        "data": null,
+        "_node_dir": ""
+      },
+      {
+        "name": "Ligand PDBQT",
+        "node_id": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+        "node_key": "MdockLigandPdbqt",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "1jzi_re",
+          "output_dir": "rel:pdbqt",
+          "graph_json": "",
+          "metal_symbol": "",
+          "vacant_site": true,
+          "max_torsions": 32,
+          "freeze_coordination_sphere": true,
+          "force_to_run": false
+        },
+        "package_name": "mdock-ligand-pdbqt",
+        "from_registry": true,
+        "id": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+        "status": "unconfigured",
+        "data": null,
+        "_node_dir": ""
+      },
+      {
+        "name": "AutoDock Run",
+        "node_id": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+        "node_key": "MdockAutodockRun",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "1jzi_re",
+          "output_dir": "rel:docking",
+          "ligand_pdbqt": "",
+          "receptor_pdbqt": "",
+          "graph_json": "",
+          "metal_symbol": "",
+          "parameter_file": "",
+          "num_poses": 10,
+          "box_center": "1.65,-7.803,27.176",
+          "box_size": "20,20,20",
+          "python_path": "pythonsh",
+          "mgltools_dir": "",
+          "autogrid4_path": "autogrid4",
+          "autodock4_path": "autodock4",
+          "force_to_run": false
+        },
+        "package_name": "mdock-autodock-run",
+        "from_registry": true,
+        "id": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+        "status": "unconfigured",
+        "data": null,
+        "_node_dir": ""
+      },
+      {
+        "name": "Results Analysis",
+        "node_id": "58c8f421-764b-43ec-96b8-76305231e11a",
+        "node_key": "MdockResultsAnalysis",
+        "node_type": "default",
+        "filename": "node",
+        "options": {
+          "case_name": "1jzi_re",
+          "output_dir": "rel:analysis",
+          "dlg_path": "",
+          "protein_pdb": "",
+          "reference_xyz": "node:demo_data/1jzi_D_REP.xyz",
+          "n_heavy_atoms": 0,
+          "cutoff": 4.0,
+          "num_poses": 0,
+          "force_to_run": false
+        },
+        "package_name": "mdock-results-analysis",
+        "from_registry": true,
+        "id": "58c8f421-764b-43ec-96b8-76305231e11a",
+        "status": "unconfigured",
+        "data": null,
+        "_node_dir": ""
+      }
+    ],
+    "links": [
+      {
+        "source": "5fdda80b-e01e-45b1-93f0-9f3c9ecbc7af",
+        "target": "5d602e31-b031-4791-a61a-724ee1d5b36c"
+      },
+      {
+        "source": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+        "target": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc"
+      },
+      {
+        "source": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+        "target": "4e4be94c-cc9b-4813-8678-1b8824d42589"
+      },
+      {
+        "source": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+        "target": "33904816-686f-4ca2-85d1-a9d4438aa2d2"
+      },
+      {
+        "source": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+        "target": "58c8f421-764b-43ec-96b8-76305231e11a"
+      }
+    ]
+  },
+  "flow_vars": {
+    "directed": true,
+    "multigraph": false,
+    "nodes": [],
+    "links": []
+  }
+}

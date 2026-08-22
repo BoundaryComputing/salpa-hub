@@ -1,6 +1,6 @@
 [package]
 name = "mdock-qm-charges"
-version = "0.1.1"
+version = "0.2.0"
 description = "DFT (ORCA/Gaussian/ADF) → CM5 partial charges + Mayer bond orders → enrich molecular graph — MetalDock pipeline step 3"
 author = "BoCoFlow / MetalDock"
 license = "LGPL-2.1"

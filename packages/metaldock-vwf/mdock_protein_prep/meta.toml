@@ -1,6 +1,6 @@
 [package]
 name = "mdock-protein-prep"
-version = "0.1.1"
+version = "0.2.0"
 description = "Clean a protein PDB, protonate with pdb2pqr, and convert to PDBQT (prepare_receptor4) — MetalDock pipeline step 1"
 author = "BoCoFlow / MetalDock"
 license = "LGPL-2.1"

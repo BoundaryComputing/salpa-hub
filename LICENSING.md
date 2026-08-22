@@ -53,8 +53,10 @@ paywalled.
 - **Platforms:** linux-64, osx-64 only. **No osx-arm64 / Windows** — MGLTools and
   AutoDock have no builds there (Apple Silicon runs via Rosetta/osx-64).
 - **Third-party tools invoked (not redistributed):** MGLTools/AutoDockTools
-  (non-commercial), AutoDock4/AutoGrid4 (GPL-2), PDB2PQR, OpenBabel, ASE; ORCA (free for
-  academia, user-supplied) for QM/CM5 charges.
+  (non-commercial), AutoDock4/AutoGrid4 (GPL-2), PDB2PQR, OpenBabel, ASE, and **xtb
+  (LGPL-3.0)** — the default charge engine since 0.3.0, installed with the package.
+  ORCA (free for academia, **user-supplied**, not redistributed) remains the DFT
+  accuracy reference and is selected per node.
 
 ---
 

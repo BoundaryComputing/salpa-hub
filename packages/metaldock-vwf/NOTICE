@@ -44,14 +44,49 @@ The scientific modules under _vendor/metaldock_modules/ are a refactored
 (*/node.py, */meta.toml) is original metal-docking work.
 
 ===============================================================================
+Bundled demonstration data
+===============================================================================
+
+The demo_data/ directories carry the inputs for the 1JZI Re case so the shipped
+workflow template runs with nothing to download:
+
+  - mdock_protein_prep/demo_data/1jzi.pdb
+    Azurin from Pseudomonas aeruginosa, RCSB Protein Data Bank entry 1JZI.
+    PDB structure data are released without restriction (CC0-equivalent); cite
+    the depositors and the PDB when reusing them.
+
+  - mdock_ligand_prep/demo_data/1jzi_D_REP.xyz
+    mdock_results_analysis/demo_data/1jzi_D_REP.xyz
+    The Re(phen)(CO)3(His83) complex geometry, taken from the MetalDock
+    repository's example_runs (MIT License; see Upstream above).
+
+  - mdock_qm_charges/demo_data/1jzi_re_orca_reference_graph.json
+    CM5 charges and bond orders for the same complex computed with ORCA 6.1 in
+    this project, kept as the accuracy reference the default xtb engine is
+    compared against. Original to metal-docking.
+
+  - Intermediate artefacts, so that each node can also be run on its own rather
+    than only as a link in the chain. All are outputs of a real run of this
+    pipeline on the two inputs above, not fabricated files; original to
+    metal-docking:
+      mdock_qm_charges/demo_data/1jzi_D_REP_c.xyz
+      mdock_qm_charges/demo_data/1jzi_re_mol_graph.json
+      mdock_ligand_pdbqt/demo_data/1jzi_re_enriched_graph.json
+      mdock_autodock_run/demo_data/1jzi_re_enriched_graph.json
+      mdock_autodock_run/demo_data/1jzi_re_ligand.pdbqt
+      mdock_autodock_run/demo_data/clean_1jzi.pdbqt
+
+===============================================================================
 Third-party tools invoked (not redistributed)
 ===============================================================================
 
   - MGLTools / AutoDockTools (Scripps, NON-COMMERCIAL license) -
     prepare_receptor4.py, prepare_gpf4.py, pythonsh
   - AutoDock4 / AutoGrid4 (GPL-2, separate binaries) - https://autodock.scripps.edu
+  - xtb (LGPL-3.0, Grimme group, University of Bonn) - default QM engine,
+    GFN1-xTB CM5 charges - https://github.com/grimme-lab/xtb
   - pdb2pqr, OpenBabel, ASE
-  - ORCA (user-supplied, free for academic use) - QM / CM5 charges -
+  - ORCA (user-supplied, free for academic use) - DFT / CM5 charges -
     https://www.faccts.de/products/orca
 
 See README.md for the pipeline description and per-node details.

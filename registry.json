@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-08-04T18:26:47.734790+00:00",
+  "generated_at": "2026-08-22T07:45:26.893469+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
@@ -68,7 +68,7 @@
     },
     {
       "name": "metaldock-vwf",
-      "version": "0.2.3",
+      "version": "0.3.0",
       "description": "Visual workflow nodes for metal-protein docking: the refactored MetalDock pipeline (protein prep, ligand prep, QM/ORCA CM5 charges, ligand PDBQT with metal-aware torsion tree, AutoDock4 docking, results analysis) wired as chainable Salpa nodes. Each node wraps one src/metaldock_modules function; molecular graphs are serialized to JSON between nodes.",
       "category": "Metal Docking",
       "hashtags": [
@@ -849,6 +849,31 @@
         "hello-world-pipeline"
       ],
       "file": "packages/hello-world-pipeline/workflows/hello-world-pipeline.json",
+      "author": "BoundaryComputing"
+    },
+    {
+      "id": "metaldock-1jzi-re-pipeline",
+      "name": "MetalDock 1JZI Re Pipeline",
+      "description": "Metal-aware docking of the Re(phen)(CO)3 complex into azurin (PDB 1JZI) \u2014 the vacancy-coordination-sphere case from the MetalDock paper. Receptor preparation, ligand molecular graph, GFN1-xTB CM5 charges, metal-aware ligand PDBQT, AutoDock4 search and pose analysis. The inputs ship inside the nodes and the charge engine installs with them, so it runs as loaded with nothing to download.",
+      "category": "molecular-docking",
+      "difficulty": "advanced",
+      "estimated_time": "5 minutes",
+      "tags": [
+        "molecular-docking",
+        "metal-complex",
+        "metalloprotein",
+        "autodock4",
+        "autogrid4",
+        "qm-charges",
+        "cm5-charges",
+        "xtb",
+        "pdbqt",
+        "metaldock"
+      ],
+      "required_packages": [
+        "metaldock-vwf"
+      ],
+      "file": "packages/metaldock-vwf/workflows/metaldock-1jzi-re-pipeline.json",
       "author": "BoundaryComputing"
     },
     {
