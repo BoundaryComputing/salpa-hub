@@ -4,6 +4,32 @@ All notable changes to the `metaldock-vwf` package are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning is
 [SemVer](https://semver.org/).
 
+## [0.3.1] — 2026-08-22
+
+### Fixed
+
+- **Docking failed in the packaged app because the install path contains a
+  space.** Salpa installs nodes under `~/Library/Application Support/`, and the
+  node wrote that absolute path into the GPF and DPF as `parameter_file`.
+  AutoGrid and AutoDock read those files as whitespace-delimited text and the
+  format has no quoting syntax, so the path was truncated at the space:
+  `autodock4: FATAL ERROR: Sorry, I can't find or open /Users/…/Application`.
+  The parameter library is now staged into the run directory and referenced by
+  bare filename, which is how every other path in these files already works and
+  is robust even when the user's own working directory contains a space.
+  Development runs were unaffected because the development home contains no
+  space, which is why every earlier run of this package passed.
+- **A failed `prepare_gpf4` no longer passes silently.** A non-zero exit was
+  logged as a warning and execution continued on a truncated grid parameter
+  file, so the run failed ten minutes later inside AutoDock instead of
+  immediately at the step that actually broke.
+- **`ligand_types` is located by keyword rather than by line number.** The
+  parser took line index 5 unconditionally; when the grid parameter file was
+  malformed it harvested numbers from the `nbp_r_eps` block as atom types and
+  requested maps such as `clean_1jzi.0.2966.map`. A well-formed file one line
+  out of position produced the same class of error. A missing `ligand_types`
+  line is now an error rather than silent corruption.
+
 ## [0.3.0] — 2026-08-20
 
 The package now runs. Everything below the first heading is a prerequisite for

@@ -111,6 +111,9 @@ def run_autodock(
     if not internal_param and lj_params is None:
         lj_params = get_lj_params(metal_symbol)
 
+    # Reference the parameter library by bare name (see _stage_parameter_file)
+    parameter_file = _stage_parameter_file(parameter_file, output_dir)
+
     # GPF
     gpf_path = output_dir / f"{name_ligand}_{name_protein}.gpf"
     _create_gpf_file(
@@ -209,6 +212,23 @@ def _auto_box_size(graph: nx.Graph, metal_symbol: str, spacing: float, scale_fac
 # GPF / DPF file creation
 # ===================================================================
 
+def _stage_parameter_file(parameter_file: Path, output_dir: Path) -> Path:
+    """Copy the parameter library into output_dir; return its bare filename.
+
+    autogrid4/autodock4 read the GPF and DPF as whitespace-delimited text and
+    the format has no quoting syntax, so an absolute ``parameter_file`` path
+    containing a space is silently truncated at that space.  The packaged app
+    installs nodes under ``~/Library/Application Support/``, which contains
+    one.  Every other path in these files is already a bare filename resolved
+    against the run directory, so stage this one the same way.
+    """
+    src = Path(parameter_file)
+    dst = Path(output_dir) / src.name
+    if not (dst.exists() and src.exists() and src.samefile(dst)):
+        shutil.copyfile(src, dst)
+    return Path(src.name)
+
+
 def _create_gpf_file(
     ligand_pdbqt: Path,
     receptor_pdbqt: Path,
@@ -241,7 +261,10 @@ def _create_gpf_file(
     ]
     result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(gpf_path.parent))
     if result.returncode != 0:
-        logger.warning("prepare_gpf4 stderr: %s", result.stderr)
+        raise RuntimeError(
+            f"prepare_gpf4 failed (exit {result.returncode}) writing {gpf_path.name}.\n"
+            f"stderr: {result.stderr.strip()}"
+        )
 
     # Append metal-specific LJ parameters
     with open(gpf_path, "a") as f:
@@ -280,7 +303,15 @@ def _create_dpf_file(
     with open(gpf_path) as f:
         gpf_lines = [line.split() for line in f]
 
-    ligand_type = gpf_lines[5][1:]  # skip 'ligand_types'
+    for _tokens in gpf_lines:
+        if _tokens and _tokens[0] == "ligand_types":
+            ligand_type = _tokens[1:]
+            break
+    else:
+        raise RuntimeError(
+            f"No 'ligand_types' line in {gpf_path}; the grid parameter file is "
+            f"malformed and autogrid4 would produce unusable maps."
+        )
     # Remove trailing grid-related entries
     while ligand_type and ligand_type[-1] in ("#", "atom", "types", "in", "ligand"):
         ligand_type.pop()
