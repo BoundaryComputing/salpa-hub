@@ -166,13 +166,11 @@ def resolve_mgltools_interpreter(python_path: str | Path) -> tuple[str, dict]:
         exec $python $pyflags $@
 
     `$@` is **unquoted**, so the shell re-splits every argument on whitespace
-    before Python ever sees it. A receptor at
-
-        /Users/you/Salpa Runs/case/clean.pdb
-
-    arrives as two arguments and MolKit reports `/Users/you/Salpa does't exist`.
-    No amount of care on our side prevents this — `subprocess` passes a correct
-    argv, and the wrapper destroys it afterwards.
+    before Python ever sees it. A receptor under a directory such as
+    ``Salpa Runs/case/clean.pdb`` arrives as two arguments, and MolKit reports
+    that everything up to the first space "does't exist" (sic). No amount of
+    care on our side prevents this — `subprocess` passes a correct argv, and the
+    wrapper destroys it afterwards.
 
     All the wrapper actually does is point PYTHONHOME/PYTHONPATH at the MGLTools
     tree and exec the interpreter beside it. Do that directly and no shell is
