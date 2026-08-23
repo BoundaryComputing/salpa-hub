@@ -4,6 +4,35 @@ All notable changes to the `metaldock-vwf` package are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning is
 [SemVer](https://semver.org/).
 
+## [0.3.2] — 2026-08-23
+
+### Fixed
+
+- **Docking still failed when the *working* directory contained a space.** 0.3.1
+  fixed the AutoDock parameter file, which was one site; this is a second and
+  independent one. Running the 1JZI example from `~/Salpa Runs/metaldock-1jzi`
+  died in the first node with:
+
+      AssertionError: /Users/…/Salpa does't exist
+
+  The cause is MGLTools' own `pythonsh` wrapper, whose final line is
+
+      exec $python $pyflags $@
+
+  with `$@` **unquoted**. The shell re-splits every argument on whitespace after
+  Python's `subprocess` has already passed a correct argv, so no amount of care
+  on the calling side prevents it — and passing a list rather than a string does
+  not help, which is why this survived review.
+
+  Both affected calls (`prepare_receptor4` and `prepare_gpf4`) now invoke the
+  interpreter that `pythonsh` wraps, supplying the `PYTHONHOME` and `PYTHONPATH`
+  it would have set. No shell is involved at any point, so this holds for a space
+  anywhere in the path — the working directory, the script location, or the
+  user's home — rather than only where we thought to look.
+
+  Verified against the failing input: the receptor PDBQT is written with 2384
+  atoms, while the same call through `pythonsh` still fails identically.
+
 ## [0.3.1] — 2026-08-22
 
 ### Fixed

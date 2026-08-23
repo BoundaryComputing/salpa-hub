@@ -153,3 +153,47 @@ def load_graph(path: str | Path) -> nx.Graph:
 def default_parameter_file() -> Path:
     """Return the path to the bundled metal_dock.dat AutoDock4 parameter file."""
     return DATA_DIR / "metal_dock.dat"
+
+
+# ---------------------------------------------------------------------------
+# MGLTools interpreter
+# ---------------------------------------------------------------------------
+def resolve_mgltools_interpreter(python_path: str | Path) -> tuple[str, dict]:
+    """Return (interpreter, env_overrides) that run an MGLTools script safely.
+
+    MGLTools ships `pythonsh`, a shell wrapper whose final line is:
+
+        exec $python $pyflags $@
+
+    `$@` is **unquoted**, so the shell re-splits every argument on whitespace
+    before Python ever sees it. A receptor at
+
+        /Users/you/Salpa Runs/case/clean.pdb
+
+    arrives as two arguments and MolKit reports `/Users/you/Salpa does't exist`.
+    No amount of care on our side prevents this — `subprocess` passes a correct
+    argv, and the wrapper destroys it afterwards.
+
+    All the wrapper actually does is point PYTHONHOME/PYTHONPATH at the MGLTools
+    tree and exec the interpreter beside it. Do that directly and no shell is
+    involved at any point, which fixes spaces everywhere — the working directory,
+    the script path, and the user's home — rather than only where we remembered
+    to look.
+
+    A `python_path` that is not `pythonsh` is returned unchanged, so callers may
+    still pass a real interpreter explicitly.
+    """
+    p = Path(python_path)
+    if p.name != "pythonsh":
+        return str(python_path), {}
+
+    mgl_root = p.parent.parent            # <env>/bin/pythonsh -> <env>
+    real_python = mgl_root / "bin" / "python"
+    if not real_python.exists():
+        # Nothing better available; the wrapper still works for space-free paths.
+        return str(python_path), {}
+
+    return str(real_python), {
+        "PYTHONHOME": str(mgl_root),
+        "PYTHONPATH": str(mgl_root / "MGLToolsPckgs"),
+    }

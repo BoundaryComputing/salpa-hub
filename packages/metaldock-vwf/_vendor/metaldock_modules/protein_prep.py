@@ -8,8 +8,11 @@ No os.chdir(), no global env vars, no god-object.
 
 import logging
 import shutil
+import os
 import subprocess
 from pathlib import Path
+
+from .utils import resolve_mgltools_interpreter
 
 logger = logging.getLogger(__name__)
 
@@ -112,8 +115,13 @@ def create_receptor_pdbqt(
             raise ValueError("Provide either prepare_receptor_script or mgltools_dir")
         prepare_receptor_script = Path(mgltools_dir) / "prepare_receptor4.py"
 
+    # MGLTools' pythonsh re-splits every argument on whitespace; call the
+    # interpreter it wraps instead. See resolve_mgltools_interpreter.
+    interpreter, env_overrides = resolve_mgltools_interpreter(python_path)
+    env = {**os.environ, **env_overrides} if env_overrides else None
+
     cmd = [
-        python_path,
+        interpreter,
         str(prepare_receptor_script),
         "-U", "nphs",
         "-A", "None",
@@ -121,7 +129,7 @@ def create_receptor_pdbqt(
         "-o", str(pdbqt_path),
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, env=env)
     if result.returncode != 0:
         logger.error(
             "prepare_receptor4 failed (rc=%d):\nstdout: %s\nstderr: %s",

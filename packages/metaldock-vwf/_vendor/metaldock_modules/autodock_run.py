@@ -10,6 +10,7 @@ No os.chdir() — uses cwd= parameter for subprocess calls.
 import logging
 import math
 import re
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -17,7 +18,7 @@ from pathlib import Path
 import networkx as nx
 import numpy as np
 
-from .utils import get_lj_params, INTERNAL_PARAM_METALS
+from .utils import get_lj_params, INTERNAL_PARAM_METALS, resolve_mgltools_interpreter
 
 logger = logging.getLogger(__name__)
 
@@ -249,8 +250,13 @@ def _create_gpf_file(
             raise ValueError("Provide prepare_gpf_script or mgltools_dir")
         prepare_gpf_script = Path(mgltools_dir) / "prepare_gpf4.py"
 
+    # pythonsh re-splits arguments on whitespace (see resolve_mgltools_interpreter),
+    # which destroys any ligand/receptor path containing a space.
+    interpreter, env_overrides = resolve_mgltools_interpreter(python_path)
+    env = {**os.environ, **env_overrides} if env_overrides else None
+
     cmd = [
-        python_path,
+        interpreter,
         str(prepare_gpf_script),
         "-l", str(ligand_pdbqt),
         "-r", str(receptor_pdbqt),
@@ -259,7 +265,7 @@ def _create_gpf_file(
         "-p", f"gridcenter={box_center[0]:.6f},{box_center[1]:.6f},{box_center[2]:.6f}",
         "-o", str(gpf_path),
     ]
-    result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(gpf_path.parent))
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(gpf_path.parent), env=env)
     if result.returncode != 0:
         raise RuntimeError(
             f"prepare_gpf4 failed (exit {result.returncode}) writing {gpf_path.name}.\n"

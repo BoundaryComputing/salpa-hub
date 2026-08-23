@@ -1,6 +1,6 @@
 [package]
 name = "metaldock-vwf"
-version = "0.3.1"
+version = "0.3.2"
 description = "Visual workflow nodes for metal-protein docking: the refactored MetalDock pipeline (protein prep, ligand prep, QM/ORCA CM5 charges, ligand PDBQT with metal-aware torsion tree, AutoDock4 docking, results analysis) wired as chainable Salpa nodes. Each node wraps one src/metaldock_modules function; molecular graphs are serialized to JSON between nodes."
 author = "BoundaryComputing / MetalDock"
 license = "LGPL-2.1 (non-commercial: MGLTools)"

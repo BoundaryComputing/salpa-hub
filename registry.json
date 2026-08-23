@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-08-22T13:32:41.914638+00:00",
+  "generated_at": "2026-08-23T11:46:29.777421+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
@@ -68,7 +68,7 @@
     },
     {
       "name": "metaldock-vwf",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "description": "Visual workflow nodes for metal-protein docking: the refactored MetalDock pipeline (protein prep, ligand prep, QM/ORCA CM5 charges, ligand PDBQT with metal-aware torsion tree, AutoDock4 docking, results analysis) wired as chainable Salpa nodes. Each node wraps one src/metaldock_modules function; molecular graphs are serialized to JSON between nodes.",
       "category": "Metal Docking",
       "hashtags": [
