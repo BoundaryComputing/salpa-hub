@@ -95,6 +95,35 @@ no crystallographic pose exists to compare against. Leaving 1JZI's reference in
 place would have compared a ferrocene pose to a rhenium complex and printed a
 number that looks like validation and means nothing.
 
+## Provenance of this template
+
+The shipped JSON was round-tripped through the app: loaded from the Hub via the
+template picker, executed, then exported with `POST /api/workflow/{id}/export-template`
+and diffed against the file in this package.
+
+Everything the canvas owns matches exactly — 6 nodes, 5 links, identical node
+geometry, identical `graph` and `flow_vars`, and **zero differences across every
+configured parameter**.
+
+`template_info` is the exception, and it is worth knowing why:
+
+| field | UI export | shipped |
+|---|---|---|
+| `id` | `hsa-ferrocene-sudlow-site-i` (derived from the name) | `metaldock-hsa-ferrocene` |
+| `category` | *(dropped)* | `molecular-docking` |
+| `difficulty` | *(dropped)* | `advanced` |
+| `estimated_time` | *(dropped)* | `5 minutes` |
+| `author` | *(dropped)* | `BoundaryComputing` |
+| `tags` | *(dropped)* | 10 tags |
+
+**A raw UI export is therefore not a shippable template.** Those fields are
+curation — they decide how the template appears in the picker and cannot be
+recovered from a canvas, because the canvas never knew them. The `id` matters
+doubly: it is what `registry.json` keys on, so letting the export regenerate it
+would silently orphan the registry entry.
+
+Export to verify the workflow; keep the curated header.
+
 ## What this case also establishes
 
 Fe takes a different code path from Re. It is in `INTERNAL_PARAM_METALS`, so
