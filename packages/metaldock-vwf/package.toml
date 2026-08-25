@@ -1,6 +1,6 @@
 [package]
 name = "metaldock-vwf"
-version = "0.3.2"
+version = "0.4.0"
 description = "Visual workflow nodes for metal-protein docking: the refactored MetalDock pipeline (protein prep, ligand prep, QM/ORCA CM5 charges, ligand PDBQT with metal-aware torsion tree, AutoDock4 docking, results analysis) wired as chainable Salpa nodes. Each node wraps one src/metaldock_modules function; molecular graphs are serialized to JSON between nodes."
 author = "BoundaryComputing / MetalDock"
 license = "LGPL-2.1 (non-commercial: MGLTools)"
@@ -65,4 +65,7 @@ tutorial = "TUTORIAL.md"
 # node's own demo_data and every output a `rel:` path under the workflow's
 # working directory, so it carries no trace of the machine that made it.
 [package.workflows]
-examples = ["workflows/metaldock-1jzi-re-pipeline.json"]
+examples = [
+    "workflows/metaldock-1jzi-re-pipeline.json",
+    "workflows/metaldock-hsa-ferrocene.json",
+]

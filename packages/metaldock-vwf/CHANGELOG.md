@@ -4,6 +4,52 @@ All notable changes to the `metaldock-vwf` package are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning is
 [SemVer](https://semver.org/).
 
+## [0.4.0] — 2026-08-25
+
+### Added
+
+- **A second worked example: ferrocene into human serum albumin.** The 1JZI case
+  is a *redocking* — the complex comes out of the same crystal it goes back into,
+  so the binding site is known before you start and success is measured as RMSD
+  against the answer. That is a validation exercise, and it quietly teaches a
+  workflow nobody can reproduce on a new target.
+
+  This one is a prediction. The receptor is apo (PDB 1AO6, chain A — HSA is
+  monomeric in solution, so the crystallographic second copy is dropped), the
+  ligand is an independent GFN1-xTB geometry rather than something extracted from
+  the protein, and there is no reference pose, so `reference_xyz` is deliberately
+  empty: RMSD-to-truth does not exist for a prediction and reporting one would be
+  theatre.
+
+  Suggested by Sylvestre Bonnet, who noted the demo should dock into a protein
+  that does not already contain a metal complex, and named albumin as the system
+  to do it with.
+
+- **Fe is exercised for the first time.** Fe sits in `INTERNAL_PARAM_METALS`, so
+  it takes a different path from Re: `get_lj_params` returns `None`, no
+  `nbp_r_eps` lines are written, and docking relies on `atom_par Fe` from the
+  parameter library. That branch had never been run. It works — xtb converges CM5
+  charges on Fe(II), the graph builder resolves eta-5 sandwich bonding (30 bonds
+  for 21 atoms = 10 C-H + 10 C-C + 10 Fe-C), and AutoDock docks it.
+
+### The part worth reading
+
+Choosing the site is the step the 1JZI demo hides, and getting it wrong does not
+raise an error — it returns a worse answer somewhere else.
+
+The first attempt centred the box on the **centroid of Trp214**, the residue that
+lines Sudlow site I. That is 9.7 A from the pocket: with a 20 A box it put the
+real site on the boundary. Result: -2.63 kcal/mol, poses spread over 0.45
+kcal/mol, and contacts in residues 328-354 — subdomain IIB, the wrong place.
+
+The shipped template takes the centre from **R-warfarin co-crystallised in 2BXD**,
+transferred into the 1AO6 frame by Kabsch superposition on all 578 CA atoms
+(RMSD 0.88 A). Result: -3.00 kcal/mol, all poses within 0.01 kcal/mol, and 11 of
+12 contacting residues in subdomain IIA — TYR150, ARG222, LEU238, ARG257, LEU260,
+ALA261, ILE264, LYS286, SER287, HIS288, ILE290, ALA291.
+
+A residue centroid is not a pocket centroid. A co-crystallised ligand is.
+
 ## [0.3.2] — 2026-08-23
 
 ### Fixed

@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-08-23T11:47:31.569229+00:00",
+  "generated_at": "2026-08-25T15:16:50.935481+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
@@ -68,7 +68,7 @@
     },
     {
       "name": "metaldock-vwf",
-      "version": "0.3.2",
+      "version": "0.4.0",
       "description": "Visual workflow nodes for metal-protein docking: the refactored MetalDock pipeline (protein prep, ligand prep, QM/ORCA CM5 charges, ligand PDBQT with metal-aware torsion tree, AutoDock4 docking, results analysis) wired as chainable Salpa nodes. Each node wraps one src/metaldock_modules function; molecular graphs are serialized to JSON between nodes.",
       "category": "Metal Docking",
       "hashtags": [
@@ -874,6 +874,31 @@
         "metaldock-vwf"
       ],
       "file": "packages/metaldock-vwf/workflows/metaldock-1jzi-re-pipeline.json",
+      "author": "BoundaryComputing"
+    },
+    {
+      "id": "metaldock-hsa-ferrocene",
+      "name": "HSA + Ferrocene (Sudlow site I)",
+      "description": "Site-directed docking of ferrocene into human serum albumin \u2014 a protein with no metal complex bound. Unlike the 1JZI case this is a prediction, not a redocking: the receptor is apo (PDB 1AO6, chain A), the ligand is an independent xtb-optimised geometry, and the search box is placed on Sudlow site I using the position of R-warfarin co-crystallised in 2BXD, transferred by superposition. Exercises AutoDock's internal Fe parameters.",
+      "category": "molecular-docking",
+      "difficulty": "advanced",
+      "estimated_time": "5 minutes",
+      "tags": [
+        "molecular-docking",
+        "metal-complex",
+        "metalloprotein",
+        "autodock4",
+        "autogrid4",
+        "qm-charges",
+        "cm5-charges",
+        "xtb",
+        "pdbqt",
+        "metaldock"
+      ],
+      "required_packages": [
+        "metaldock-vwf"
+      ],
+      "file": "packages/metaldock-vwf/workflows/metaldock-hsa-ferrocene.json",
       "author": "BoundaryComputing"
     },
     {
