@@ -99,9 +99,13 @@ needs (`graph_json`, `canonical_xyz`, `ligand_pdbqt`, `receptor_pdbqt`,
 
 ## Example workflow
 
-The package ships one installable template,
-**MetalDock 1JZI Re Pipeline** (`workflows/metaldock-1jzi-re-pipeline.json`), which
-reproduces the 1JZI case from the MetalDock paper.
+The package ships **two** installable templates. They answer different questions,
+and the difference is the point.
+
+### 1. MetalDock 1JZI Re Pipeline — a redocking
+
+`workflows/metaldock-1jzi-re-pipeline.json`, reproducing the 1JZI case from the
+MetalDock paper.
 
 - **Receptor:** 1JZI, *Pseudomonas aeruginosa* azurin
 - **Ligand:** Re(phen)(CO)₃(His83) — 29 atoms, vacant coordination site
@@ -114,6 +118,26 @@ the workflow's working directory, so it runs wherever it is opened.
 
 `workflows/1jzi_re_demo.md` documents the same case in more detail, including how
 to run it against ORCA instead.
+
+### 2. HSA + Ferrocene (Sudlow site I) — a prediction
+
+`workflows/metaldock-hsa-ferrocene.json`. The receptor has no metal complex in
+it, so there is no crystallographic pose to recover and no RMSD to report.
+
+- **Receptor:** 1AO6, human serum albumin, chain A (HSA is monomeric in solution)
+- **Ligand:** ferrocene, Fe(C₅H₅)₂ — an independent GFN1-xTB geometry
+- **Site:** Sudlow site I, subdomain IIA, centred on the position of R-warfarin
+  co-crystallised in 2BXD and superposed into the 1AO6 frame
+- **Charges:** GFN1-xTB, neutral, closed shell
+
+This is the case that exercises **Fe**, which takes AutoDock's internal
+parameters rather than the tabulated LJ terms Re uses.
+
+It also demonstrates the step the redocking hides: **choosing the binding site.**
+Centring the box on the centroid of Trp214 — the residue that lines Sudlow I, and
+the obvious guess — lands 9.7 Å from the pocket and returns a weaker pose in the
+wrong subdomain, without erroring. `workflows/hsa_ferrocene_demo.md` sets both
+attempts side by side.
 
 ## Outputs and interpretation
 
@@ -129,6 +153,12 @@ to run it against ORCA instead.
 Published reference values for this case with ORCA/DFT charges: ΔG ≈ −5.54
 kcal/mol, roughly 12 interacting residues, RMSD ≈ 5.9 Å against the
 crystallographic pose. Semi-empirical charges will not reproduce these exactly.
+
+For the HSA case there is **no** reference pose, so `reference_xyz` is left empty
+and `rmsd_values` comes back empty with it. That is correct: a prediction has no
+answer to be scored against, and reporting an RMSD anyway would be theatre.
+Judge it on binding energy and on which residues line the pose — here −3.00
+kcal/mol with 11 of 12 contacts in subdomain IIA.
 
 ## Requirements and platforms
 
