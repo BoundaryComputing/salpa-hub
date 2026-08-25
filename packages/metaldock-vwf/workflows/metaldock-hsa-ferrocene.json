@@ -274,13 +274,13 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "complex",
+                  "value": "hsa_fe",
                   "docstring": "Name for this docking case (forwarded downstream)."
                 },
                 "pdb_file": {
                   "type": "file_edit",
                   "label": "Protein PDB",
-                  "value": "node:demo_data/1jzi.pdb",
+                  "value": "node:demo_data/1ao6_A.pdb",
                   "docstring": "Input protein structure (.pdb).",
                   "manual_input": ""
                 },
@@ -293,7 +293,7 @@
                 "ph": {
                   "type": "float",
                   "label": "Protonation pH",
-                  "value": 7.0,
+                  "value": 7.4,
                   "docstring": "pH used by pdb2pqr for protonation."
                 },
                 "clean": {
@@ -348,10 +348,10 @@
               }
             },
             "config": {
-              "case_name": "1jzi_re",
-              "pdb_file": "node:demo_data/1jzi.pdb",
+              "case_name": "hsa_fe",
+              "pdb_file": "node:demo_data/1ao6_A.pdb",
               "output_dir": "rel:protein",
-              "ph": 7.0,
+              "ph": 7.4,
               "clean": true,
               "pdb2pqr_path": "pdb2pqr30",
               "python_path": "pythonsh",
@@ -449,13 +449,13 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "complex",
+                  "value": "hsa_fe",
                   "docstring": "Case name. Leave default to inherit from a predecessor."
                 },
                 "xyz_file": {
                   "type": "file_edit",
                   "label": "Ligand XYZ",
-                  "value": "node:demo_data/1jzi_D_REP.xyz",
+                  "value": "node:demo_data/ferrocene.xyz",
                   "docstring": "Metal-complex geometry (.xyz).",
                   "manual_input": ""
                 },
@@ -468,7 +468,7 @@
                 "metal_symbol": {
                   "type": "string",
                   "label": "Metal Symbol",
-                  "value": "",
+                  "value": "Fe",
                   "docstring": "Metal element symbol (e.g. Re, Ru, Cu). Forwarded downstream."
                 },
                 "obabel_path": {
@@ -509,10 +509,10 @@
               }
             },
             "config": {
-              "case_name": "1jzi_re",
-              "xyz_file": "node:demo_data/1jzi_D_REP.xyz",
+              "case_name": "hsa_fe",
+              "xyz_file": "node:demo_data/ferrocene.xyz",
               "output_dir": "rel:ligand",
-              "metal_symbol": "Re",
+              "metal_symbol": "Fe",
               "obabel_path": "obabel",
               "use_openbabel_python_api": false,
               "force_to_run": false
@@ -620,7 +620,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "complex",
+                  "value": "hsa_fe",
                   "docstring": null
                 },
                 "output_dir": {
@@ -663,7 +663,7 @@
                 "charge": {
                   "type": "int",
                   "label": "Total Charge",
-                  "value": 1,
+                  "value": 0,
                   "docstring": "Net charge of the complex."
                 },
                 "spin": {
@@ -687,7 +687,7 @@
                 "orcasimpleinput": {
                   "type": "string",
                   "label": "ORCA Simple Input",
-                  "value": "PBE def2-TZVP CPCM(Water)",
+                  "value": "B3LYP def2-SVP",
                   "docstring": "ORCA `! ...` keyword line."
                 },
                 "orcablocks": {
@@ -770,13 +770,13 @@
               }
             },
             "config": {
-              "case_name": "1jzi_re",
+              "case_name": "hsa_fe",
               "output_dir": "rel:qm",
               "graph_json": "",
               "xyz_file": "",
               "engine": "xtb",
               "geom_opt": false,
-              "charge": 1,
+              "charge": 0,
               "spin": 0,
               "ncpu": 4,
               "orca_path": "",
@@ -882,7 +882,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "complex",
+                  "value": "hsa_fe",
                   "docstring": null
                 },
                 "output_dir": {
@@ -949,7 +949,7 @@
               }
             },
             "config": {
-              "case_name": "1jzi_re",
+              "case_name": "hsa_fe",
               "output_dir": "rel:pdbqt",
               "graph_json": "",
               "metal_symbol": "",
@@ -1057,7 +1057,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "complex",
+                  "value": "hsa_fe",
                   "docstring": null
                 },
                 "output_dir": {
@@ -1109,7 +1109,7 @@
                 "box_center": {
                   "type": "string",
                   "label": "Box Center (x,y,z)",
-                  "value": "",
+                  "value": "34.64,32.92,36.18",
                   "docstring": "Grid box center in \u00c5. Leave empty to center on the metal atom."
                 },
                 "box_size": {
@@ -1176,7 +1176,7 @@
               }
             },
             "config": {
-              "case_name": "1jzi_re",
+              "case_name": "hsa_fe",
               "output_dir": "rel:docking",
               "ligand_pdbqt": "",
               "receptor_pdbqt": "",
@@ -1184,7 +1184,7 @@
               "metal_symbol": "",
               "parameter_file": "",
               "num_poses": 10,
-              "box_center": "1.65,-7.803,27.176",
+              "box_center": "34.64,32.92,36.18",
               "box_size": "20,20,20",
               "python_path": "pythonsh",
               "mgltools_dir": "",
@@ -1283,7 +1283,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "complex",
+                  "value": "hsa_fe",
                   "docstring": null
                 },
                 "output_dir": {
@@ -1309,7 +1309,7 @@
                 "reference_xyz": {
                   "type": "file_edit",
                   "label": "Reference XYZ (optional)",
-                  "value": "node:demo_data/1jzi_D_REP.xyz",
+                  "value": "",
                   "docstring": "Crystal/reference geometry; if set, RMSD is computed per pose.",
                   "manual_input": ""
                 },
@@ -1359,11 +1359,11 @@
               }
             },
             "config": {
-              "case_name": "1jzi_re",
+              "case_name": "hsa_fe",
               "output_dir": "rel:analysis",
               "dlg_path": "",
               "protein_pdb": "",
-              "reference_xyz": "node:demo_data/1jzi_D_REP.xyz",
+              "reference_xyz": "",
               "n_heavy_atoms": 0,
               "cutoff": 4.0,
               "num_poses": 0,
@@ -1384,15 +1384,15 @@
     "nodes": [
       {
         "name": "Protein Prep",
-        "node_id": "5fdda80b-e01e-45b1-93f0-9f3c9ecbc7af",
+        "node_id": "d1b181ba-5399-4d9f-a994-419e5ff1169f",
         "node_key": "MdockProteinPrep",
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "1jzi_re",
-          "pdb_file": "node:demo_data/1jzi.pdb",
+          "case_name": "hsa_fe",
+          "pdb_file": "node:demo_data/1ao6_A.pdb",
           "output_dir": "rel:protein",
-          "ph": 7.0,
+          "ph": 7.4,
           "clean": true,
           "pdb2pqr_path": "pdb2pqr30",
           "python_path": "pythonsh",
@@ -1401,47 +1401,47 @@
         },
         "package_name": "mdock-protein-prep",
         "from_registry": true,
-        "id": "5fdda80b-e01e-45b1-93f0-9f3c9ecbc7af",
+        "id": "d1b181ba-5399-4d9f-a994-419e5ff1169f",
         "status": "unconfigured",
         "data": null,
         "_node_dir": ""
       },
       {
         "name": "Ligand Prep",
-        "node_id": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+        "node_id": "d3efbdbf-0cc4-4e4f-b762-40441fe8af1d",
         "node_key": "MdockLigandPrep",
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "1jzi_re",
-          "xyz_file": "node:demo_data/1jzi_D_REP.xyz",
+          "case_name": "hsa_fe",
+          "xyz_file": "node:demo_data/ferrocene.xyz",
           "output_dir": "rel:ligand",
-          "metal_symbol": "Re",
+          "metal_symbol": "Fe",
           "obabel_path": "obabel",
           "use_openbabel_python_api": false,
           "force_to_run": false
         },
         "package_name": "mdock-ligand-prep",
         "from_registry": true,
-        "id": "5d602e31-b031-4791-a61a-724ee1d5b36c",
+        "id": "d3efbdbf-0cc4-4e4f-b762-40441fe8af1d",
         "status": "unconfigured",
         "data": null,
         "_node_dir": ""
       },
       {
         "name": "QM Charges",
-        "node_id": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+        "node_id": "2eb0b1eb-178e-4843-a327-09eaaed3975f",
         "node_key": "MdockQmCharges",
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "1jzi_re",
+          "case_name": "hsa_fe",
           "output_dir": "rel:qm",
           "graph_json": "",
           "xyz_file": "",
           "engine": "xtb",
           "geom_opt": false,
-          "charge": 1,
+          "charge": 0,
           "spin": 0,
           "ncpu": 4,
           "orca_path": "",
@@ -1457,19 +1457,19 @@
         },
         "package_name": "mdock-qm-charges",
         "from_registry": true,
-        "id": "2998b1e2-ae42-4859-a8d7-7a5c87793ffc",
+        "id": "2eb0b1eb-178e-4843-a327-09eaaed3975f",
         "status": "unconfigured",
         "data": null,
         "_node_dir": ""
       },
       {
         "name": "Ligand PDBQT",
-        "node_id": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+        "node_id": "ff743af2-93ce-41aa-8fe3-3045323b6957",
         "node_key": "MdockLigandPdbqt",
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "1jzi_re",
+          "case_name": "hsa_fe",
           "output_dir": "rel:pdbqt",
           "graph_json": "",
           "metal_symbol": "",
@@ -1480,19 +1480,19 @@
         },
         "package_name": "mdock-ligand-pdbqt",
         "from_registry": true,
-        "id": "4e4be94c-cc9b-4813-8678-1b8824d42589",
+        "id": "ff743af2-93ce-41aa-8fe3-3045323b6957",
         "status": "unconfigured",
         "data": null,
         "_node_dir": ""
       },
       {
         "name": "AutoDock Run",
-        "node_id": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+        "node_id": "f6e4f2b7-5df1-4581-b090-563f4c18fb4c",
         "node_key": "MdockAutodockRun",
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "1jzi_re",
+          "case_name": "hsa_fe",
           "output_dir": "rel:docking",
           "ligand_pdbqt": "",
           "receptor_pdbqt": "",
@@ -1500,7 +1500,7 @@
           "metal_symbol": "",
           "parameter_file": "",
           "num_poses": 10,
-          "box_center": "1.65,-7.803,27.176",
+          "box_center": "34.64,32.92,36.18",
           "box_size": "20,20,20",
           "python_path": "pythonsh",
           "mgltools_dir": "",
@@ -1510,23 +1510,23 @@
         },
         "package_name": "mdock-autodock-run",
         "from_registry": true,
-        "id": "33904816-686f-4ca2-85d1-a9d4438aa2d2",
+        "id": "f6e4f2b7-5df1-4581-b090-563f4c18fb4c",
         "status": "unconfigured",
         "data": null,
         "_node_dir": ""
       },
       {
         "name": "Results Analysis",
-        "node_id": "58c8f421-764b-43ec-96b8-76305231e11a",
+        "node_id": "cf8f0495-0f08-4bb4-bce4-89bfe9500069",
         "node_key": "MdockResultsAnalysis",
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "1jzi_re",
+          "case_name": "hsa_fe",
           "output_dir": "rel:analysis",
           "dlg_path": "",
           "protein_pdb": "",
-          "reference_xyz": "node:demo_data/1jzi_D_REP.xyz",
+          "reference_xyz": "",
           "n_heavy_atoms": 0,
           "cutoff": 4.0,
           "num_poses": 0,
@@ -1534,7 +1534,7 @@
         },
         "package_name": "mdock-results-analysis",
         "from_registry": true,
-        "id": "58c8f421-764b-43ec-96b8-76305231e11a",
+        "id": "cf8f0495-0f08-4bb4-bce4-89bfe9500069",
         "status": "unconfigured",
         "data": null,
         "_node_dir": ""
