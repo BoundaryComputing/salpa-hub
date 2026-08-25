@@ -90,6 +90,14 @@ Those are the residues the albumin literature names for Sudlow I. The energy is
 modest because ferrocene is small and neutral; the *pose* is the result worth
 reading, not the number.
 
+**The contact count varies between runs and that is expected.** AutoDock seeds its
+genetic algorithm from `pid time`, so repeated runs explore differently. Observed
+across runs of this template: 11 or 12 contacting residues, with HIS288 the one
+that comes and goes. What does *not* vary is the binding energy (−3.00 kcal/mol),
+the convergence (all poses within 0.01), or the pocket — every run puts the ligand
+in subdomain IIA among the same core residues. Judge a re-run on those, not on an
+exact residue count.
+
 **`rmsd_values` is empty, deliberately.** `reference_xyz` is left blank because
 no crystallographic pose exists to compare against. Leaving 1JZI's reference in
 place would have compared a ferrocene pose to a rhenium complex and printed a
@@ -123,6 +131,36 @@ doubly: it is what `registry.json` keys on, so letting the export regenerate it
 would silently orphan the registry entry.
 
 Export to verify the workflow; keep the curated header.
+
+### And the file held its ancestor's inputs
+
+That diff compared `config`, which is what runs — and `config` was right. But the
+template stores each parameter **four** times, and the other three were still the
+1JZI template's, because this one was derived from it:
+
+```
+react…models[].options.config                <- correct, what runs
+react…models[].config                        <- stale
+react…models[].options.option_types[].value  <- stale
+graph.nodes[].options                        <- stale
+```
+
+Nothing read them: execution and the config panel both go through `option_values`,
+which is why the runs were correct throughout. But `1jzi.pdb`, `1jzi_D_REP.xyz` and
+`case_name: 1jzi_re` appeared 21 times in a file describing an albumin docking —
+and the JSON is how a reviewer checks what a template does.
+
+All four are now synced. Verified after the fix: `1jzi` appears **zero** times, all
+four copies agree on every parameter, and a fresh install from the Hub reproduces
+the result — −3.00 kcal/mol, 10 of 11 contacts in subdomain IIA.
+
+**The exporter still does this**, so the next template derived from another will
+inherit the same way. Tracked as `bocoflow#113`.
+
+One thing worth carrying from the repair: fixing the three locations that had been
+identified still left `1jzi` in the file nine times. Only searching the whole file
+for the ancestor's name found the fourth. The check worth writing is *"the ancestor
+appears nowhere"*, not *"location X is correct"*.
 
 ## What this case also establishes
 

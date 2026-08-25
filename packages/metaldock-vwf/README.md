@@ -158,7 +158,8 @@ For the HSA case there is **no** reference pose, so `reference_xyz` is left empt
 and `rmsd_values` comes back empty with it. That is correct: a prediction has no
 answer to be scored against, and reporting an RMSD anyway would be theatre.
 Judge it on binding energy and on which residues line the pose — here −3.00
-kcal/mol with 11 of 12 contacts in subdomain IIA.
+kcal/mol with 11–12 contacts in subdomain IIA. The exact count varies between
+runs — AutoDock seeds from `pid time` — while the energy and the pocket do not.
 
 ## Requirements and platforms
 
