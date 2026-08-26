@@ -3,7 +3,7 @@
   "template_info": {
     "id": "metaldock-hsa-ferrocene",
     "name": "HSA + Ferrocene (Sudlow site I)",
-    "description": "Site-directed docking of ferrocene into human serum albumin \u2014 a protein with no metal complex bound. Unlike the 1JZI case this is a prediction, not a redocking: the receptor is apo (PDB 1AO6, chain A), the ligand is an independent xtb-optimised geometry, and the search box is placed on Sudlow site I using the position of R-warfarin co-crystallised in 2BXD, transferred by superposition. Exercises AutoDock's internal Fe parameters.",
+    "description": "Docks ferrocene into human serum albumin (PDB 1AO6, chain A) at Sudlow site I, the principal drug-binding pocket. Receptor preparation, molecular graph, GFN1-xTB CM5 charges, AutoDock4 with iron parameters, and contact analysis. All inputs ship with the package.",
     "required_packages": [
       "metaldock-vwf"
     ],
@@ -27,7 +27,7 @@
   "metadata": {
     "id": "metaldock-hsa-ferrocene",
     "name": "HSA + Ferrocene (Sudlow site I)",
-    "description": "Site-directed docking of ferrocene into human serum albumin \u2014 a protein with no metal complex bound. Unlike the 1JZI case this is a prediction, not a redocking: the receptor is apo (PDB 1AO6, chain A), the ligand is an independent xtb-optimised geometry, and the search box is placed on Sudlow site I using the position of R-warfarin co-crystallised in 2BXD, transferred by superposition. Exercises AutoDock's internal Fe parameters.",
+    "description": "Docks ferrocene into human serum albumin (PDB 1AO6, chain A) at Sudlow site I, the principal drug-binding pocket. Receptor preparation, molecular graph, GFN1-xTB CM5 charges, AutoDock4 with iron parameters, and contact analysis. All inputs ship with the package.",
     "environment": "local",
     "status": "draft",
     "nodeCount": 6,
