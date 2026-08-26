@@ -107,6 +107,15 @@ centroid of Trp214 — the residue that lines the site — lands 9.7 Å away, pu
 pocket on the box boundary, and returns a weaker pose in the wrong subdomain
 without any error.
 
+**On the iron.** Fe, Zn and Mn are the three metals MetalDock supplies no fitted
+parameters for; they fall back to AutoDock 4's stock `atom_par` line, while every
+other metal gets four re-fitted pairwise well depths. Fe's stock line is
+`Rii 1.30 Å, epsii 0.010 kcal/mol` — 87x shallower than Mn — so the iron adds
+almost no dispersion and reaches the score through its xTB charge instead. Here
+that is fine: the iron sits between two Cp rings and barely touches protein, so
+the carbons do the binding. Read the number with more caution for an Fe complex
+whose metal is exposed and coordinating protein donors.
+
 ### 6 · Results Analysis
 
 Reads the docking log: binding energy per pose, ligand efficiency, and which

@@ -113,8 +113,21 @@ start from.
 - **Runtime:** about 11 minutes
 
 Docking into a protein that does not already contain the complex is what a user
-normally does, and it exercises **Fe**, which takes AutoDock's internal
-parameters rather than the tabulated LJ terms used for Re.
+normally does.
+
+It also runs **Fe**, which MetalDock does not supply optimised parameters for.
+Fe, Zn and Mn fall back to AutoDock 4's stock `atom_par` line; every other metal
+gets four re-fitted pairwise well depths written into the GPF. For Fe that stock
+line is `Rii 1.30 Å, epsii 0.010 kcal/mol` — a well depth 87x shallower than Mn
+and 15x shallower than aliphatic carbon, so the iron contributes almost no
+dispersion and its effect on the score arrives through the xTB charge instead.
+
+That is fine here, because ferrocene's iron is sandwiched between two Cp rings
+and barely contacts the protein. It is a real limitation for an Fe complex whose
+metal is solvent-exposed and coordinating protein donors. MetalDock ships a
+Monte-Carlo optimiser that can fit those four terms against known structures, so
+Fe parameters are derivable with the existing machinery — they have simply not
+been fitted.
 
 `workflows/metaldock-hsa-ferrocene.md` walks through every node — what it takes,
 what it writes, and the handful of parameters that decide the result. The same

@@ -3,7 +3,7 @@
   "template_info": {
     "id": "metaldock-hsa-ferrocene",
     "name": "HSA + Ferrocene (Sudlow site I)",
-    "description": "Docks ferrocene into human serum albumin (PDB 1AO6, chain A) at Sudlow site I, the principal drug-binding pocket. Receptor preparation, molecular graph, GFN1-xTB CM5 charges, AutoDock4 with iron parameters, and contact analysis. All inputs ship with the package.",
+    "description": "Docks ferrocene into human serum albumin (PDB 1AO6, chain A) at Sudlow site I, the principal drug-binding pocket. Receptor preparation, molecular graph, GFN1-xTB CM5 charges, AutoDock4, and contact analysis. All inputs ship with the package.",
     "required_packages": [
       "metaldock-vwf"
     ],
@@ -27,7 +27,7 @@
   "metadata": {
     "id": "metaldock-hsa-ferrocene",
     "name": "HSA + Ferrocene (Sudlow site I)",
-    "description": "Docks ferrocene into human serum albumin (PDB 1AO6, chain A) at Sudlow site I, the principal drug-binding pocket. Receptor preparation, molecular graph, GFN1-xTB CM5 charges, AutoDock4 with iron parameters, and contact analysis. All inputs ship with the package.",
+    "description": "Docks ferrocene into human serum albumin (PDB 1AO6, chain A) at Sudlow site I, the principal drug-binding pocket. Receptor preparation, molecular graph, GFN1-xTB CM5 charges, AutoDock4, and contact analysis. All inputs ship with the package.",
     "environment": "local",
     "status": "draft",
     "nodeCount": 6,
