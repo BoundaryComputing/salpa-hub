@@ -116,7 +116,7 @@ Load it from the template library and run it. Every input path is a `node:`
 reference into a node's own `demo_data/`, and every output path is `rel:` under
 the workflow's working directory, so it runs wherever it is opened.
 
-`workflows/1jzi_re_demo.md` documents the same case in more detail, including how
+`workflows/metaldock-1jzi-re-pipeline.md` documents the same case in more detail, including how
 to run it against ORCA instead.
 
 ### 2. HSA + Ferrocene (Sudlow site I) — a prediction
@@ -136,8 +136,24 @@ parameters rather than the tabulated LJ terms Re uses.
 It also demonstrates the step the redocking hides: **choosing the binding site.**
 Centring the box on the centroid of Trp214 — the residue that lines Sudlow I, and
 the obvious guess — lands 9.7 Å from the pocket and returns a weaker pose in the
-wrong subdomain, without erroring. `workflows/hsa_ferrocene_demo.md` sets both
+wrong subdomain, without erroring. `workflows/metaldock-hsa-ferrocene.md` sets both
 attempts side by side.
+
+### Where a template's explanation lives
+
+One Markdown file per template, named after the template's own `id`:
+
+```
+workflows/<template-id>.json    the template
+workflows/<template-id>.md      what it does and why      <- authored
+workflows/figures/<id>-*.jpg    figures the doc references
+workflows/vmd/                  the scripts that render them
+```
+
+The name is derived, not declared, so it cannot drift out of step — the registry
+keys on the same `id`. That one file is the source for both places a reader meets
+it: the app renders it when someone is choosing a template, and salpa.app builds
+a page from it for anyone who has not installed anything.
 
 ## Outputs and interpretation
 

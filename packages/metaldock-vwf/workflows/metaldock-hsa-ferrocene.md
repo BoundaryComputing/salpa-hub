@@ -77,6 +77,21 @@ pose in the wrong subdomain. That is the failure mode this demo exists to show.
 Where no co-crystal exists, use a pocket detector (fpocket, P2Rank, CASTp)
 rather than guessing from sequence.
 
+## The structures
+
+![Ferrocene, Fe(C5H5)2 — iron sandwiched between two cyclopentadienyl rings](figures/metaldock-hsa-ferrocene-ligand.jpg)
+
+Ferrocene as the template ships it. All ten Fe–C contacts fall between 2.064 and
+2.066 Å against roughly 2.04–2.06 Å measured — the check that the input is sound
+before any docking happens. Nothing declares that bonding: the graph builder
+infers it from distance against covalent radii, and η⁵ coordination falls out.
+
+![The docked pose inside Sudlow site I, with the contacting residues as sticks and the albumin fold in cartoon](figures/metaldock-hsa-ferrocene-pocket.jpg)
+
+The best-scoring pose in Sudlow site I. Closest approaches: ILE290 1.53 Å,
+LEU260 1.54 Å, LEU238 1.88 Å, SER287 1.94 Å, ARG257 2.03 Å. Both figures are
+rendered from a real run by `workflows/vmd/`, not drawn.
+
 ## Expected outputs
 
 ```

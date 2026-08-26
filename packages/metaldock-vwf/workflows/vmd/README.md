@@ -1,13 +1,13 @@
 # Regenerating the figures
 
-The two renders in `../hsa_ferrocene_walkthrough.html` come from VMD, run headless
+The two renders in `../metaldock-hsa-ferrocene.md` come from VMD, run headless
 with the Tachyon software renderer — no display, no window, no screenshot.
 
 ```bash
 VMD=/Applications/VMD*/Contents/vmd/vmd_MACOSXX86_64
 $VMD -dispdev text -e ligand.tcl     # ferrocene alone      -> ligand.tga
 $VMD -dispdev text -e pocket.tcl     # the pose in the site -> pocket.tga
-ffmpeg -i ligand.tga ligand.jpg
+ffmpeg -i ligand.tga ligand.jpg   # then copy into ../figures/
 ```
 
 `pocket.tcl` expects two files beside it, both produced by a run of the template:
