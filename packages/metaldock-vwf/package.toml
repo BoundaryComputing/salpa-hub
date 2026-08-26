@@ -66,9 +66,15 @@ tutorial = "TUTORIAL.md"
 # working directory, so it carries no trace of the machine that made it.
 [package.workflows]
 # The HSA case is the default example: it docks into a protein with no complex
-# bound, which is what a user actually does. The 1JZI entry is a redocking,
-# kept because it reproduces the published MetalDock case.
+# bound, which is what a user actually does.
+#
+# The 1JZI case is a REDOCKING — the ligand is lifted out of a solved structure
+# and put back. It reproduces the published MetalDock result, which is why
+# workflows/metaldock-1jzi-re-pipeline.json and its notes stay in this repo, but
+# it is not what someone reaches for when they have a target and a ligand. It is
+# deliberately absent from `examples` so it does not ship as a Hub template
+# alongside a case that answers a real question; the site already excludes its
+# doc for the same reason.
 examples = [
     "workflows/metaldock-hsa-ferrocene.json",
-    "workflows/metaldock-1jzi-re-pipeline.json",
 ]
