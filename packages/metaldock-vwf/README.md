@@ -97,47 +97,39 @@ needs (`graph_json`, `canonical_xyz`, `ligand_pdbqt`, `receptor_pdbqt`,
 `dlg_path`, `pose_xyz_paths`, `cleaned_pdb`, `n_heavy_atoms`) from upstream
 `data`.
 
-## Example workflow
+## Example workflows
 
-The package ships **two** installable templates. They answer different questions,
-and the difference is the point.
+The package ships two installable templates. **HSA + Ferrocene** is the one to
+start from.
 
-### 1. MetalDock 1JZI Re Pipeline — a redocking
+### HSA + Ferrocene (Sudlow site I) — the default
+
+`workflows/metaldock-hsa-ferrocene.json`
+
+- **Receptor:** 1AO6, human serum albumin, chain A — no metal complex bound
+- **Ligand:** ferrocene, Fe(C₅H₅)₂, an independent GFN1-xTB geometry
+- **Site:** Sudlow site I, subdomain IIA
+- **Charges:** GFN1-xTB, neutral, closed shell
+- **Runtime:** about 11 minutes
+
+Docking into a protein that does not already contain the complex is what a user
+normally does, and it exercises **Fe**, which takes AutoDock's internal
+parameters rather than the tabulated LJ terms used for Re.
+
+`workflows/metaldock-hsa-ferrocene.md` walks through every node — what it takes,
+what it writes, and the handful of parameters that decide the result. The same
+page is published at
+[salpa.app/docs/workflows/metaldock-hsa-ferrocene](https://salpa.app/docs/workflows/metaldock-hsa-ferrocene).
+
+### MetalDock 1JZI Re Pipeline — the published reference case
 
 `workflows/metaldock-1jzi-re-pipeline.json`, reproducing the 1JZI case from the
-MetalDock paper.
+MetalDock paper: Re(phen)(CO)₃ redocked into azurin.
 
-- **Receptor:** 1JZI, *Pseudomonas aeruginosa* azurin
-- **Ligand:** Re(phen)(CO)₃(His83) — 29 atoms, vacant coordination site
-- **Inputs:** bundled in each node's `demo_data/`; nothing to download
-- **Charges:** GFN1-xTB single point, charge +1, closed shell
-
-Load it from the template library and run it. Every input path is a `node:`
-reference into a node's own `demo_data/`, and every output path is `rel:` under
-the workflow's working directory, so it runs wherever it is opened.
-
-`workflows/metaldock-1jzi-re-pipeline.md` documents the same case in more detail, including how
-to run it against ORCA instead.
-
-### 2. HSA + Ferrocene (Sudlow site I) — a prediction
-
-`workflows/metaldock-hsa-ferrocene.json`. The receptor has no metal complex in
-it, so there is no crystallographic pose to recover and no RMSD to report.
-
-- **Receptor:** 1AO6, human serum albumin, chain A (HSA is monomeric in solution)
-- **Ligand:** ferrocene, Fe(C₅H₅)₂ — an independent GFN1-xTB geometry
-- **Site:** Sudlow site I, subdomain IIA, centred on the position of R-warfarin
-  co-crystallised in 2BXD and superposed into the 1AO6 frame
-- **Charges:** GFN1-xTB, neutral, closed shell
-
-This is the case that exercises **Fe**, which takes AutoDock's internal
-parameters rather than the tabulated LJ terms Re uses.
-
-It also demonstrates the step the redocking hides: **choosing the binding site.**
-Centring the box on the centroid of Trp214 — the residue that lines Sudlow I, and
-the obvious guess — lands 9.7 Å from the pocket and returns a weaker pose in the
-wrong subdomain, without erroring. `workflows/metaldock-hsa-ferrocene.md` sets both
-attempts side by side.
+A redocking: the complex comes out of the crystal it goes back into, so the site
+is known in advance and the result is scored as RMSD against the crystallographic
+pose. Useful for checking the method reproduces a published number. Notes in
+`workflows/1jzi-redocking-notes.md`.
 
 ### Where a template's explanation lives
 

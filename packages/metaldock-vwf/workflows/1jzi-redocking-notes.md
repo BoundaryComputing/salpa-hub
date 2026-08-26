@@ -1,3 +1,9 @@
+<!-- Deliberately NOT named metaldock-1jzi-re-pipeline.md.
+     scripts/sync-workflows.mjs on the website generates a page for
+     workflows/<template-id>.md, so a doc under any other name stays in the
+     package and off salpa.app. The 1JZI case is a redocking kept for
+     reference; the HSA template is the one users are pointed at. -->
+
 # Demo workflow — 1JZI Re complex docking
 
 Reproduces the **1JZI Re-complex** case from the MetalDock paper as a Salpa

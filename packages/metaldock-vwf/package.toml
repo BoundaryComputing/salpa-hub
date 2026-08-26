@@ -65,7 +65,10 @@ tutorial = "TUTORIAL.md"
 # node's own demo_data and every output a `rel:` path under the workflow's
 # working directory, so it carries no trace of the machine that made it.
 [package.workflows]
+# The HSA case is the default example: it docks into a protein with no complex
+# bound, which is what a user actually does. The 1JZI entry is a redocking,
+# kept because it reproduces the published MetalDock case.
 examples = [
-    "workflows/metaldock-1jzi-re-pipeline.json",
     "workflows/metaldock-hsa-ferrocene.json",
+    "workflows/metaldock-1jzi-re-pipeline.json",
 ]
