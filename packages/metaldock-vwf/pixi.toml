@@ -3,9 +3,10 @@ name = "metaldock_vwf"
 version = "0.2.0"
 description = "Shared environment for metaldock_vwf nodes (refactored MetalDock docking pipeline)"
 channels = ["conda-forge", "bioconda"]
-# Legacy docking toolchain (mgltools/autodock/autogrid) ships osx-64 + linux-64
-# only — no osx-arm64 builds exist. Matches the project's `docking` pixi env.
-# Apple-Silicon users run this env under Rosetta (osx-64).
+# mgltools and autodock ship osx-64 + linux-64 only — no osx-arm64 builds exist.
+# autogrid DOES have an osx-arm64 build; an earlier version of this comment said
+# otherwise and the claim was repeated several times before anyone checked.
+# Apple Silicon runs this env under Rosetta, which pixi selects automatically.
 platforms = ["linux-64", "osx-64"]
 
 # ---------------------------------------------------------------------------

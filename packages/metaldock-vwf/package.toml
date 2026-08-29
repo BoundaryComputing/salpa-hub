@@ -49,7 +49,7 @@ hashtags = [
     "transition-metal",
     "computational-chemistry",
 ]
-platform_note = "linux-64 and osx-64 only — MGLTools and AutoDock4 have no osx-arm64 or win-64 conda builds (Apple Silicon runs the environment under Rosetta; Windows needs WSL2/Docker). Everything the bundled demo needs is installed for you, QM charges included: the default engine is GFN1-xTB. ORCA remains the DFT accuracy reference and is downloaded separately (free for academic use), then pointed at via mdock_qm_charges' orca_path."
+platform_note = "Runs on Linux and on Mac. On Apple Silicon it runs through Rosetta, which macOS installs on request — if Salpa says Rosetta is missing, run 'softwareupdate --install-rosetta --agree-to-license' and try again. Windows needs WSL2 or Docker. MGLTools and AutoDock4 ship x86_64 builds only, which is why Rosetta is involved. Everything the bundled demo needs is installed for you, QM charges included: the default engine is GFN1-xTB. ORCA remains the DFT accuracy reference and is downloaded separately (free for academic use), then pointed at via mdock_qm_charges' orca_path."
 
 [package.documentation]
 readme = "README.md"

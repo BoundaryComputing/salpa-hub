@@ -205,8 +205,14 @@ its directory to **mdock_qm_charges** via the *ORCA Directory* parameter, or put
 ### Licensing
 
 Academic / non-commercial use only, because MGLTools is distributed by Scripps
-under a non-commercial licence. A planned migration to Meeko (Apache-2.0) will
-remove that constraint and restore osx-arm64 and win-64. See `NOTICE`.
+under a non-commercial licence. A planned migration to Meeko would remove that
+constraint. See `NOTICE`.
+
+It would **not** deliver native Apple Silicon or Windows, contrary to what this
+section previously claimed. Meeko replaces MGLTools; AutoDock4 has no osx-arm64
+or win-64 build either, so native support on those platforms also requires moving
+off AutoDock4 — a different scoring function, and the metal work revalidated.
+Apple Silicon works today through Rosetta, which pixi selects automatically.
 
 ### Locating `metaldock_modules`
 
