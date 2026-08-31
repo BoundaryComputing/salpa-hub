@@ -33,12 +33,22 @@ COMMAND_VERB = re.compile(r"^\s*(gmx|echo|pdb2pqr|obabel|python)\b")
 def _starts_a_command(node: ast.JoinedStr) -> bool:
     """Read the f-string's own first literal chunk, not its unparsed source.
 
-    Matching against `ast.unparse(node)` looked simpler and was version-dependent:
-    CPython picks the quoting style when it round-trips, and an f-string holding
-    BOTH quote characters comes back triple-quoted on 3.13 (`f'''gmx grompp ...`)
-    while 3.12 gave single quotes. A leading-quote regex therefore matched on one
-    interpreter and not the other, and this guard silently passed on 3.13 while
-    the same file failed on 3.12 -- hiding six unquoted paths in gmx_md_relax.
+    Matching against `ast.unparse(node)` looked simpler and was version-dependent.
+    An f-string whose interpolation contains ANOTHER f-string round-trips as
+    triple-quoted on some CPythons and single-quoted on others, so a regex
+    anchored on the leading quote matched on one interpreter and not the next.
+
+    Measured on the exact line this hid -- gmx_md_relax's `gmx grompp`, whose
+    `-po` argument nests `f"mdout_{run_label}.mdp"` inside the outer f-string:
+
+        py3.9.6   ->  f'''gmx grompp ...   detector MISSED it
+        py3.12.3  ->  f'gmx grompp ...     detector caught it
+        py3.13.7  ->  f'''gmx grompp ...   detector MISSED it
+
+    So 3.12 was the outlier, and a full run on 3.13 reported clean while six
+    unquoted paths sat in the package. Note that both quote characters being
+    present is NOT enough on its own -- the same command without the nested
+    f-string unparses identically on all three. The nesting is the trigger.
 
     The AST itself carries no quoting, so ask it directly.
     """
@@ -150,22 +160,24 @@ def test_shell_true_callers_exist_and_are_known():
 def test_detection_survives_a_command_holding_both_quote_characters():
     """The guard's own blind spot, pinned.
 
-    `gmx grompp -f "{mdp}"` written inside single quotes holds BOTH quote
-    characters. CPython round-trips that through `ast.unparse` as a
-    triple-quoted f-string on 3.13 and a single-quoted one on 3.12, so the
-    original detector -- a regex over the unparsed source -- matched on one
-    interpreter and not the other.
+    An f-string whose interpolation nests ANOTHER f-string round-trips through
+    `ast.unparse` with different quoting on different CPythons -- triple-quoted
+    on 3.9 and 3.13, single-quoted on 3.12 -- so the original detector, a regex
+    over the unparsed source, matched on one interpreter and not the others.
 
     The effect was not theoretical: this guard passed on 3.13 while the same
     package failed on 3.12, and six unquoted paths in gmx_md_relax survived a
     full local run. A guard whose verdict depends on the interpreter is worse
     than no guard, because it is trusted.
     """
+    # The nested f-string in the -po argument is what makes unparse's quoting
+    # diverge. Without it this fixture passes on every version and proves nothing.
     src = (
-        "def f(mdp_file, gro_file):\n"
+        "import os\n"
+        "def f(mdp_file, gro_file, output_dir, run_label):\n"
         "    cmd = (\n"
-        "        f'gmx grompp -f \"{mdp_file}\" '\n"
-        "        f'-c \"{gro_file}\" -maxwarn 10'\n"
+        "        f'gmx grompp -f \"{mdp_file}\" -c \"{gro_file}\" '\n"
+        "        f'-po \"{os.path.join(output_dir, f\"mdout_{run_label}.mdp\")}\" -maxwarn 10'\n"
         "    )\n"
     )
     tree = ast.parse(src)
