@@ -25,6 +25,7 @@ import os
 import re
 import subprocess
 from dataclasses import dataclass, field
+from shlex import quote as _q  # every path in a shell command goes through this
 
 # ── Constants ──────────────────────────────────────────────────────────────
 
@@ -305,10 +306,10 @@ def process_pka_gmx_em(
         pqr_file = os.path.join(output_dir, "propka.pqr")
 
         cmd = (
-            f"pdb2pqr --ff {pdb2pqr_ff} --ffout {pdb2pqr_ff} "
+            f"pdb2pqr --ff {_q(pdb2pqr_ff)} --ffout {_q(pdb2pqr_ff)} "
             f"--keep-chain --titration-state-method=propka --with-ph={ph:.2f} "
             f"--log-level=INFO --include-header "
-            f'"{input_pdb}" "{pqr_file}"'
+            f'{_q(input_pdb)} {_q(pqr_file)}'
         )
 
         rc, out = _run(cmd, cwd=output_dir, timeout=120)
@@ -348,8 +349,8 @@ def process_pka_gmx_em(
     pdb2gmx_top = os.path.join(output_dir, "pdb2gmx.top")
 
     cmd = (
-        f'gmx pdb2gmx -f "{gmx_input_pdb}" -o "{pdb2gmx_gro}" '
-        f'-p "{pdb2gmx_top}" -ff {force_field} -water {water_model} -ignh'
+        f'gmx pdb2gmx -f {_q(gmx_input_pdb)} -o {_q(pdb2gmx_gro)} '
+        f'-p {_q(pdb2gmx_top)} -ff {_q(force_field)} -water {_q(water_model)} -ignh'
     )
 
     rc, out = _run(cmd, cwd=output_dir)
@@ -363,7 +364,7 @@ def process_pka_gmx_em(
     box_gro = os.path.join(output_dir, "box.gro")
 
     cmd = (
-        f'gmx editconf -f "{pdb2gmx_gro}" -o "{box_gro}" '
+        f'gmx editconf -f {_q(pdb2gmx_gro)} -o {_q(box_gro)} '
         f"-bt triclinic -d {box_distance}"
     )
 
@@ -379,8 +380,8 @@ def process_pka_gmx_em(
 
     em1_tpr = os.path.join(output_dir, "em_noconstr.tpr")
     cmd = (
-        f'gmx grompp -f "{em1_mdp}" -c "{box_gro}" '
-        f'-p "{pdb2gmx_top}" -o "{em1_tpr}" -maxwarn 10'
+        f'gmx grompp -f {_q(em1_mdp)} -c {_q(box_gro)} '
+        f'-p {_q(pdb2gmx_top)} -o {_q(em1_tpr)} -maxwarn 10'
     )
     rc, out = _run(cmd, cwd=output_dir)
     log_lines.append(f"grompp(em1): rc={rc}")
@@ -403,8 +404,8 @@ def process_pka_gmx_em(
 
     em2_tpr = os.path.join(output_dir, "em_hbonds.tpr")
     cmd = (
-        f'gmx grompp -f "{em2_mdp}" -c "{em1_gro}" '
-        f'-p "{pdb2gmx_top}" -o "{em2_tpr}" -maxwarn 10'
+        f'gmx grompp -f {_q(em2_mdp)} -c {_q(em1_gro)} '
+        f'-p {_q(pdb2gmx_top)} -o {_q(em2_tpr)} -maxwarn 10'
     )
     rc, out = _run(cmd, cwd=output_dir)
     log_lines.append(f"grompp(em2): rc={rc}")

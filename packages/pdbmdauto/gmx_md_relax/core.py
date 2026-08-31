@@ -20,6 +20,7 @@ import os
 import re
 import subprocess
 from dataclasses import dataclass
+from shlex import quote as _q  # every path in a shell command goes through this
 
 CHECK_MAX_FORCE = 1000.0  # kJ/mol/nm — threshold for "safe" minimization
 
@@ -95,7 +96,7 @@ def _run_grompp_mdrun(
     if rc != 0:
         return False, "", f"grompp({run_label}) failed (rc={rc}):\n{out}"
 
-    cmd = f"gmx mdrun -v -deffnm {run_label}"
+    cmd = f"gmx mdrun -v -deffnm {_q(run_label)}"
     rc, out = _run(cmd, cwd=output_dir, timeout=timeout)
     if rc != 0:
         return False, "", f"mdrun({run_label}) failed (rc={rc}):\n{out}"

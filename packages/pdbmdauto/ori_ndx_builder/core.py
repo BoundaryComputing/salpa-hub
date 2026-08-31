@@ -17,6 +17,7 @@ import glob
 import os
 import subprocess
 from dataclasses import dataclass
+from shlex import quote as _q  # every path in a shell command goes through this
 
 
 # Backbone atom names for position restraints
@@ -122,7 +123,7 @@ def generate_ori_ndx(
     log_lines = []
 
     # Step 1: Generate base NDX
-    cmd = f'echo q | gmx make_ndx -f "{structure_path}" -o "{ndx_path}"'
+    cmd = f'echo q | gmx make_ndx -f {_q(structure_path)} -o {_q(ndx_path)}'
     rc = subprocess.run(cmd, shell=True, capture_output=True, timeout=60).returncode
     if rc != 0:
         result.log = f"gmx make_ndx failed (rc={rc})"
