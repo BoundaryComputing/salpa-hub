@@ -1,6 +1,6 @@
 [package]
 name = "pdbmdauto"
-version = "1.1.0"
+version = "1.1.1"
 description = "Automated protein structure preparation for molecular dynamics — homology modeling, solvation, relaxation"
 author = "BoundaryComputing"
 license = "MIT"

@@ -43,13 +43,17 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from gmx_solv_ion import core  # noqa: E402
 
-AWKWARD = [
-    # The real shape of a packaged macOS install.
-    "/Users/someone/Library/Application Support/bocoflow-electron/nodes",
-    # And the ones that a naive f'-f "{path}"' would NOT have survived either.
-    "/tmp/it's a dir",
-    "/tmp/cost $HOME dollars",
-    '/tmp/say "hello" twice',
+# Directory NAMES that make a path awkward. Kept as bare names, not absolute
+# paths: the test builds them under pytest's tmp_path, so this works on any
+# platform and ships no hardcoded home directory.
+AWKWARD_NAMES = [
+    # The shape of a packaged macOS install: `~/Library/Application Support/...`
+    "Application Support",
+    # And the ones a naive f'-f "{path}"' would NOT have survived either.
+    "it's a dir",
+    "cost $HOME dollars",
+    'say "hello" twice',
+    "trailing space and & ampersand",
 ]
 
 
@@ -87,23 +91,31 @@ def _capture_commands(tmp_path, root):
     return seen
 
 
+def _root(tmp_path, name):
+    d = tmp_path / name / "pkgroot"
+    d.mkdir(parents=True, exist_ok=True)
+    return str(d)
+
+
 def test_commands_are_produced(tmp_path):
     """Guards the assertions below against passing on an empty list."""
-    assert _capture_commands(tmp_path, AWKWARD[0]), "no gmx commands were built"
+    root = _root(tmp_path, AWKWARD_NAMES[0])
+    assert _capture_commands(tmp_path, root), "no gmx commands were built"
 
 
 def test_every_command_is_a_list_not_a_string(tmp_path):
     """A string here would mean someone reintroduced the shell round-trip."""
-    for argv in _capture_commands(tmp_path, AWKWARD[0]):
+    for argv in _capture_commands(tmp_path, _root(tmp_path, AWKWARD_NAMES[0])):
         assert isinstance(
             argv, (list, tuple)
         ), f"command was built as a string, which only a shell can run: {argv!r}"
         assert argv and argv[0] in {"gmx", "pdb2pqr"}, argv
 
 
-@pytest.mark.parametrize("root", AWKWARD)
-def test_an_awkward_path_arrives_as_one_intact_argument(tmp_path, root):
+@pytest.mark.parametrize("name", AWKWARD_NAMES)
+def test_an_awkward_path_arrives_as_one_intact_argument(tmp_path, name):
     """THE REGRESSION, as the property that actually matters."""
+    root = _root(tmp_path, name)
     checked = 0
     for argv in _capture_commands(tmp_path, root):
         for element in argv:
