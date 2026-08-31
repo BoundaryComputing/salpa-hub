@@ -11,7 +11,6 @@ Output: Solvated/ionized GRO + updated TOP + NDX
 import os
 import subprocess
 from datetime import datetime
-from shlex import quote as _q  # every path in a shell command goes through this
 
 from bocoflow_core.logger import log_message
 from bocoflow_core.node import Node, NodeException, NodeResult
@@ -112,8 +111,13 @@ class GmxSolvIon(Node):
                 ndx = os.path.join(output_dir, "index.ndx")
             # Only generate if NDX doesn't exist at all (standalone mode without gen_gmx_ndx)
             if not os.path.exists(ndx):
-                subprocess.run(f"echo q | gmx make_ndx -f {_q(gro)} -o {_q(ndx)}",
-                              shell=True, capture_output=True, cwd=output_dir, timeout=30)
+                # "q" accepts make_ndx's default groups. stdin, not a shell
+                # pipe, so a spaced path stays one argument (bocoflow#104).
+                subprocess.run(
+                    ["gmx", "make_ndx", "-f", gro, "-o", ndx],
+                    input="q\n", capture_output=True, text=True,
+                    cwd=output_dir, timeout=30,
+                )
 
             if not all([gro, top, mdp]):
                 raise NodeException("gmx_solv_ion", "GRO, TOP, and MDP files are required.")

@@ -25,7 +25,6 @@ import os
 import re
 import subprocess
 from dataclasses import dataclass, field
-from shlex import quote as _q  # every path in a shell command goes through this
 
 # ── Constants ──────────────────────────────────────────────────────────────
 
@@ -55,10 +54,19 @@ class PkaGmxEmResult:
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 
-def _run(cmd, cwd=None, timeout=300):
-    """Run a shell command.  Returns (returncode, combined stdout+stderr)."""
+def _run(argv, cwd=None, timeout=300, stdin_text=None):
+    """Run a command as an argv list. Returns (returncode, combined output).
+
+    NO SHELL. Arguments are passed to execve as-is, so a space, quote or `$` in
+    a path is simply part of the argument. Building one string and letting a
+    shell re-split it is what broke the pipeline on packaged macOS, where every
+    node lives under `~/Library/Application Support/...` (bocoflow#104).
+
+    `stdin_text` replaces the `echo q | gmx make_ndx` idiom: the pipe only ever
+    answered an interactive prompt, and stdin does that without a shell.
+    """
     r = subprocess.run(
-        cmd, shell=True, capture_output=True, text=True,
+        argv, input=stdin_text, capture_output=True, text=True,
         cwd=cwd, timeout=timeout,
     )
     return r.returncode, (r.stdout or "") + "\n" + (r.stderr or "")
@@ -305,12 +313,12 @@ def process_pka_gmx_em(
     if run_pdb2pqr:
         pqr_file = os.path.join(output_dir, "propka.pqr")
 
-        cmd = (
-            f"pdb2pqr --ff {_q(pdb2pqr_ff)} --ffout {_q(pdb2pqr_ff)} "
-            f"--keep-chain --titration-state-method=propka --with-ph={ph:.2f} "
-            f"--log-level=INFO --include-header "
-            f'{_q(input_pdb)} {_q(pqr_file)}'
-        )
+        cmd = [
+            "pdb2pqr", "--ff", pdb2pqr_ff, "--ffout", pdb2pqr_ff,
+            "--keep-chain", "--titration-state-method=propka",
+            f"--with-ph={ph:.2f}", "--log-level=INFO", "--include-header",
+            input_pdb, pqr_file,
+        ]
 
         rc, out = _run(cmd, cwd=output_dir, timeout=120)
 
@@ -348,10 +356,9 @@ def process_pka_gmx_em(
     pdb2gmx_gro = os.path.join(output_dir, "pdb2gmx.gro")
     pdb2gmx_top = os.path.join(output_dir, "pdb2gmx.top")
 
-    cmd = (
-        f'gmx pdb2gmx -f {_q(gmx_input_pdb)} -o {_q(pdb2gmx_gro)} '
-        f'-p {_q(pdb2gmx_top)} -ff {_q(force_field)} -water {_q(water_model)} -ignh'
-    )
+    cmd = ["gmx", "pdb2gmx", "-f", gmx_input_pdb, "-o", pdb2gmx_gro,
+           "-p", pdb2gmx_top, "-ff", force_field, "-water", water_model,
+           "-ignh"]
 
     rc, out = _run(cmd, cwd=output_dir)
     log_lines.append(f"pdb2gmx: rc={rc}")
@@ -363,10 +370,8 @@ def process_pka_gmx_em(
     # ── Step 4: gmx editconf — box ───────────────────────────────────────
     box_gro = os.path.join(output_dir, "box.gro")
 
-    cmd = (
-        f'gmx editconf -f {_q(pdb2gmx_gro)} -o {_q(box_gro)} '
-        f"-bt triclinic -d {box_distance}"
-    )
+    cmd = ["gmx", "editconf", "-f", pdb2gmx_gro, "-o", box_gro,
+           "-bt", "triclinic", "-d", str(box_distance)]
 
     rc, out = _run(cmd, cwd=output_dir)
     log_lines.append(f"editconf: rc={rc}")
@@ -379,17 +384,15 @@ def process_pka_gmx_em(
     _write_em_mdp(em1_mdp, constraints="none", nsteps=em_steps)
 
     em1_tpr = os.path.join(output_dir, "em_noconstr.tpr")
-    cmd = (
-        f'gmx grompp -f {_q(em1_mdp)} -c {_q(box_gro)} '
-        f'-p {_q(pdb2gmx_top)} -o {_q(em1_tpr)} -maxwarn 10'
-    )
+    cmd = ["gmx", "grompp", "-f", em1_mdp, "-c", box_gro,
+           "-p", pdb2gmx_top, "-o", em1_tpr, "-maxwarn", "10"]
     rc, out = _run(cmd, cwd=output_dir)
     log_lines.append(f"grompp(em1): rc={rc}")
     if rc != 0:
         result.log = "\n".join(log_lines) + "\n" + out
         return result
 
-    cmd = "gmx mdrun -v -deffnm em_noconstr"
+    cmd = ["gmx", "mdrun", "-v", "-deffnm", "em_noconstr"]
     rc, out = _run(cmd, cwd=output_dir, timeout=600)
     log_lines.append(f"mdrun(em1): rc={rc}")
     if rc != 0:
@@ -403,17 +406,15 @@ def process_pka_gmx_em(
     _write_em_mdp(em2_mdp, constraints="h-bonds", nsteps=em_steps)
 
     em2_tpr = os.path.join(output_dir, "em_hbonds.tpr")
-    cmd = (
-        f'gmx grompp -f {_q(em2_mdp)} -c {_q(em1_gro)} '
-        f'-p {_q(pdb2gmx_top)} -o {_q(em2_tpr)} -maxwarn 10'
-    )
+    cmd = ["gmx", "grompp", "-f", em2_mdp, "-c", em1_gro,
+           "-p", pdb2gmx_top, "-o", em2_tpr, "-maxwarn", "10"]
     rc, out = _run(cmd, cwd=output_dir)
     log_lines.append(f"grompp(em2): rc={rc}")
     if rc != 0:
         result.log = "\n".join(log_lines) + "\n" + out
         return result
 
-    cmd = "gmx mdrun -v -deffnm em_hbonds"
+    cmd = ["gmx", "mdrun", "-v", "-deffnm", "em_hbonds"]
     rc, out = _run(cmd, cwd=output_dir, timeout=600)
     log_lines.append(f"mdrun(em2): rc={rc}")
     if rc != 0:

@@ -15,7 +15,6 @@ import re
 import shutil
 import subprocess
 from dataclasses import dataclass, field
-from shlex import quote as _q  # every path in a shell command goes through this
 
 
 @dataclass
@@ -60,21 +59,35 @@ def _extract_custom_groups(ndx_path: str) -> str:
     return "".join(result_lines) if result_lines else ""
 
 
-def _run_gmx(cmd: str, cwd: str = None) -> tuple:
-    """Run a GROMACS shell command. Returns (returncode, stdout+stderr).
+def _run_gmx(argv, cwd=None, stdin_text=None) -> tuple:
+    """Run GROMACS as an argv list. Returns (returncode, stdout+stderr).
 
-    These run through a shell (genion and make_ndx are driven by piping a group
-    selection into stdin), so EVERY interpolated path must be `_q()`-quoted.
+    NO SHELL. That is the whole point, and it is not a style preference.
 
-    Not hypothetical tidiness. The packaged macOS app installs nodes under
-    `~/Library/Application Support/...`, and an unquoted `-f {mdp_file}` split at
-    that space: GROMACS reported only `fopen() returned error code 2`, nine steps
-    into an eleven-step pipeline. Steps touching the working directory kept
-    passing, because that path has no space -- which is exactly why local runs and
-    `salpa smoke` never saw it (bocoflow#104).
+    These commands used to be built as one string and handed to `shell=True`,
+    which means the arguments were flattened and then re-split by the shell
+    guessing where the boundaries had been. A path containing a space made it
+    guess wrong: the packaged macOS app installs nodes under
+    `~/Library/Application Support/...`, so `-f <mdp>` silently became two
+    arguments and GROMACS reported only `fopen() returned error code 2`, nine
+    steps into an eleven-step pipeline (bocoflow#104).
+
+    Quoting every path fixes that round-trip. Not making the round-trip removes
+    it: argv elements are passed to execve as-is, so a space, a quote, a `$` or
+    a newline in a path is simply part of the argument, and there is nothing
+    left to remember to quote.
+
+    `stdin_text` replaces the `echo SOL | gmx genion` idiom. Piping through a
+    shell was only ever a way to answer an interactive prompt; handing the same
+    bytes to stdin does it without a shell in the middle.
     """
     result = subprocess.run(
-        cmd, shell=True, capture_output=True, text=True, cwd=cwd, timeout=300,
+        argv,
+        input=stdin_text,
+        capture_output=True,
+        text=True,
+        cwd=cwd,
+        timeout=300,
     )
     combined = result.stdout + "\n" + result.stderr
     return result.returncode, combined
@@ -133,9 +146,11 @@ def process_solv_ion(
     box_gro = os.path.join(output_dir, "box.gro")
 
     if box[0] > 0:
-        cmd = f"gmx editconf -f {_q(gro_file)} -o {_q(box_gro)} -box {box[0]} {box[1]} {box[2]}"
+        cmd = ["gmx", "editconf", "-f", gro_file, "-o", box_gro,
+               "-box", str(box[0]), str(box[1]), str(box[2])]
     else:
-        cmd = f"gmx editconf -f {_q(gro_file)} -o {_q(box_gro)} -bt triclinic -d 2.0"
+        cmd = ["gmx", "editconf", "-f", gro_file, "-o", box_gro,
+               "-bt", "triclinic", "-d", "2.0"]
 
     rc, out = _run_gmx(cmd, cwd=output_dir)
     log_lines.append(f"editconf: rc={rc}")
@@ -146,7 +161,8 @@ def process_solv_ion(
 
     # Step 2: solvate — add water
     solv_gro = os.path.join(output_dir, "solv.gro")
-    cmd = f"gmx solvate -cp {_q(box_gro)} -cs spc216.gro -p {_q(work_top)} -o {_q(solv_gro)} -scale {scale_fill}"
+    cmd = ["gmx", "solvate", "-cp", box_gro, "-cs", "spc216.gro",
+           "-p", work_top, "-o", solv_gro, "-scale", str(scale_fill)]
     rc, out = _run_gmx(cmd, cwd=output_dir)
     log_lines.append(f"solvate: rc={rc}")
     if rc != 0:
@@ -156,7 +172,8 @@ def process_solv_ion(
 
     # Step 3: grompp — preprocess for genion
     ion_tpr = os.path.join(output_dir, "ion.tpr")
-    cmd = f"gmx grompp -f {_q(mdp_file)} -c {_q(solv_gro)} -p {_q(work_top)} -o {_q(ion_tpr)} -maxwarn 10"
+    cmd = ["gmx", "grompp", "-f", mdp_file, "-c", solv_gro,
+           "-p", work_top, "-o", ion_tpr, "-maxwarn", "10"]
     rc, out = _run_gmx(cmd, cwd=output_dir)
     log_lines.append(f"grompp: rc={rc}")
     if rc != 0:
@@ -166,11 +183,11 @@ def process_solv_ion(
     # Step 4: genion — add ions
     ion_gro = os.path.join(output_dir, "ion.gro")
     if ion_conc > 0:
-        cmd = (
-            f"echo SOL | gmx genion -s {_q(ion_tpr)} -p {_q(work_top)} "
-            f"-o {_q(ion_gro)} -neutral -nname CL -pname NA -conc {ion_conc}"
-        )
-        rc, out = _run_gmx(cmd, cwd=output_dir)
+        # "SOL" answers genion's "which group to replace with ions?" prompt.
+        cmd = ["gmx", "genion", "-s", ion_tpr, "-p", work_top, "-o", ion_gro,
+               "-neutral", "-nname", "CL", "-pname", "NA",
+               "-conc", str(ion_conc)]
+        rc, out = _run_gmx(cmd, cwd=output_dir, stdin_text="SOL\n")
         log_lines.append(f"genion: rc={rc}")
         if rc != 0:
             result.log = "\n".join(log_lines) + "\n" + out
@@ -184,8 +201,9 @@ def process_solv_ion(
     # but PRESERVE OriHeavy/OriBackBone from gen_gmx_ndx
     out_ndx = ndx_file
     ori_groups = _extract_custom_groups(ndx_file)  # save OriHeavy/OriBackBone
-    cmd = f"echo q | gmx make_ndx -f {_q(ion_gro)} -o {_q(out_ndx)}"
-    _run_gmx(cmd, cwd=output_dir)
+    # "q" quits make_ndx's interactive group editor, accepting the defaults.
+    cmd = ["gmx", "make_ndx", "-f", ion_gro, "-o", out_ndx]
+    _run_gmx(cmd, cwd=output_dir, stdin_text="q\n")
     if ori_groups:
         with open(out_ndx, "a") as f:
             f.write(ori_groups)

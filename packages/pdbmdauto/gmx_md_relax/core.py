@@ -20,7 +20,6 @@ import os
 import re
 import subprocess
 from dataclasses import dataclass
-from shlex import quote as _q  # every path in a shell command goes through this
 
 CHECK_MAX_FORCE = 1000.0  # kJ/mol/nm — threshold for "safe" minimization
 
@@ -43,10 +42,19 @@ class RelaxResult:
             self.steps_completed = []
 
 
-def _run(cmd, cwd=None, timeout=3600):
-    """Run shell command. Returns (returncode, combined output)."""
+def _run(argv, cwd=None, timeout=3600, stdin_text=None):
+    """Run a command as an argv list. Returns (returncode, combined output).
+
+    NO SHELL. Arguments are passed to execve as-is, so a space, quote or `$` in
+    a path is simply part of the argument. Building one string and letting a
+    shell re-split it is what broke the pipeline on packaged macOS, where every
+    node lives under `~/Library/Application Support/...` (bocoflow#104).
+
+    `stdin_text` replaces the `echo q | gmx make_ndx` idiom: the pipe only ever
+    answered an interactive prompt, and stdin does that without a shell.
+    """
     r = subprocess.run(
-        cmd, shell=True, capture_output=True, text=True,
+        argv, input=stdin_text, capture_output=True, text=True,
         cwd=cwd, timeout=timeout,
     )
     return r.returncode, (r.stdout or "") + "\n" + (r.stderr or "")
@@ -87,17 +95,14 @@ def _run_grompp_mdrun(
     out_tpr = os.path.join(output_dir, f"{run_label}.tpr")
 
     mdout = os.path.join(output_dir, f"mdout_{run_label}.mdp")
-    cmd = (
-        f"gmx grompp -f {_q(mdp_file)} -c {_q(gro_file)} -p {_q(top_file)} "
-        f"-o {_q(out_tpr)} -n {_q(ndx_file)} "
-        f"-po {_q(mdout)} -maxwarn 10"
-    )
+    cmd = ["gmx", "grompp", "-f", mdp_file, "-c", gro_file, "-p", top_file,
+           "-o", out_tpr, "-n", ndx_file, "-po", mdout, "-maxwarn", "10"]
 
     rc, out = _run(cmd, cwd=output_dir)
     if rc != 0:
         return False, "", f"grompp({run_label}) failed (rc={rc}):\n{out}"
 
-    cmd = f"gmx mdrun -v -deffnm {_q(run_label)}"
+    cmd = ["gmx", "mdrun", "-v", "-deffnm", run_label]
     rc, out = _run(cmd, cwd=output_dir, timeout=timeout)
     if rc != 0:
         return False, "", f"mdrun({run_label}) failed (rc={rc}):\n{out}"
