@@ -19,14 +19,35 @@ moment it lands -- there is nothing to remember to update.
 
 import ast
 import re
+import sys
 from pathlib import Path
 
 import pytest
 
 PKG = Path(__file__).resolve().parent.parent
 
-# An f-string that starts with one of these is a command line, not log text.
-COMMAND_START = re.compile(r"""^f?['"]\s*(gmx|echo|pdb2pqr|obabel|python)\b""")
+# A command line starts with one of these verbs.
+COMMAND_VERB = re.compile(r"^\s*(gmx|echo|pdb2pqr|obabel|python)\b")
+
+
+def _starts_a_command(node: ast.JoinedStr) -> bool:
+    """Read the f-string's own first literal chunk, not its unparsed source.
+
+    Matching against `ast.unparse(node)` looked simpler and was version-dependent:
+    CPython picks the quoting style when it round-trips, and an f-string holding
+    BOTH quote characters comes back triple-quoted on 3.13 (`f'''gmx grompp ...`)
+    while 3.12 gave single quotes. A leading-quote regex therefore matched on one
+    interpreter and not the other, and this guard silently passed on 3.13 while
+    the same file failed on 3.12 -- hiding six unquoted paths in gmx_md_relax.
+
+    The AST itself carries no quoting, so ask it directly.
+    """
+    for value in node.values:
+        if isinstance(value, ast.Constant) and isinstance(value.value, str):
+            return bool(COMMAND_VERB.match(value.value))
+        return False  # starts with an interpolation: not a literal command
+    return False
+
 
 # Interpolations that are numbers or enums by construction, never paths.
 NON_PATH = re.compile(
@@ -36,11 +57,32 @@ NON_PATH = re.compile(
 
 QUOTED = re.compile(r"\b(_q|quote|shlex\.quote)\s*\(")
 
+# Directories that are not this package's source. `.venv` matters: an author who
+# builds a virtualenv inside the package would otherwise have this guard scan
+# pip's vendored code and report findings there -- which is exactly what happened
+# on the first Linux run.
+NOT_SOURCE = {
+    "tests",
+    ".pixi",
+    ".venv",
+    "venv",
+    "env",
+    "site-packages",
+    "node_modules",
+    "build",
+    "dist",
+    "__pycache__",
+}
+
+
+def _skip(path) -> bool:
+    return any(part in NOT_SOURCE for part in path.parts)
+
 
 def _command_fstrings():
     """Yield (path, lineno, expr) for every interpolation in a command f-string."""
     for py in sorted(PKG.rglob("*.py")):
-        if "tests" in py.parts or ".pixi" in py.parts:
+        if _skip(py):
             continue
         try:
             tree = ast.parse(py.read_text(encoding="utf-8"))
@@ -49,7 +91,7 @@ def _command_fstrings():
         for node in ast.walk(tree):
             if not isinstance(node, ast.JoinedStr):
                 continue
-            if not COMMAND_START.search(ast.unparse(node).strip()):
+            if not _starts_a_command(node):
                 continue
             for value in node.values:
                 if isinstance(value, ast.FormattedValue):
@@ -83,7 +125,7 @@ def test_shell_true_callers_exist_and_are_known():
     """shell=True is what makes quoting load-bearing; keep the list visible."""
     shelly = []
     for py in sorted(PKG.rglob("*.py")):
-        if "tests" in py.parts or ".pixi" in py.parts:
+        if _skip(py):
             continue
         tree = ast.parse(py.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
@@ -102,4 +144,39 @@ def test_shell_true_callers_exist_and_are_known():
     assert len(shelly) <= 8, (
         "new shell=True caller(s) -- confirm every path is shlex.quote'd, then "
         f"raise this number:\n  " + "\n  ".join(shelly)
+    )
+
+
+def test_detection_survives_a_command_holding_both_quote_characters():
+    """The guard's own blind spot, pinned.
+
+    `gmx grompp -f "{mdp}"` written inside single quotes holds BOTH quote
+    characters. CPython round-trips that through `ast.unparse` as a
+    triple-quoted f-string on 3.13 and a single-quoted one on 3.12, so the
+    original detector -- a regex over the unparsed source -- matched on one
+    interpreter and not the other.
+
+    The effect was not theoretical: this guard passed on 3.13 while the same
+    package failed on 3.12, and six unquoted paths in gmx_md_relax survived a
+    full local run. A guard whose verdict depends on the interpreter is worse
+    than no guard, because it is trusted.
+    """
+    src = (
+        "def f(mdp_file, gro_file):\n"
+        "    cmd = (\n"
+        "        f'gmx grompp -f \"{mdp_file}\" '\n"
+        "        f'-c \"{gro_file}\" -maxwarn 10'\n"
+        "    )\n"
+    )
+    tree = ast.parse(src)
+    found = [
+        ast.unparse(v.value)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.JoinedStr) and _starts_a_command(node)
+        for v in node.values
+        if isinstance(v, ast.FormattedValue)
+    ]
+    assert "mdp_file" in found and "gro_file" in found, (
+        f"the detector missed a mixed-quote command on Python "
+        f"{sys.version_info.major}.{sys.version_info.minor}; found {found}"
     )

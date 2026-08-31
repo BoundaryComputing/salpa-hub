@@ -86,10 +86,11 @@ def _run_grompp_mdrun(
     """
     out_tpr = os.path.join(output_dir, f"{run_label}.tpr")
 
+    mdout = os.path.join(output_dir, f"mdout_{run_label}.mdp")
     cmd = (
-        f'gmx grompp -f "{mdp_file}" -c "{gro_file}" -p "{top_file}" '
-        f'-o "{out_tpr}" -n "{ndx_file}" '
-        f'-po "{os.path.join(output_dir, f"mdout_{run_label}.mdp")}" -maxwarn 10'
+        f"gmx grompp -f {_q(mdp_file)} -c {_q(gro_file)} -p {_q(top_file)} "
+        f"-o {_q(out_tpr)} -n {_q(ndx_file)} "
+        f"-po {_q(mdout)} -maxwarn 10"
     )
 
     rc, out = _run(cmd, cwd=output_dir)
