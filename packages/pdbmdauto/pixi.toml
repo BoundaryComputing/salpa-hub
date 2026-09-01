@@ -19,6 +19,12 @@ redis-py = ">=5.0.0"
 # GROMACS for MD preparation nodes
 gromacs = ">=2023"
 promod3 = ">=3.5"            # fix_residues_promod3 (from bioconda, Apache 2.0)
+# promod3 3.6.0 (built 2025-08-11) compiles against OpenMM's 8.3-8.5 ABI. Its own
+# constraint (>=8.3.1,<9.0a0) is too loose: openmm 8.6.0 (2026-08-19) removed
+# MonteCarloBarostat(double,double,int), so promod3's _sidechain.so fails to
+# dlopen and the pipeline dies at FixResiduesPromod3 (bocoflow#130). Verified:
+# 8.6.0 fails the import, 8.5.2 loads.
+openmm = ">=8.3.1,<8.6"
 
 # Protonation state prediction for pka_gmx_em
 pdb2pqr = ">=3.0"            # PDB2PQR + PROPKA (pH-dependent protonation)
