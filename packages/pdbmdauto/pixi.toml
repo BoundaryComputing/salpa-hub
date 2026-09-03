@@ -1,11 +1,14 @@
 [project]
 name = "pdbmdauto"
-version = "1.0.0"
+version = "1.2.0"
 description = "Shared environment for PDBmdAuto workflow nodes"
 channels = ["conda-forge", "bioconda"]
-# win-64 not supported: gromacs and promod3 have no Windows conda packages.
-# Windows users need Docker or WSL2 — see issue #48.
-platforms = ["linux-64", "osx-64", "osx-arm64"]
+# win-64 is impossible, not merely undeclared: `No candidates were found for gromacs`.
+# On Windows the app builds this environment inside WSL2 automatically (bocoflow#48,
+# verified end-to-end; see dev-notes/wsl2-first-install-field-report.md in the dev repo).
+# linux-aarch64 solves to the same package set as linux-64 and every dependency has an
+# ARM build (bocoflow#105); osx-arm64 is native — no Rosetta.
+platforms = ["linux-64", "linux-aarch64", "osx-64", "osx-arm64"]
 
 [dependencies]
 python = ">=3.9,<3.13"
@@ -19,6 +22,10 @@ redis-py = ">=5.0.0"
 # GROMACS for MD preparation nodes
 gromacs = ">=2023"
 promod3 = ">=3.5"            # fix_residues_promod3 (from bioconda, Apache 2.0)
+# fix_residues_promod3 does `import ost` directly. Until 1.2.0 that import was satisfied
+# only transitively, through promod3 — an undeclared dependency that works until the day
+# promod3 restructures its own. Declared at the version the solve already resolves.
+openstructure = ">=2.11"
 # promod3 3.6.0 (built 2025-08-11) compiles against OpenMM's 8.3-8.5 ABI. Its own
 # constraint (>=8.3.1,<9.0a0) is too loose: openmm 8.6.0 (2026-08-19) removed
 # MonteCarloBarostat(double,double,int), so promod3's _sidechain.so fails to

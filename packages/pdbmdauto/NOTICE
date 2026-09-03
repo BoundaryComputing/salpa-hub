@@ -1,0 +1,42 @@
+pdbmdauto — automated protein structure preparation for molecular dynamics
+Copyright (c) 2026 Boundary Computing
+
+Licensed under the MIT License (see the Salpa Hub's LICENSE and LICENSING.md). That covers
+everything authored here: the node wrappers (`node.py`), the core modules (`core.py`), the
+GROMACS parameter files (`*.mdp`), the workflow template and its walkthrough, the tutorial and
+this package's documentation and figures.
+
+## Bundled demonstration data
+
+- `pdb_fasta_biopython/demo_data/3LZ0.pdb`, `3LZ0.fasta` — RCSB PDB entry 3LZ0, nucleosome core
+  particle with the Widom "601" DNA sequence. Vasudevan D., Chua E.Y., Davey C.A. (2010),
+  *Crystal structures of nucleosome core particles containing the '601' strong positioning
+  sequence*, J. Mol. Biol. 403, 1–10, doi:10.1016/j.jmb.2010.08.039. Redistributed under the
+  RCSB PDB's usage policy (public domain data, attribution requested).
+- `pdb2pqr/demo_data/mini.pdb` — a synthetic Ala-Ala-Gly tripeptide written for this package.
+- `gmx_mdrun_local/demo_data/`, `gmx_mdrun/demo_data/` (`water_box/`, `md.mdp`) and every other
+  `*.mdp` — original to this package.
+- The bundled workflow template fetches PDB entry 4Z8J from the RCSB PDB at run time. Nothing
+  from 4Z8J is redistributed here.
+
+## Third-party software invoked at run time
+
+These are installed into the package's own pixi environment from conda-forge and bioconda when
+the package is installed. They are not redistributed in this repository, and their licences
+apply to them, not to this package. Versions and licence identifiers are as resolved by the
+environment on 2026-09-03; the solve may pick newer builds later.
+
+| Tool | Used by | Licence (conda metadata) |
+|---|---|---|
+| GROMACS 2026.3 | pKa + GROMACS EM, Original Atom Groups, GMX MD Relaxation, GMX Solvate & Ionize, GROMACS MD Run | LGPL-2.1-or-later |
+| ProMod3 3.6.0 | Fix Missing Residues | Apache-2.0 |
+| OpenStructure 2.11.1 | Fix Missing Residues (ProMod3's foundation) | LGPL-3.0-or-later |
+| OpenMM 8.5.2 | ProMod3 (linked, not called directly) | LGPL-3.0-or-later |
+| PDB2PQR 3.6.1 | PDB2PQR, pKa + GROMACS EM | BSD-3-Clause |
+| PROPKA 3.5.1 | PDB2PQR, pKa + GROMACS EM | LGPL-2.1-only |
+| Biopython 1.88 | PDB FASTA Parser, Merge PDB Chains | Biopython License Agreement / BSD-3-Clause |
+| MDAnalysis 2.10.0 | pdb2pqr (run-time dependency) | LGPL-3.0-or-later |
+| pdb-tools 2.7.0 | kept in the environment (see pixi.toml) | Apache-2.0 |
+| Python 3.12 | everything | PSF-2.0 |
+
+Cite the tools you used according to their own guidance; the README lists the references.

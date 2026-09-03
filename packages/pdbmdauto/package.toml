@@ -1,6 +1,6 @@
 [package]
 name = "pdbmdauto"
-version = "1.1.2"
+version = "1.2.0"
 description = "Automated protein structure preparation for molecular dynamics — homology modeling, solvation, relaxation"
 author = "BoundaryComputing"
 license = "MIT"
@@ -34,10 +34,18 @@ shared_environment = "pdbmdauto"
 category = "Molecular Dynamics"
 keywords = ["molecular-dynamics", "homology-modeling", "gromacs", "promod3", "structure-preparation"]
 hashtags = ["molecular-dynamics", "homology-modeling", "structure-preparation", "gromacs", "promod3", "pdb", "md-simulation"]
-platform_note = "Requires GROMACS and promod3 which have no Windows conda packages. Docker/WSL2 support coming soon (issue #48)."
+platform_note = "Runs natively on Linux (x86-64 and ARM64) and on Macs with Intel or Apple Silicon processors: GROMACS and ProMod3 ship native arm64 builds, so Rosetta is not involved. There is no native Windows build of GROMACS or ProMod3, so on Windows Salpa installs this package inside WSL2 for you; that first install sets up the Linux environment and took about 20 minutes on a virtual machine, after which it runs like any other package. The bundled example fetches its structure (PDB 4Z8J) from the RCSB PDB, so the first run needs network access."
 
 [package.documentation]
+# Two registers, deliberately separate. README.md is the formal reference (scope,
+# methodology, node table, references); TUTORIAL.md is the plain-language walk for
+# someone who has never run a simulation. Keep them apart: a README that explains
+# with analogies stops being citable, and a tutorial that cites stops being readable.
 readme = "README.md"
+tutorial = "TUTORIAL.md"
 
 [package.workflows]
+# workflows/pdbmdauto-pipeline.md is the walkthrough for this template: same basename
+# as the JSON, which is how the app's template picker ("Read the walkthrough") and
+# salpa.app/docs/workflows find it. Figures it references live in workflows/figures/.
 examples = ["workflows/pdbmdauto-pipeline.json"]

@@ -34,4 +34,6 @@ parallel_capable = false
 long_running = false
 
 [node.platforms]
-supported = ["linux", "macos", "windows"]
+# Windows is served through WSL2, which the app sets up itself; the environment has no
+# native win-64 solve (GROMACS/ProMod3), so this list names the native platforms only.
+supported = ["linux", "macos"]

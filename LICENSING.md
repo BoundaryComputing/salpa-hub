@@ -32,11 +32,14 @@ paywalled.
 ## pdbmdauto
 
 - **License:** MIT.
-- **Attribution:** original BoCoFlow work; no bundled third-party source.
-- **Platforms:** linux-64, osx-64, osx-arm64. **No Windows** — GROMACS and ProMod3
-  have no Windows conda packages (use Docker or WSL2).
-- **Third-party tools invoked (not redistributed):** GROMACS, ProMod3 (Apache-2.0),
-  PDB2PQR, PROPKA, pdb-tools, Biopython; SLURM (`sbatch`) for the HPC `gmx_mdrun` node.
+- **Attribution:** original work; no bundled third-party source. Bundled demonstration data and
+  the tools the environment installs are itemised in `packages/pdbmdauto/NOTICE`.
+- **Platforms:** linux-64, linux-aarch64, osx-64, osx-arm64 (Apple Silicon native, no Rosetta).
+  **Windows through WSL2**, which the app sets up itself — GROMACS and ProMod3 have no native
+  Windows conda packages.
+- **Third-party tools invoked (not redistributed):** GROMACS (LGPL-2.1), ProMod3 (Apache-2.0),
+  OpenStructure (LGPL-3.0), OpenMM (LGPL-3.0), PDB2PQR (BSD-3), PROPKA (LGPL-2.1), Biopython,
+  MDAnalysis (LGPL-3.0), pdb-tools (Apache-2.0); SLURM (`sbatch`) for the HPC `gmx_mdrun` node.
 
 ## metaldock-vwf
 

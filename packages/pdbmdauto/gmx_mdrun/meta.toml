@@ -6,7 +6,7 @@
 name = "gmx-mdrun"
 version = "2.0.1"
 description = "GROMACS MD simulation node with local and HPC/SLURM execution support"
-author = "BoCoFlow Community"
+author = "BoundaryComputing"
 license = "MIT"
 repository = "https://github.com/BoundaryComputing/salpa-hub"
 homepage = "https://www.gromacs.org/"
@@ -144,3 +144,8 @@ journal = "SoftwareX"
 year = "2015"
 doi = "10.1016/j.softx.2015.06.001"
 url = "https://www.gromacs.org/"
+
+[node.platforms]
+# Windows is served through WSL2, which the app sets up itself; the environment has no
+# native win-64 solve (GROMACS/ProMod3), so this list names the native platforms only.
+supported = ["linux", "macos"]

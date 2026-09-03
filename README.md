@@ -18,7 +18,7 @@ need. Heavy execution routes to **Salpa Compute** — never gated here.
 |---|---|---|---|
 | [`hello-world-pipeline`](packages/hello-world-pipeline) | Getting-started starter — a 3-node encrypt/decrypt/reveal pipeline (Caesar cipher) to try the Hub in seconds; pure-Python, no environment — 3 visual nodes | MIT | all |
 | [`metalparm-vwf`](packages/metalparm-vwf) | Force-field parameterization for metal-containing systems (built on EasyParm) + metallopeptide fragment fusion + MD preparation — 20 visual nodes | LGPL-2.1 | linux · macOS |
-| [`pdbmdauto`](packages/pdbmdauto) | Automated protein structure preparation for MD — homology modeling (ProMod3), protonation, solvation/ionization, staged GROMACS minimization — 13 visual nodes | MIT | linux · macOS |
+| [`pdbmdauto`](packages/pdbmdauto) | Automated protein structure preparation for MD — homology modeling (ProMod3), protonation, solvation/ionization, staged GROMACS minimization — 13 visual nodes, a worked template with its own walkthrough | MIT | linux (x86-64, ARM64) · macOS (Intel & Apple Silicon) · Windows through WSL2, set up by the app |
 | [`metaldock-vwf`](packages/metaldock-vwf) | Metal-protein docking — refactored MetalDock pipeline (protein/ligand prep, QM CM5 charges, metal-aware PDBQT, AutoDock4) — 6 visual nodes | ⚠ Academic / non-commercial † | linux · macOS (x86) |
 
 > **†** "Free and open" here means **never paywalled** — not a commercial-use grant. `metaldock-vwf`

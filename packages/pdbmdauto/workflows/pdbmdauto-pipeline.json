@@ -3,7 +3,7 @@
   "template_info": {
     "id": "pdbmdauto-pipeline",
     "name": "PDBmdAuto Full Pipeline",
-    "description": "Automated 11-node MD preparation pipeline: PDB fetch, homology modeling (ProMod3), protonation, GROMACS topology, solvation, vacuum & solvated relaxation, and production MD. Demo: protein 4Z8J (SNX27 PDZ + PTHR peptide, 2 chains, 5 missing residues).",
+    "description": "Automated 11-node MD preparation pipeline: PDB fetch, homology modeling (ProMod3), pH-dependent protonation (PDB2PQR/PROPKA), GROMACS topology, restrained relaxation, solvation and ionization, solvated minimization and a short production MD. Demo: PDB 4Z8J (SNX27 PDZ domain + PTHR C-terminal peptide, 2 chains; six unresolved N-terminal residues are rebuilt). Fetches 4Z8J from RCSB, so it needs network access; the first run also builds the environment.",
     "required_packages": [
       "pdbmdauto"
     ],
