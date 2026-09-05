@@ -8,7 +8,7 @@
 
 [package]
 name = "hello-decrypt"
-version = "1.0.1"
+version = "1.0.2"
 description = "Decrypts a Caesar-cipher message from a file and writes the plaintext"
 author = "BoundaryComputing"
 license = "MIT"

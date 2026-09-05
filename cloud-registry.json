@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-08-04T19:26:11.397585+00:00",
+  "generated_at": "2026-09-05T14:15:16.784865+00:00",
   "source_name": "Salpa Compute",
   "packages": [
     {
       "name": "cloud-gcp-evo2",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "description": "DNA sequence scoring, embeddings, and generation using Evo2 on GCP (L4 GPU)",
       "display_name": "Evo2 DNA Model (GCP)",
       "category": "Genomics",
@@ -48,7 +48,7 @@
     },
     {
       "name": "cloud-modal-boltz2",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "description": "Protein structure prediction using Boltz-2 on Modal H100 GPU",
       "display_name": "Boltz-2 Prediction (Modal)",
       "category": "cloud",
@@ -67,7 +67,7 @@
     },
     {
       "name": "cloud-modal-chai1",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "description": "Multi-modal structure prediction using Chai-1 on Modal H100 GPU",
       "display_name": "Chai-1 Prediction (Modal)",
       "category": "cloud",

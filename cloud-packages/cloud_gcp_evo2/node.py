@@ -32,6 +32,16 @@ from bocoflow_core.parameters import (
 from bocoflow_core.stream_logger import post_with_progress, stream_log
 
 
+#: How to run this node on its own -- the values `salpa smoke` feeds it. Strings
+#: starting with `demo_data/` resolve relative to this directory. Running needs a
+#: Salpa account with cloud access; without one the node stops at authentication,
+#: which is what `salpa smoke` will report. See demo_data/README.md.
+DEMO_CONFIG = {
+    "sequence_file": 'demo_data/lac_operator.fasta',
+    "mode": 'score',
+}
+
+
 class CloudGcpEvo2(Node):
     """
     DNA foundation model using Evo2 7B (GCP Cloud, L4 GPU).

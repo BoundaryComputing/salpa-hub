@@ -36,6 +36,16 @@ def caesar_decrypt(text, shift):
     return "".join(result)
 
 
+#: How to run this node on its own -- the values `salpa smoke` feeds it. Strings
+#: starting with `demo_data/` resolve relative to this directory; a parameter's
+#: type gives its shape and never its value, so every value is written down here.
+DEMO_CONFIG = {
+    "case_name": 'demo',
+    "shift": 3,
+    "input_dir": 'demo_data/demo',
+}
+
+
 class HelloDecrypt(Node):
     """
     Decrypts a Caesar-cipher message from an encrypted file.

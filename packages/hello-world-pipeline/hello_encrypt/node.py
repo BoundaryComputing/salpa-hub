@@ -33,6 +33,16 @@ def caesar_encrypt(text, shift):
     return "".join(result)
 
 
+#: How to run this node on its own -- the values `salpa smoke` feeds it. Strings
+#: starting with `demo_data/` resolve relative to this directory; a parameter's
+#: type gives its shape and never its value, so every value is written down here.
+DEMO_CONFIG = {
+    "case_name": 'demo',
+    "message": 'Hello from Salpa!',
+    "shift": 3,
+}
+
+
 class HelloEncrypt(Node):
     """
     Encrypts a plaintext message using a Caesar cipher.

@@ -3,7 +3,7 @@
 
 [package]
 name = "cloud-gcp-evo2"
-version = "1.0.2"
+version = "1.0.3"
 description = "DNA sequence scoring, embeddings, and generation using Evo2 on GCP (L4 GPU)"
 author = "BoundaryComputing"
 license = "MIT"

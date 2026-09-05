@@ -118,6 +118,16 @@ def build_detailed_report(case_name, ciphertext, plaintext, shift, timestamp):
     return "\n".join(lines)
 
 
+#: How to run this node on its own -- the values `salpa smoke` feeds it. Strings
+#: starting with `demo_data/` resolve relative to this directory; a parameter's
+#: type gives its shape and never its value, so every value is written down here.
+DEMO_CONFIG = {
+    "case_name": 'demo',
+    "input_dir": 'demo_data/demo',
+    "report_style": 'detailed',
+}
+
+
 class HelloReveal(Node):
     """
     Generates a visual comparison report for encrypted vs decrypted messages.

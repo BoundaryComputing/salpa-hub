@@ -37,6 +37,16 @@ from bocoflow_core.parameters import (
 )
 
 
+#: How to run this node on its own -- the values `salpa smoke` feeds it. Strings
+#: starting with `demo_data/` resolve relative to this directory. Running needs a
+#: Salpa account with cloud access; without one the node stops at authentication,
+#: which is what `salpa smoke` will report. See demo_data/README.md.
+DEMO_CONFIG = {
+    "sequence": 'NLYIQWLKDGGPSSGRPPPS',
+    "msa_mode": 'empty',
+}
+
+
 class CloudModalBoltz2(Node):
     """
     Boltz-2 Protein Structure Prediction (BoCoFlow Credits - Mode B).

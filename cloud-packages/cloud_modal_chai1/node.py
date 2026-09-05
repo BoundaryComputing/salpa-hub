@@ -40,6 +40,15 @@ from bocoflow_core.parameters import (
 )
 
 
+#: How to run this node on its own -- the values `salpa smoke` feeds it. Strings
+#: starting with `demo_data/` resolve relative to this directory. Running needs a
+#: Salpa account with cloud access; without one the node stops at authentication,
+#: which is what `salpa smoke` will report. See demo_data/README.md.
+DEMO_CONFIG = {
+    "fasta_input": '>protein|name=trp-cage\nNLYIQWLKDGGPSSGRPPPS',
+}
+
+
 class CloudModalChai1(Node):
     """
     Chai-1 Multi-Modal Structure Prediction (BoCoFlow Credits - Mode B).
