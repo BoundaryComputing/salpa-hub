@@ -1,0 +1,4 @@
+# One molecule per line: SMILES, then an optional name. Three small, real molecules.
+CCO ethanol
+CC(=O)Oc1ccccc1C(=O)O aspirin
+Cn1cnc2c1c(=O)n(C)c(=O)n2C caffeine

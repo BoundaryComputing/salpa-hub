@@ -1,0 +1,62 @@
+# Pixi Environment Definition
+# This file defines the isolated environment for this node
+# See: https://pixi.sh/
+
+[workspace]
+name = "smiles-to-3d"
+version = "0.1.0"
+description = "Generate 3D conformers from SMILES and write them as SDF (RDKit ETKDG + MMFF94)"
+channels = ["conda-forge"]
+# Declare ONLY platforms your deps actually build for (pixi solves ALL of them).
+# Many bioconda / specialized packages lack win-64 (and sometimes osx-arm64).
+# `salpa add <package>` narrows this for you and records why — you rarely edit it by hand.
+# salpa add: linux-aarch64 added — every dependency has a build there (salpa platforms).
+platforms = ["linux-64", "linux-aarch64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+# Core Python requirement
+python = ">=3.10,<3.13"
+
+# Redis client for real-time log streaming from subprocess to UI.
+# Keeps stream_log() calls in your node appearing in the UI immediately.
+redis-py = ">=5.0.0"
+
+# Your dependencies go here — this default env is what the Salpa app installs to run
+# your node.
+#
+#   salpa add numpy pandas
+#
+# finds each one in the channels above, writes it here, works out which of your
+# declared platforms can still run ALL of them, and solves. Hand-editing works too;
+# the command exists because the platform half is the part that is easy to get wrong.
+# Examples:
+# numpy = ">=1.24"
+# pandas = ">=2.0"
+# scipy = ">=1.10"
+
+# Add a [pypi-dependencies] table only if you need pip-only packages not on
+# conda-forge. Prefer conda-forge — and if you add one here, check it doesn't
+# conflict with a conda-pinned version of the same dep.
+#
+# Do NOT add bocoflow_core / bocoflow-core-sdk to THIS default env — the Salpa app
+# provides the full runtime, and a subset here would shadow it during execution. The
+# node-authoring API is provided by the separate `test` env below.
+
+# --- Local testing --------------------------------------------------------------
+# `pixi run test` runs in a SEPARATE env that adds bocoflow-core-sdk (the source-
+# protected node-authoring API, from PyPI) — so `from bocoflow_core.node import Node`
+# resolves and your node.py tests RUN locally, not just core.py. This env is never
+# used by the app, so it can't shadow the runtime bocoflow_core.
+rdkit = ">=2023.09"   # ETKDGv3 + MMFF94; every declared platform has a build
+[feature.test.dependencies]
+pytest = ">=7.0"
+
+[feature.test.pypi-dependencies]
+bocoflow-core-sdk = ">=0.1.2"   # 0.1.2 adds upstream(); 0.1.1 made stream_log() fail fast
+
+[feature.test.tasks]
+# `python -m pytest` puts the package root on sys.path (for `from core import ...`).
+test = "python -m pytest tests/ -v"
+
+[environments]
+test = ["test"]

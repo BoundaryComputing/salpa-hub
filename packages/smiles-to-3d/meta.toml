@@ -1,0 +1,52 @@
+# Node package metadata — the registry reads THIS file to discover your node.
+# Replace every double-brace placeholder below.
+#
+# Guide: https://salpa.app/docs/custom-nodes  (also bundled — run `salpa docs`)
+
+[package]
+# kebab-case, globally unique (the registry keys on it and collisions silently
+# overwrite). The DIRECTORY uses underscores. Keep this line comment-free — some
+# tooling parses it literally.
+name = "smiles-to-3d"
+version = "0.1.0"
+description = "Generate 3D conformers from SMILES and write them as SDF (RDKit ETKDG + MMFF94)"
+author = "Boundary Computing"
+license = "BSD-3-Clause"           # REQUIRED — a node with no license is skipped at
+                                   # load time and silently never appears in the
+                                   # palette. Set the real license of the tool you wrap.
+
+[node]
+class_name = "SmilesTo3d"      # REQUIRED — must match the class in node.py exactly
+display_name = "SMILES to 3D"  # REQUIRED — shown in the UI
+num_in = 1                         # input ports (use 0 for a source node)
+num_out = 1                        # output ports
+
+# Hashtags drive discovery — use 5-10, lowercase-with-hyphens, and be specific
+# ("gromacs-mdrun", not "simulation"). Cover: what it does, the tool it wraps,
+# the scientific domain, and the input/output types.
+hashtags = ["smiles", "3d", "conformer", "sdf", "rdkit", "ligand-prep", "docking"]
+
+[node.metadata]
+icon = "🧪"                        # an emoji — real packages use emoji, not SVG
+category = "Chemistry"          # e.g. "Cheminformatics", "MD Analysis", "Structure Prep".
+                                   # The app looks here FIRST, then falls back to [node].
+# Uncomment if your deps do not build everywhere. It replaces the app's generic
+# "unsupported platform" error with your sentence — say what is missing, and why.
+# platform_note = "Requires X, which has no Windows conda package."
+
+[node.features]
+# default_timeout is the ONLY key the app reads here. It becomes the node's
+# starting timeout in the config panel (600s if unset).
+# supports_resume / requires_gpu / parallel_capable / long_running were removed:
+# nothing has ever read them, so they described a node to no one.
+# default_timeout = 3600           # seconds; omit for the default
+
+[dependencies]
+# Declarative only — this is what the app DISPLAYS as the node's dependencies.
+# It installs nothing: the environment comes from pixi.toml, and that is where
+# runtime deps must go. Extra entries here are shown but never installed.
+python = ">=3.10"
+rdkit = ">=2023.09"
+
+[documentation]
+readme = "README.md"

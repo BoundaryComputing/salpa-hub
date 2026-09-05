@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-09-03T10:53:59.393520+00:00",
+  "generated_at": "2026-09-05T12:22:38.423428+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
@@ -827,6 +827,25 @@
         }
       ],
       "shared_environment": "pdbmdauto"
+    },
+    {
+      "name": "smiles-to-3d",
+      "version": "0.1.0",
+      "description": "Generate 3D conformers from SMILES and write them as SDF (RDKit ETKDG + MMFF94)",
+      "display_name": "SMILES to 3D",
+      "category": "Chemistry",
+      "hashtags": [
+        "smiles",
+        "3d",
+        "conformer",
+        "sdf",
+        "rdkit",
+        "ligand-prep",
+        "docking"
+      ],
+      "author": "Boundary Computing",
+      "license": "BSD-3-Clause",
+      "download_url": "packages/smiles-to-3d"
     }
   ],
   "workflows": [
