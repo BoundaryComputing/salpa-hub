@@ -1,0 +1,17 @@
+# Build artifacts and the solved environment — none of this belongs in git.
+#
+# .pixi/ is the big one: a trivial package is ~100 MB, one pulling AmberTools or
+# GROMACS is gigabytes. `salpa env clean` removes it; `pixi run test` rebuilds it.
+.pixi/
+
+# `salpa validate` reports these as H2 — they are what `pixi run test` leaves behind,
+# and they should not reach a published package.
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+.DS_Store
+
+# pixi.lock is deliberately NOT listed. Committing it pins your dependency versions
+# for anyone who clones this; leaving it out lets each solve take the newest release
+# satisfying pixi.toml. Both are defensible — it is your call, so it is left visible.

@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-09-05T12:22:38.423428+00:00",
+  "generated_at": "2026-09-05T14:13:43.967186+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
@@ -65,6 +65,25 @@
           ]
         }
       ]
+    },
+    {
+      "name": "ligand-pdbqt-meeko",
+      "version": "0.1.0",
+      "description": "Prepare docking-ready PDBQT ligands from an SDF with Meeko (AutoDock Vina / AutoDock4)",
+      "display_name": "Ligand PDBQT (Meeko)",
+      "category": "Docking",
+      "hashtags": [
+        "pdbqt",
+        "meeko",
+        "autodock",
+        "vina",
+        "ligand-prep",
+        "sdf",
+        "docking"
+      ],
+      "author": "Boundary Computing",
+      "license": "LGPL-2.1-only",
+      "download_url": "packages/ligand-pdbqt-meeko"
     },
     {
       "name": "metaldock-vwf",

@@ -1,0 +1,53 @@
+# Node package metadata — the registry reads THIS file to discover your node.
+# Replace every double-brace placeholder below.
+#
+# Guide: https://salpa.app/docs/custom-nodes  (also bundled — run `salpa docs`)
+
+[package]
+# kebab-case, globally unique (the registry keys on it and collisions silently
+# overwrite). The DIRECTORY uses underscores. Keep this line comment-free — some
+# tooling parses it literally.
+name = "ligand-pdbqt-meeko"
+version = "0.1.0"
+description = "Prepare docking-ready PDBQT ligands from an SDF with Meeko (AutoDock Vina / AutoDock4)"
+author = "Boundary Computing"
+license = "LGPL-2.1-only"          # REQUIRED — a node with no license is skipped at
+                                   # load time and silently never appears in the
+                                   # palette. Set the real license of the tool you wrap.
+
+[node]
+class_name = "LigandPdbqtMeeko"      # REQUIRED — must match the class in node.py exactly
+display_name = "Ligand PDBQT (Meeko)"  # REQUIRED — shown in the UI
+num_in = 1                         # input ports (use 0 for a source node)
+num_out = 1                        # output ports
+
+# Hashtags drive discovery — use 5-10, lowercase-with-hyphens, and be specific
+# ("gromacs-mdrun", not "simulation"). Cover: what it does, the tool it wraps,
+# the scientific domain, and the input/output types.
+hashtags = ["pdbqt", "meeko", "autodock", "vina", "ligand-prep", "sdf", "docking"]
+
+[node.metadata]
+icon = "🎯"                        # an emoji — real packages use emoji, not SVG
+category = "Docking"          # e.g. "Cheminformatics", "MD Analysis", "Structure Prep".
+                                   # The app looks here FIRST, then falls back to [node].
+# Uncomment if your deps do not build everywhere. It replaces the app's generic
+# "unsupported platform" error with your sentence — say what is missing, and why.
+# platform_note = "Requires X, which has no Windows conda package."
+
+[node.features]
+# default_timeout is the ONLY key the app reads here. It becomes the node's
+# starting timeout in the config panel (600s if unset).
+# supports_resume / requires_gpu / parallel_capable / long_running were removed:
+# nothing has ever read them, so they described a node to no one.
+# default_timeout = 3600           # seconds; omit for the default
+
+[dependencies]
+# Declarative only — this is what the app DISPLAYS as the node's dependencies.
+# It installs nothing: the environment comes from pixi.toml, and that is where
+# runtime deps must go. Extra entries here are shown but never installed.
+python = ">=3.10"
+meeko = ">=0.8"
+rdkit = ">=2026"
+
+[documentation]
+readme = "README.md"
