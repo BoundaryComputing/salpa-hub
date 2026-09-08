@@ -27,6 +27,10 @@ __pycache__/
 # Internal dev notes / handoff — LOCAL only, never published
 /dev-notes/
 
+# Incoming package candidates under evaluation — third-party papers, collaborator
+# correspondence, feasibility assessments. LOCAL only, never published.
+/candidates/
+
 # Claude Code / AI guidance — LOCAL only, not for the public mirror
 /CLAUDE.md
 
