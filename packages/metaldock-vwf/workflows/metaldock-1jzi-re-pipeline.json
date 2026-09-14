@@ -274,7 +274,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "complex",
+                  "value": "1jzi_re",
                   "docstring": "Name for this docking case (forwarded downstream)."
                 },
                 "pdb_file": {
@@ -448,7 +448,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "complex",
+                  "value": "1jzi_re",
                   "docstring": "Case name. Leave default to inherit from a predecessor."
                 },
                 "xyz_file": {
@@ -467,7 +467,7 @@
                 "metal_symbol": {
                   "type": "string",
                   "label": "Metal Symbol",
-                  "value": "",
+                  "value": "Re",
                   "docstring": "Metal element symbol (e.g. Re, Ru, Cu). Forwarded downstream."
                 },
                 "obabel_path": {
@@ -618,7 +618,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "complex",
+                  "value": "1jzi_re",
                   "docstring": null
                 },
                 "output_dir": {
@@ -685,7 +685,7 @@
                 "orcasimpleinput": {
                   "type": "string",
                   "label": "ORCA Simple Input",
-                  "value": "PBE def2-TZVP CPCM(Water)",
+                  "value": "B3LYP def2-SVP",
                   "docstring": "ORCA `! ...` keyword line."
                 },
                 "orcablocks": {
@@ -879,7 +879,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "complex",
+                  "value": "1jzi_re",
                   "docstring": null
                 },
                 "output_dir": {
@@ -1053,7 +1053,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "complex",
+                  "value": "1jzi_re",
                   "docstring": null
                 },
                 "output_dir": {
@@ -1105,7 +1105,7 @@
                 "box_center": {
                   "type": "string",
                   "label": "Box Center (x,y,z)",
-                  "value": "",
+                  "value": "1.65,-7.803,27.176",
                   "docstring": "Grid box center in \u00c5. Leave empty to center on the metal atom."
                 },
                 "box_size": {
@@ -1278,7 +1278,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "complex",
+                  "value": "1jzi_re",
                   "docstring": null
                 },
                 "output_dir": {

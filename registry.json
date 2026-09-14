@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-09-05T14:15:14.770068+00:00",
+  "generated_at": "2026-09-14T12:48:54.145889+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
       "name": "hello-world-pipeline",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "description": "A 3-node hello-world workflow \u2014 encrypt, decrypt, and reveal messages using a Caesar cipher. The simplest multi-node pipeline for learning Salpa.",
       "category": "Getting Started",
       "hashtags": [
@@ -87,7 +87,7 @@
     },
     {
       "name": "metaldock-vwf",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "description": "Visual workflow nodes for metal-protein docking: the refactored MetalDock pipeline (protein prep, ligand prep, QM/ORCA CM5 charges, ligand PDBQT with metal-aware torsion tree, AutoDock4 docking, results analysis) wired as chainable Salpa nodes. Each node wraps one src/metaldock_modules function; molecular graphs are serialized to JSON between nodes.",
       "category": "Metal Docking",
       "hashtags": [
@@ -579,7 +579,7 @@
     },
     {
       "name": "pdbmdauto",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "description": "Automated protein structure preparation for molecular dynamics \u2014 homology modeling, solvation, relaxation",
       "category": "Molecular Dynamics",
       "hashtags": [

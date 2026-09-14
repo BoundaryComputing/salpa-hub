@@ -4,6 +4,19 @@ All notable changes to the `metaldock-vwf` package are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning is
 [SemVer](https://semver.org/).
 
+## [0.4.1] — 2026-09-14
+
+### Fixed
+
+- **Every parameter in `workflows/metaldock-1jzi-re-pipeline.json` now holds one value.** A
+  template records each parameter in four places. Loading reads one of them, and that one was
+  right, but `option_types`, the copy stored with each parameter's type, still held other values:
+  the nodes' defaults for `case_name` (`complex`, against `1jzi_re` on all six nodes) and for the
+  ORCA line (`PBE def2-TZVP CPCM(Water)`, against `B3LYP def2-SVP`), and an empty `metal_symbol`
+  and `box_center` (against `Re` and `1.65,-7.803,27.176`). Nothing that runs changed, and the HSA
+  template already agreed with itself. The file is now what the app writes when the template is
+  loaded and exported again.
+
 ## [0.4.0] — 2026-08-25
 
 ### Added

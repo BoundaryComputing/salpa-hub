@@ -189,7 +189,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": null,
+                  "value": "demo",
                   "docstring": "Name for this case (used in output file names). If left empty, uses predecessor data or defaults to 'secret'."
                 },
                 "message": {
@@ -207,7 +207,7 @@
                 "output_dir": {
                   "type": "folder",
                   "label": "Output Directory",
-                  "value": null,
+                  "value": "rel:./",
                   "docstring": "Directory where the encrypted file will be written."
                 },
                 "force_to_run": {
@@ -233,10 +233,10 @@
               }
             },
             "config": {
-              "case_name": null,
+              "case_name": "demo",
               "message": "Hello from Salpa!",
               "shift": 3,
-              "output_dir": null,
+              "output_dir": "rel:./",
               "force_to_run": true
             }
           },
@@ -326,7 +326,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": null,
+                  "value": "demo",
                   "docstring": "Name for this case (used to find the encrypted file). If left empty, uses predecessor data or defaults to 'secret'."
                 },
                 "shift": {
@@ -338,13 +338,13 @@
                 "input_dir": {
                   "type": "folder",
                   "label": "Input Directory",
-                  "value": null,
+                  "value": "rel:./",
                   "docstring": "Directory where the encrypted file is located."
                 },
                 "output_dir": {
                   "type": "folder",
                   "label": "Output Directory",
-                  "value": null,
+                  "value": "rel:./",
                   "docstring": "Directory where the decrypted file will be written."
                 },
                 "force_to_run": {
@@ -370,10 +370,10 @@
               }
             },
             "config": {
-              "case_name": null,
+              "case_name": "demo",
               "shift": 3,
-              "input_dir": null,
-              "output_dir": null,
+              "input_dir": "rel:./",
+              "output_dir": "rel:./",
               "force_to_run": true
             }
           },
@@ -461,19 +461,19 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": null,
+                  "value": "demo",
                   "docstring": "Name for this case (used to find the encrypted/decrypted files). If left empty, uses predecessor data or defaults to 'secret'."
                 },
                 "input_dir": {
                   "type": "folder",
                   "label": "Input Directory",
-                  "value": null,
+                  "value": "rel:./",
                   "docstring": "Directory where the encrypted and decrypted files are located."
                 },
                 "output_dir": {
                   "type": "folder",
                   "label": "Output Directory",
-                  "value": null,
+                  "value": "rel:./",
                   "docstring": "Directory where the reveal report will be written."
                 },
                 "report_style": {
@@ -509,9 +509,9 @@
               }
             },
             "config": {
-              "case_name": null,
-              "input_dir": null,
-              "output_dir": null,
+              "case_name": "demo",
+              "input_dir": "rel:./",
+              "output_dir": "rel:./",
               "report_style": "detailed",
               "force_to_run": true
             }

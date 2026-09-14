@@ -4,6 +4,20 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 versions are the `[package].version` in `package.toml`, which is what the Marketplace's Updates tab
 compares against.
 
+## [1.2.1] — 2026-09-14
+
+The bundled template only. No node code changed, and nothing that runs changed.
+
+### Fixed
+- **Every parameter in `workflows/pdbmdauto-pipeline.json` now holds one value.** A template
+  records each parameter in four places. Loading reads one of them, and that one was right; two of
+  the others held values the pipeline does not use. There, `case_name` was empty or null on all 11
+  nodes, against `e2e_4z8j`; PDB FASTA Parser's `pdb_id` and `output_dir` were null, against `4Z8J`
+  and `rel:pdbmdauto-e2e-full`; `check_pdb_header` was false, against true; and the second
+  relaxation's `protocol` was `full_4step`, the node's default, against `em_only`. A reader of
+  those copies saw a different pipeline from the one that runs. The file is now what the app
+  writes when the template is loaded and exported again.
+
 ## [1.2.0] — 2026-09-03
 
 Documentation and metadata. No node code changed.

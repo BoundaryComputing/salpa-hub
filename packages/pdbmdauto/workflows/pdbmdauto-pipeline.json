@@ -438,7 +438,7 @@
                 "pdb_id": {
                   "type": "string",
                   "label": "PDB ID",
-                  "value": null,
+                  "value": "4Z8J",
                   "docstring": "4-character RCSB PDB identifier (e.g. '3LZ0'). Used in pdb_id mode."
                 },
                 "pdb_file": {
@@ -451,13 +451,13 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": null,
+                  "value": "e2e_4z8j",
                   "docstring": "Identifier for this case. Falls back to PDB ID, predecessor data, or 'protein'."
                 },
                 "output_dir": {
                   "type": "folder",
                   "label": "Output Directory",
-                  "value": null,
+                  "value": "rel:pdbmdauto-e2e-full",
                   "docstring": "Directory where output files will be written."
                 },
                 "split_chains": {
@@ -475,7 +475,7 @@
                 "check_pdb_header": {
                   "type": "boolean",
                   "label": "Check PDB Header",
-                  "value": false,
+                  "value": true,
                   "docstring": "Extract missing residues information from the PDB header."
                 },
                 "force_to_run": {
@@ -507,13 +507,13 @@
             },
             "config": {
               "input_mode": "pdb_id",
-              "pdb_id": null,
+              "pdb_id": "4Z8J",
               "pdb_file": null,
-              "case_name": null,
-              "output_dir": null,
+              "case_name": "e2e_4z8j",
+              "output_dir": "rel:pdbmdauto-e2e-full",
               "split_chains": true,
               "include_hetatm": false,
-              "check_pdb_header": false,
+              "check_pdb_header": true,
               "force_to_run": false
             }
           },
@@ -605,7 +605,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "",
+                  "value": "e2e_4z8j",
                   "docstring": "Case identifier. Leave empty to use predecessor data."
                 },
                 "output_dir": {
@@ -643,7 +643,7 @@
               }
             },
             "config": {
-              "case_name": "",
+              "case_name": "e2e_4z8j",
               "output_dir": "",
               "append_end_in_seq": true,
               "force_to_run": false
@@ -736,7 +736,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "",
+                  "value": "e2e_4z8j",
                   "docstring": "Case identifier. Leave empty to use predecessor data."
                 },
                 "merge_folder_name": {
@@ -774,7 +774,7 @@
               }
             },
             "config": {
-              "case_name": "",
+              "case_name": "e2e_4z8j",
               "merge_folder_name": "Merge",
               "selected_chain_ids": "all",
               "force_to_run": false
@@ -867,7 +867,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "",
+                  "value": "e2e_4z8j",
                   "docstring": "Case identifier. Leave empty to use predecessor data."
                 },
                 "merge_folder_name": {
@@ -912,7 +912,7 @@
               }
             },
             "config": {
-              "case_name": "",
+              "case_name": "e2e_4z8j",
               "merge_folder_name": "Merge",
               "merge_file_name": "merge.pdb",
               "selected_chain_ids": "all",
@@ -1005,7 +1005,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "",
+                  "value": "e2e_4z8j",
                   "docstring": "Case identifier. Leave empty to use predecessor data."
                 },
                 "model_termini": {
@@ -1036,7 +1036,7 @@
               }
             },
             "config": {
-              "case_name": "",
+              "case_name": "e2e_4z8j",
               "model_termini": false,
               "force_to_run": false
             }
@@ -1135,7 +1135,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "",
+                  "value": "e2e_4z8j",
                   "docstring": "Leave empty to use predecessor data."
                 },
                 "input_pdb": {
@@ -1228,7 +1228,7 @@
               }
             },
             "config": {
-              "case_name": "",
+              "case_name": "e2e_4z8j",
               "input_pdb": "",
               "output_dir": "",
               "force_field": "amber99sb",
@@ -1326,7 +1326,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "",
+                  "value": "e2e_4z8j",
                   "docstring": "Leave empty to use predecessor data."
                 },
                 "input_structure": {
@@ -1358,7 +1358,7 @@
               }
             },
             "config": {
-              "case_name": "",
+              "case_name": "e2e_4z8j",
               "input_structure": "",
               "force_to_run": false
             }
@@ -1452,7 +1452,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "",
+                  "value": "e2e_4z8j",
                   "docstring": "Leave empty to use predecessor data."
                 },
                 "protocol": {
@@ -1520,7 +1520,7 @@
               }
             },
             "config": {
-              "case_name": "",
+              "case_name": "e2e_4z8j",
               "protocol": "full_4step",
               "input_top_file": "",
               "input_gro_file": "",
@@ -1621,7 +1621,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "",
+                  "value": "e2e_4z8j",
                   "docstring": "Leave empty to use predecessor data."
                 },
                 "run_label": {
@@ -1716,7 +1716,7 @@
               }
             },
             "config": {
-              "case_name": "",
+              "case_name": "e2e_4z8j",
               "run_label": "md",
               "force_field": "amber99sb",
               "water_model": "tip3p",
@@ -1817,13 +1817,13 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "",
+                  "value": "e2e_4z8j",
                   "docstring": "Leave empty to use predecessor data."
                 },
                 "protocol": {
                   "type": "select",
                   "label": "Relaxation Protocol",
-                  "value": "full_4step",
+                  "value": "em_only",
                   "docstring": "full_4step: 4-step progressive unfreezing (NVT frozen→NVT backbone→CG EM×2). em_only: single steepest-descent EM. custom: single step with user MDP.",
                   "options": [
                     "full_4step",
@@ -1885,8 +1885,8 @@
               }
             },
             "config": {
-              "case_name": "",
-              "protocol": "full_4step",
+              "case_name": "e2e_4z8j",
+              "protocol": "em_only",
               "input_top_file": "",
               "input_gro_file": "",
               "input_mdp_file": "",
@@ -1999,7 +1999,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "",
+                  "value": "e2e_4z8j",
                   "docstring": "Name for this simulation (optional)"
                 },
                 "run_label": {
@@ -2090,7 +2090,7 @@
               }
             },
             "config": {
-              "case_name": "",
+              "case_name": "e2e_4z8j",
               "run_label": "md",
               "input_top_file": "",
               "input_gro_file": "",
