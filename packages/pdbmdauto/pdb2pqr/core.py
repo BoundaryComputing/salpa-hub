@@ -15,7 +15,6 @@ import sys
 
 import MDAnalysis as mda
 
-
 # ---------------------------------------------------------------------------
 # Executable discovery
 # ---------------------------------------------------------------------------
@@ -40,16 +39,12 @@ def find_pdb2pqr_executable(custom_path=""):
     """
     if custom_path:
         if not os.path.exists(custom_path):
-            raise FileNotFoundError(
-                f"Custom pdb2pqr path not found: {custom_path}"
-            )
+            raise FileNotFoundError(f"Custom pdb2pqr path not found: {custom_path}")
         return custom_path
 
     # Auto-detect from the same environment as Python
     python_bin_dir = os.path.dirname(sys.executable)
-    potential_names = (
-        ["pdb2pqr.exe", "pdb2pqr"] if os.name == "nt" else ["pdb2pqr"]
-    )
+    potential_names = ["pdb2pqr.exe", "pdb2pqr"] if os.name == "nt" else ["pdb2pqr"]
 
     for name in potential_names:
         candidate = os.path.join(python_bin_dir, name)
@@ -96,9 +91,12 @@ def build_pdb2pqr_command(
     """
     cmd = [
         pdb2pqr_cmd,
-        "--ff", force_field,
-        "--ffout", force_field,
-        "--log-level", log_level,
+        "--ff",
+        force_field,
+        "--ffout",
+        force_field,
+        "--log-level",
+        log_level,
     ]
 
     if use_propka:
@@ -109,7 +107,9 @@ def build_pdb2pqr_command(
         cmd.append("--keep-chain")
 
     if not optimize_hydrogens:
-        cmd.append("--no-optimize")
+        # PDB2PQR's flag is --noopt. Its parser is strict, so the --no-optimize
+        # this used to write stopped every run with exit status 2.
+        cmd.append("--noopt")
 
     if include_header:
         cmd.append("--include-header")

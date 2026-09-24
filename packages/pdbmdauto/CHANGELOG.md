@@ -4,6 +4,30 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 versions are the `[package].version` in `package.toml`, which is what the Marketplace's Updates tab
 compares against.
 
+## [1.2.2] — 2026-09-24
+
+Two node fixes and two corrections to what the package says. The environment is unchanged, so
+nothing is rebuilt.
+
+### Fixed
+- **PDB to PQR Converter runs with Optimize Hydrogens off.** It passed `--no-optimize`, an option
+  PDB2PQR does not have: PDB2PQR's is `--noopt`. PDB2PQR's parser is strict, so every run with the
+  option off stopped at once with "unrecognized arguments". The node's tests now check the command
+  against PDB2PQR's own parser, and run it once with the option off.
+- **pKa + GROMACS EM fails when PDB2PQR fails.** It used to carry on with the unprotonated structure
+  and report success, with "0 protonation change(s)". pdb2gmx then chose the protonation states,
+  not PDB2PQR at the requested pH, and the only record went to a log file the app does not show.
+  Now the step stops. The Log Center shows why, from the end of PDB2PQR's output, where the reason
+  is, and so does the node's error. To let pdb2gmx choose the states deliberately, turn off
+  *Run PDB2PQR*.
+- **Fix Missing Residues is described as it runs.** The README, the walkthrough and the node's own
+  description said the step minimises the model and runs `pm build-model`. It does neither: it
+  drives ProMod3's Python API, and the model is first minimised in the next step. The node's error
+  messages no longer name `build-model`. Its description no longer says DNA and RNA chains are kept:
+  they are left out of `fixed.pdb`, as its warning says.
+- **PDB2PQR's citation.** The PDB to PQR Converter gave the 2004 paper's title with the 2007 paper's
+  DOI. It now gives the 2004 paper's own, 10.1093/nar/gkh381, as the README's References do.
+
 ## [1.2.1] — 2026-09-14
 
 The bundled template only. No node code changed, and nothing that runs changed.

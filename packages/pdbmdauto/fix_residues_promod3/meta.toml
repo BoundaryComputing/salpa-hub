@@ -1,6 +1,6 @@
 [package]
 name = "fix-residues-promod3"
-version = "1.0.1"
+version = "1.0.2"
 description = "Fix missing residues in PDB structures using ProMod3 homology modeling engine"
 author = "BoundaryComputing"
 license = "MIT"

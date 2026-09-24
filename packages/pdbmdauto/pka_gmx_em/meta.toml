@@ -1,6 +1,6 @@
 [package]
 name = "pka-gmx-em"
-version = "1.0.1"
+version = "1.0.2"
 description = "pH-dependent protonation (PDB2PQR/PROPKA) + GROMACS topology (pdb2gmx) + two-step vacuum energy minimisation"
 author = "BoundaryComputing"
 license = "MIT"

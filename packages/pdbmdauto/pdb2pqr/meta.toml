@@ -1,6 +1,6 @@
 [package]
 name = "pdb2pqr"
-version = "2.0.1"
+version = "2.0.2"
 description = "Converts PDB files to PQR format with protonation states, hydrogen addition, and charge assignment using PDB2PQR. Supports PROPKA pKa predictions and multiple force fields."
 author = "BoundaryComputing"
 license = "MIT"
@@ -47,7 +47,7 @@ readme = "README.md"
 
 [citation]
 reference = "PDB2PQR: An Automated Pipeline for the Setup of Poisson-Boltzmann Electrostatics Calculations"
-doi = "10.1093/nar/gkm276"
+doi = "10.1093/nar/gkh381"
 
 [node.platforms]
 # Windows is served through WSL2, which the app sets up itself; the environment has no

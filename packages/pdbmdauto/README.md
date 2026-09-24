@@ -43,9 +43,9 @@ retrieved and its per-chain sequences extracted. Residues present in the sequenc
 the coordinates — the entry's `REMARK 465` records — are identified, an alignment of the resolved
 residues to the full sequence is written per chain, and the missing residues are built by ProMod3:
 internal gaps from its fragment database, terminal extensions by its terminus modeling, followed by
-sidechain reconstruction and a brief minimization. The result is a chemically complete, continuous
-model. Reconstructed residues are predictions, not measurements, and should be treated as such in
-any analysis.
+sidechain reconstruction. ProMod3's own energy minimization is not run; the model is first minimized
+in vacuo in stage 2. The result is a chemically complete, continuous model. Reconstructed residues
+are predictions, not measurements, and should be treated as such in any analysis.
 
 **2. Protonation and topology generation.** Protonation states of titratable residues are predicted
 at the requested pH (PROPKA); hydrogen atoms and partial charges are assigned (PDB2PQR, AMBER

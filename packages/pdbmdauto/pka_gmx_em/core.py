@@ -37,6 +37,7 @@ _CHARMM_PROTONATION = {"HSD", "HSE", "HSP", "ASPP", "GLUP", "CYX", "CYM"}
 
 # ── Result dataclass ──────────────────────────────────────────────────────
 
+
 @dataclass
 class PkaGmxEmResult:
     """Result of the protonation + topology + EM pipeline."""
@@ -54,6 +55,7 @@ class PkaGmxEmResult:
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 
+
 def _run(argv, cwd=None, timeout=300, stdin_text=None):
     """Run a command as an argv list. Returns (returncode, combined output).
 
@@ -66,8 +68,12 @@ def _run(argv, cwd=None, timeout=300, stdin_text=None):
     answered an interactive prompt, and stdin does that without a shell.
     """
     r = subprocess.run(
-        argv, input=stdin_text, capture_output=True, text=True,
-        cwd=cwd, timeout=timeout,
+        argv,
+        input=stdin_text,
+        capture_output=True,
+        text=True,
+        cwd=cwd,
+        timeout=timeout,
     )
     return r.returncode, (r.stdout or "") + "\n" + (r.stderr or "")
 
@@ -128,6 +134,7 @@ def _write_em_mdp(path, constraints="none", nsteps=1000):
 #   3. Patch PDB    →  apply renamed residues to the original PDB
 #   4. Feed to pdb2gmx -ignh  →  topology with correct protonation
 #
+
 
 def _parse_pqr_residues(pqr_path, ff_type="AMBER"):
     """Parse PQR file and return residues that PDB2PQR renamed for protonation.
@@ -190,11 +197,11 @@ def _detect_unrenamed_his(pqr_path):
         has_hd1 = "HD1" in atoms
         has_he2 = "HE2" in atoms
         if has_hd1 and has_he2:
-            assignments[key] = "HIP"   # doubly protonated (+1 charge)
+            assignments[key] = "HIP"  # doubly protonated (+1 charge)
         elif has_hd1:
-            assignments[key] = "HID"   # delta-protonated (neutral)
+            assignments[key] = "HID"  # delta-protonated (neutral)
         else:
-            assignments[key] = "HIE"   # epsilon-protonated (neutral, most common)
+            assignments[key] = "HIE"  # epsilon-protonated (neutral, most common)
 
     return assignments
 
@@ -247,9 +254,9 @@ def patch_pdb_with_protonation(original_pdb, pqr_path, output_pdb, ff_type="AMBE
                     # 3-char names (AMBER: HID, HIE, HIP, ASH, GLH, CYX)
                     # 4-char names (CHARMM: ASPP, GLUP) extend into column 20
                     if len(new_name) <= 3:
-                        res_field = f" {new_name:<3s}"    # " HID"
+                        res_field = f" {new_name:<3s}"  # " HID"
                     else:
-                        res_field = f"{new_name:<4s}"     # "ASPP"
+                        res_field = f"{new_name:<4s}"  # "ASPP"
                     line = line[:17] + res_field + line[21:]
 
                     if key not in changes:
@@ -264,6 +271,7 @@ def patch_pdb_with_protonation(original_pdb, pqr_path, output_pdb, ff_type="AMBE
 
 
 # ── Main pipeline ─────────────────────────────────────────────────────────
+
 
 def process_pka_gmx_em(
     input_pdb,
@@ -287,7 +295,9 @@ def process_pka_gmx_em(
         box_distance:  Padding distance around solute (nm) for editconf.
         em_steps:      Maximum steps per EM stage.
         ph:            Target pH for PROPKA protonation prediction.
-        run_pdb2pqr:   Whether to run PDB2PQR (if False, feeds raw PDB to pdb2gmx).
+        run_pdb2pqr:   Whether to run PDB2PQR. If False, pdb2gmx gets the raw PDB
+                       and chooses the states itself. If True and PDB2PQR fails,
+                       the step fails.
 
     Returns:
         PkaGmxEmResult with output file paths and status.
@@ -302,7 +312,7 @@ def process_pka_gmx_em(
     elif force_field.startswith("charmm"):
         pdb2pqr_ff = "CHARMM"
     elif force_field.startswith("opls"):
-        pdb2pqr_ff = "AMBER"   # OPLS ≈ AMBER naming for titratable residues
+        pdb2pqr_ff = "AMBER"  # OPLS ≈ AMBER naming for titratable residues
     else:
         pdb2pqr_ff = "AMBER"
 
@@ -314,10 +324,18 @@ def process_pka_gmx_em(
         pqr_file = os.path.join(output_dir, "propka.pqr")
 
         cmd = [
-            "pdb2pqr", "--ff", pdb2pqr_ff, "--ffout", pdb2pqr_ff,
-            "--keep-chain", "--titration-state-method=propka",
-            f"--with-ph={ph:.2f}", "--log-level=INFO", "--include-header",
-            input_pdb, pqr_file,
+            "pdb2pqr",
+            "--ff",
+            pdb2pqr_ff,
+            "--ffout",
+            pdb2pqr_ff,
+            "--keep-chain",
+            "--titration-state-method=propka",
+            f"--with-ph={ph:.2f}",
+            "--log-level=INFO",
+            "--include-header",
+            input_pdb,
+            pqr_file,
         ]
 
         rc, out = _run(cmd, cwd=output_dir, timeout=120)
@@ -329,7 +347,10 @@ def process_pka_gmx_em(
             # ── Step 2: Protonation bridge ────────────────────────────────
             patched_pdb = os.path.join(output_dir, "protonated.pdb")
             changes = patch_pdb_with_protonation(
-                input_pdb, pqr_file, patched_pdb, ff_type=pdb2pqr_ff,
+                input_pdb,
+                pqr_file,
+                patched_pdb,
+                ff_type=pdb2pqr_ff,
             )
             result.patched_pdb = patched_pdb
             result.protonation_changes = changes
@@ -340,25 +361,44 @@ def process_pka_gmx_em(
                     f"protonation bridge: {len(changes)} residue(s) renamed"
                 )
                 for (ch, seq), (old, new) in sorted(changes.items()):
-                    log_lines.append(
-                        f"  chain {ch or '-'} res {seq}: {old} -> {new}"
-                    )
+                    log_lines.append(f"  chain {ch or '-'} res {seq}: {old} -> {new}")
             else:
                 log_lines.append(
                     "protonation bridge: no changes (standard states at this pH)"
                 )
         else:
-            log_lines.append(f"pdb2pqr: FAILED (rc={rc}), falling back to raw PDB")
-            log_lines.append(f"  {out[:400]}")
-            # Not fatal — pdb2gmx will use its own hydrogen-bond analysis
+            # A failed PDB2PQR fails the step. This used to fall back to the raw
+            # PDB and report success, with the states pdb2gmx chose rather than
+            # the ones asked for at this pH. PDB2PQR prints its banner first and
+            # the reason last, so keep the end of its output.
+            log_lines.append(f"pdb2pqr: FAILED (rc={rc})")
+            log_lines.append(out.strip()[-1000:])
+            log_lines.append(
+                "Protonation for this pH was not set. To let pdb2gmx choose the "
+                "states itself, turn off Run PDB2PQR."
+            )
+            result.log = "\n".join(log_lines)
+            return result
 
     # ── Step 3: gmx pdb2gmx ──────────────────────────────────────────────
     pdb2gmx_gro = os.path.join(output_dir, "pdb2gmx.gro")
     pdb2gmx_top = os.path.join(output_dir, "pdb2gmx.top")
 
-    cmd = ["gmx", "pdb2gmx", "-f", gmx_input_pdb, "-o", pdb2gmx_gro,
-           "-p", pdb2gmx_top, "-ff", force_field, "-water", water_model,
-           "-ignh"]
+    cmd = [
+        "gmx",
+        "pdb2gmx",
+        "-f",
+        gmx_input_pdb,
+        "-o",
+        pdb2gmx_gro,
+        "-p",
+        pdb2gmx_top,
+        "-ff",
+        force_field,
+        "-water",
+        water_model,
+        "-ignh",
+    ]
 
     rc, out = _run(cmd, cwd=output_dir)
     log_lines.append(f"pdb2gmx: rc={rc}")
@@ -370,8 +410,18 @@ def process_pka_gmx_em(
     # ── Step 4: gmx editconf — box ───────────────────────────────────────
     box_gro = os.path.join(output_dir, "box.gro")
 
-    cmd = ["gmx", "editconf", "-f", pdb2gmx_gro, "-o", box_gro,
-           "-bt", "triclinic", "-d", str(box_distance)]
+    cmd = [
+        "gmx",
+        "editconf",
+        "-f",
+        pdb2gmx_gro,
+        "-o",
+        box_gro,
+        "-bt",
+        "triclinic",
+        "-d",
+        str(box_distance),
+    ]
 
     rc, out = _run(cmd, cwd=output_dir)
     log_lines.append(f"editconf: rc={rc}")
@@ -384,8 +434,20 @@ def process_pka_gmx_em(
     _write_em_mdp(em1_mdp, constraints="none", nsteps=em_steps)
 
     em1_tpr = os.path.join(output_dir, "em_noconstr.tpr")
-    cmd = ["gmx", "grompp", "-f", em1_mdp, "-c", box_gro,
-           "-p", pdb2gmx_top, "-o", em1_tpr, "-maxwarn", "10"]
+    cmd = [
+        "gmx",
+        "grompp",
+        "-f",
+        em1_mdp,
+        "-c",
+        box_gro,
+        "-p",
+        pdb2gmx_top,
+        "-o",
+        em1_tpr,
+        "-maxwarn",
+        "10",
+    ]
     rc, out = _run(cmd, cwd=output_dir)
     log_lines.append(f"grompp(em1): rc={rc}")
     if rc != 0:
@@ -406,8 +468,20 @@ def process_pka_gmx_em(
     _write_em_mdp(em2_mdp, constraints="h-bonds", nsteps=em_steps)
 
     em2_tpr = os.path.join(output_dir, "em_hbonds.tpr")
-    cmd = ["gmx", "grompp", "-f", em2_mdp, "-c", em1_gro,
-           "-p", pdb2gmx_top, "-o", em2_tpr, "-maxwarn", "10"]
+    cmd = [
+        "gmx",
+        "grompp",
+        "-f",
+        em2_mdp,
+        "-c",
+        em1_gro,
+        "-p",
+        pdb2gmx_top,
+        "-o",
+        em2_tpr,
+        "-maxwarn",
+        "10",
+    ]
     rc, out = _run(cmd, cwd=output_dir)
     log_lines.append(f"grompp(em2): rc={rc}")
     if rc != 0:

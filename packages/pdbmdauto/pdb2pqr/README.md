@@ -59,4 +59,4 @@ The `demo_data/` directory contains `mini.pdb`, a small peptide structure for te
 
 Dolinsky TJ et al. PDB2PQR: An Automated Pipeline for the Setup of
 Poisson-Boltzmann Electrostatics Calculations. *Nucleic Acids Research*, 2004.
-DOI: [10.1093/nar/gkm276](https://doi.org/10.1093/nar/gkm276)
+DOI: [10.1093/nar/gkh381](https://doi.org/10.1093/nar/gkh381)

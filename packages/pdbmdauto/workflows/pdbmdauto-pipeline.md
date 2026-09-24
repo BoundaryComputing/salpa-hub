@@ -82,7 +82,8 @@ cofactors). If your system needs a bound ligand, this is the step to notice.
 | takes | `Merge/merge.pdb`, `Merge/homology.ali` |
 | writes | `Merge/alignment_A.fasta`, `Merge/alignment_B.fasta`, `Merge/fixed.pdb` |
 
-Builds the six missing residues, reconstructs sidechains and briefly minimises. In the reference run
+Builds the six missing residues and reconstructs sidechains. It does not minimise: ProMod3's own
+minimisation is left out, and step 6 minimises the model in vacuo. In the reference run
 chain A went from 96 to 101 residues and chain B from 7 to 8. Two things to know: ProMod3
 **renumbers from 1** (`merge.pdb` carried 38–133 and 587–593; `fixed.pdb` reads 1–101 and 1–8),
 and the *Model Terminal Extensions* option has no effect in this version — termini are always

@@ -109,7 +109,8 @@ class PkaGmxEm(Node):
         """Execute the protonation + topology + EM pipeline."""
         stream_log(
             "Starting pKa + GROMACS EM...",
-            node_id=self.node_id, progress=0,
+            node_id=self.node_id,
+            progress=0,
         )
 
         try:
@@ -117,13 +118,10 @@ class PkaGmxEm(Node):
             result.metadata["execution_time"] = datetime.now().isoformat()
 
             input_data = (
-                predecessor_data[0]
-                if predecessor_data and predecessor_data[0]
-                else {}
+                predecessor_data[0] if predecessor_data and predecessor_data[0] else {}
             )
-            case_name = (
-                flow_vars["case_name"].get_value()
-                or input_data.get("case_name", "protein")
+            case_name = flow_vars["case_name"].get_value() or input_data.get(
+                "case_name", "protein"
             )
 
             # ── Resolve input PDB ─────────────────────────────────────────
@@ -143,9 +141,7 @@ class PkaGmxEm(Node):
 
             input_pdb = self.resolve_path(input_pdb)
             if not os.path.exists(input_pdb):
-                raise NodeException(
-                    "pka_gmx_em", f"Input PDB not found: {input_pdb}"
-                )
+                raise NodeException("pka_gmx_em", f"Input PDB not found: {input_pdb}")
 
             log_message(f"Input PDB: {input_pdb}")
 
@@ -162,7 +158,8 @@ class PkaGmxEm(Node):
 
             stream_log(
                 "Running PDB2PQR + protonation bridge...",
-                node_id=self.node_id, progress=10,
+                node_id=self.node_id,
+                progress=10,
             )
 
             # ── Run pipeline ──────────────────────────────────────────────
@@ -179,40 +176,49 @@ class PkaGmxEm(Node):
             )
 
             if not em_result.success:
+                # log_message() reaches only the log file; the UI shows what
+                # stream_log() sends and the error raised here. Send the whole log,
+                # and raise with its end, where PDB2PQR and GROMACS print the reason.
                 log_message(f"Pipeline log:\n{em_result.log}")
+                stream_log(
+                    f"pKa + GROMACS EM failed:\n{em_result.log}",
+                    node_id=self.node_id,
+                    progress=100,
+                    level="error",
+                )
                 raise NodeException(
                     "pka_gmx_em",
-                    f"Pipeline failed:\n{em_result.log[:500]}",
+                    f"Pipeline failed:\n{em_result.log.strip()[-1500:]}",
                 )
 
             stream_log(
                 f"EM complete — max force: {em_result.em_max_force:.1f} kJ/mol/nm",
-                node_id=self.node_id, progress=90,
+                node_id=self.node_id,
+                progress=90,
             )
 
             # ── Build result ──────────────────────────────────────────────
             # Pass gmx/ as working_path — all downstream nodes use the same folder
-            result.data.update({
-                "case_name": case_name,
-                "working_path": self.format_output_path(output_dir),
-                "output_gro": self.format_output_path(em_result.em_gro),
-                "output_top": self.format_output_path(em_result.em_top),
-                "em_max_force": em_result.em_max_force,
-            })
+            result.data.update(
+                {
+                    "case_name": case_name,
+                    "working_path": self.format_output_path(output_dir),
+                    "output_gro": self.format_output_path(em_result.em_gro),
+                    "output_top": self.format_output_path(em_result.em_top),
+                    "em_max_force": em_result.em_max_force,
+                }
+            )
 
             if em_result.patched_pdb:
                 result.data["patched_pdb"] = self.format_output_path(
                     em_result.patched_pdb
                 )
             if em_result.pqr_file:
-                result.data["pqr_file"] = self.format_output_path(
-                    em_result.pqr_file
-                )
+                result.data["pqr_file"] = self.format_output_path(em_result.pqr_file)
             if em_result.protonation_changes:
                 result.data["protonation_changes"] = {
                     f"{ch or '-'}:{seq}": f"{old}->{new}"
-                    for (ch, seq), (old, new)
-                    in em_result.protonation_changes.items()
+                    for (ch, seq), (old, new) in em_result.protonation_changes.items()
                 }
 
             result.files["input"] = {

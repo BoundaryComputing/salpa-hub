@@ -3,7 +3,9 @@ fix-residues-promod3 — BoCoFlow node wrapper.
 
 Fills missing residues in PDB structures using ProMod3 (SWISS-MODEL engine).
 Reads the merged PDB and per-chain alignment files from upstream nodes,
-converts to ProMod3 format, and runs `pm build-model`.
+converts the alignments to ProMod3's FASTA format, and models each protein
+chain through the ProMod3 Python API (see core.py). It runs neither
+`pm build-model` nor ProMod3's energy minimization.
 
 Input: predecessor data from merge_pdb_chains (output_pdb, chain_types)
 Output: Repaired PDB with missing residues filled
@@ -31,21 +33,23 @@ except ImportError:
     except ImportError:
         process_fix_residues = None
 
+
 class FixResiduesPromod3(Node):
     """
     Fix missing residues in PDB structures using ProMod3.
 
     Uses the ProMod3 homology modeling engine (SWISS-MODEL) to fill
     gaps in protein structures. ProMod3 searches a fragment database
-    (~19.7M fragments), performs loop modeling, rebuilds sidechains,
-    and runs energy minimization.
+    (~19.7M fragments), performs loop modeling and rebuilds sidechains.
+    It does not minimize the model; the GROMACS steps downstream do.
 
     Requires:
     - ProMod3 installed (`pixi add promod3` from bioconda channel)
     - Per-chain .ali alignment files (from gen_ali)
     - Merged PDB structure (from merge_pdb_chains)
 
-    Only protein chains are modeled — DNA/RNA chains are preserved as-is.
+    Only protein chains are modeled. DNA and RNA chains are left out of
+    the output, and the node warns when it finds them.
 
     Input: predecessor data (working_path, output_pdb, chain_types)
     Output: Repaired PDB file in Merge/ subdirectory
@@ -73,7 +77,11 @@ class FixResiduesPromod3(Node):
 
         try:
             result = NodeResult()
-            stream_log("Starting missing residue repair (ProMod3)", node_id=self.node_id, progress=0)
+            stream_log(
+                "Starting missing residue repair (ProMod3)",
+                node_id=self.node_id,
+                progress=0,
+            )
 
             # --- Parse predecessor data (flat dict) ---
             if not predecessor_data or not predecessor_data[0]:
@@ -92,7 +100,9 @@ class FixResiduesPromod3(Node):
             working_path = input_data.get("working_path", "")
             output_dir = self.resolve_path(working_path) if working_path else ""
             if not output_dir:
-                raise NodeException("fix_residues_promod3", "No output directory from predecessor.")
+                raise NodeException(
+                    "fix_residues_promod3", "No output directory from predecessor."
+                )
 
             # Find merged PDB. Prefer the explicit path from the upstream
             # merge_pdb_chains node (input_data["output_pdb"]) — scanning the
@@ -108,8 +118,11 @@ class FixResiduesPromod3(Node):
             # force-rerun bug discovered 2026-04-23.
             pdb_path = None
             merge_folder = input_data.get("merge_folder", "")
-            merge_dir = self.resolve_path(merge_folder) if merge_folder \
+            merge_dir = (
+                self.resolve_path(merge_folder)
+                if merge_folder
                 else os.path.join(output_dir, "Merge")
+            )
 
             output_pdb_hint = input_data.get("output_pdb", "")
             if output_pdb_hint:
@@ -135,11 +148,17 @@ class FixResiduesPromod3(Node):
                 raise NodeException("fix_residues_promod3", "No PDB file found.")
 
             log_message(f"Case: {case_name}, PDB: {pdb_path}")
-            stream_log("Converting alignments to ProMod3 format", node_id=self.node_id, progress=10)
+            stream_log(
+                "Converting alignments to ProMod3 format",
+                node_id=self.node_id,
+                progress=10,
+            )
 
             # Get chain info from predecessor
             chain_types = input_data.get("chain_types", {})
-            chain_list = input_data.get("pdb_chain_list", input_data.get("selected_pdb_chain_list", []))
+            chain_list = input_data.get(
+                "pdb_chain_list", input_data.get("selected_pdb_chain_list", [])
+            )
             protein_chains = [c for c, t in chain_types.items() if t == "P1"]
 
             if not protein_chains:
@@ -157,7 +176,11 @@ class FixResiduesPromod3(Node):
                 stream_log(f"Warning: {warning}", node_id=self.node_id, progress=15)
 
             log_message(f"Protein chains to model: {protein_chains}")
-            stream_log("Running ProMod3 (per-chain gap filling)", node_id=self.node_id, progress=20)
+            stream_log(
+                "Running ProMod3 (per-chain gap filling)",
+                node_id=self.node_id,
+                progress=20,
+            )
 
             # --- Process ---
             fix_result = process_fix_residues(
@@ -176,7 +199,7 @@ class FixResiduesPromod3(Node):
                 # surfaces without needing to dig into the file log.
                 log_message(f"ProMod3 log:\n{fix_result.promod3_log}")
                 stream_log(
-                    f"ProMod3 build-model failed:\n{fix_result.promod3_log}",
+                    f"ProMod3 modeling failed:\n{fix_result.promod3_log}",
                     node_id=self.node_id,
                     progress=100,
                     level="error",
@@ -188,34 +211,45 @@ class FixResiduesPromod3(Node):
                     tail = tail[-1500:]
                 raise NodeException(
                     "fix_residues_promod3",
-                    f"ProMod3 build-model failed:\n{tail}" if tail
-                    else "ProMod3 build-model failed. Check logs for details."
+                    (
+                        f"ProMod3 modeling failed:\n{tail}"
+                        if tail
+                        else "ProMod3 modeling failed. Check logs for details."
+                    ),
                 )
 
-            stream_log("ProMod3 completed successfully", node_id=self.node_id, progress=90)
+            stream_log(
+                "ProMod3 completed successfully", node_id=self.node_id, progress=90
+            )
 
             # --- Build result ---
             formatted_output_dir = self.format_output_path(output_dir)
 
-            result.files["output"]["fixed_pdb"] = self.format_output_path(fix_result.output_pdb)
+            result.files["output"]["fixed_pdb"] = self.format_output_path(
+                fix_result.output_pdb
+            )
 
-            result.data.update({
-                "case_name": case_name,
-                "working_path": formatted_output_dir,
-                "output_pdb": self.format_output_path(fix_result.output_pdb),
-                "pdb_chain_list": chain_list,
-                "chain_types": chain_types,
-                "chain_info": input_data.get("chain_info", {}),
-                "num_chains_modeled": fix_result.num_chains_processed,
-                "total_residues_added": fix_result.total_residues_added,
-                "chain_details": fix_result.chain_details,
-            })
+            result.data.update(
+                {
+                    "case_name": case_name,
+                    "working_path": formatted_output_dir,
+                    "output_pdb": self.format_output_path(fix_result.output_pdb),
+                    "pdb_chain_list": chain_list,
+                    "chain_types": chain_types,
+                    "chain_info": input_data.get("chain_info", {}),
+                    "num_chains_modeled": fix_result.num_chains_processed,
+                    "total_residues_added": fix_result.total_residues_added,
+                    "chain_details": fix_result.chain_details,
+                }
+            )
 
-            result.metadata.update({
-                "case_name": case_name,
-                "output_dir": formatted_output_dir,
-                "execution_time": datetime.now().isoformat(),
-            })
+            result.metadata.update(
+                {
+                    "case_name": case_name,
+                    "output_dir": formatted_output_dir,
+                    "execution_time": datetime.now().isoformat(),
+                }
+            )
 
             result.success = True
             result.message = (

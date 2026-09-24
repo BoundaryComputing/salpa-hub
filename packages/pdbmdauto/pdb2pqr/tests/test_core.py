@@ -4,6 +4,7 @@ Tests for pdb2pqr core.py — pure Python logic.
 Tests cover:
   - Executable discovery (mocked filesystem)
   - CLI command building (all flag combinations)
+  - The built command against pdb2pqr's own parser, and one real run
   - Subprocess execution (mocked)
   - PQR statistics extraction (real PQR content)
   - PQR to PDB conversion (mocked MDAnalysis)
@@ -11,7 +12,10 @@ Tests cover:
 Run: pytest tests/test_core.py -v
 """
 
+import importlib.metadata
+import json
 import os
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -131,9 +135,7 @@ class TestBuildCommand:
     """Test pdb2pqr CLI command construction."""
 
     def test_basic_command(self):
-        cmd = build_pdb2pqr_command(
-            "pdb2pqr", "input.pdb", "output.pqr"
-        )
+        cmd = build_pdb2pqr_command("pdb2pqr", "input.pdb", "output.pqr")
         assert cmd[0] == "pdb2pqr"
         assert "--ff" in cmd
         assert "AMBER" in cmd
@@ -150,9 +152,7 @@ class TestBuildCommand:
         assert "6.5" in cmd
 
     def test_without_propka(self):
-        cmd = build_pdb2pqr_command(
-            "pdb2pqr", "in.pdb", "out.pqr", use_propka=False
-        )
+        cmd = build_pdb2pqr_command("pdb2pqr", "in.pdb", "out.pqr", use_propka=False)
         assert "--titration-state-method" not in cmd
         assert "--with-ph" not in cmd
 
@@ -160,30 +160,24 @@ class TestBuildCommand:
         cmd = build_pdb2pqr_command(
             "pdb2pqr", "in.pdb", "out.pqr", optimize_hydrogens=False
         )
-        assert "--no-optimize" in cmd
+        assert "--noopt" in cmd
 
     def test_with_optimization(self):
         cmd = build_pdb2pqr_command(
             "pdb2pqr", "in.pdb", "out.pqr", optimize_hydrogens=True
         )
-        assert "--no-optimize" not in cmd
+        assert "--noopt" not in cmd
 
     def test_keep_chain(self):
-        cmd = build_pdb2pqr_command(
-            "pdb2pqr", "in.pdb", "out.pqr", keep_chain=True
-        )
+        cmd = build_pdb2pqr_command("pdb2pqr", "in.pdb", "out.pqr", keep_chain=True)
         assert "--keep-chain" in cmd
 
     def test_no_keep_chain(self):
-        cmd = build_pdb2pqr_command(
-            "pdb2pqr", "in.pdb", "out.pqr", keep_chain=False
-        )
+        cmd = build_pdb2pqr_command("pdb2pqr", "in.pdb", "out.pqr", keep_chain=False)
         assert "--keep-chain" not in cmd
 
     def test_include_header(self):
-        cmd = build_pdb2pqr_command(
-            "pdb2pqr", "in.pdb", "out.pqr", include_header=True
-        )
+        cmd = build_pdb2pqr_command("pdb2pqr", "in.pdb", "out.pqr", include_header=True)
         assert "--include-header" in cmd
 
     def test_no_include_header(self):
@@ -209,7 +203,7 @@ class TestBuildCommand:
         assert "CHARMM" in cmd
         assert "5.5" in cmd
         assert "--keep-chain" in cmd
-        assert "--no-optimize" in cmd
+        assert "--noopt" in cmd
         assert "--include-header" in cmd
         assert "--titration-state-method" in cmd
         assert "DEBUG" in cmd
@@ -219,10 +213,108 @@ class TestBuildCommand:
 
     def test_force_field_options(self):
         for ff in ["AMBER", "CHARMM", "PARSE", "TYL06", "PEOEPB", "SWANSON"]:
-            cmd = build_pdb2pqr_command(
-                "pdb2pqr", "in.pdb", "out.pqr", force_field=ff
-            )
+            cmd = build_pdb2pqr_command("pdb2pqr", "in.pdb", "out.pqr", force_field=ff)
             assert ff in cmd
+
+
+# ---------------------------------------------------------------------------
+# Tests: the command against pdb2pqr itself
+# ---------------------------------------------------------------------------
+
+
+def _pdb2pqr_version():
+    """The installed PDB2PQR's version, or None.
+
+    Asked of the installed distribution, not of `import`: pytest imports this
+    node's own directory, which is also named pdb2pqr, as the top-level module
+    `pdb2pqr`, and that hides the tool. `importorskip` therefore skipped these
+    tests even where PDB2PQR was installed.
+    """
+    try:
+        return importlib.metadata.version("pdb2pqr")
+    except importlib.metadata.PackageNotFoundError:
+        return None
+
+
+# Runs in a fresh interpreter, from a directory of its own, for the same reason.
+_PARSE_WITH_PDB2PQR = (
+    "import json, sys\n"
+    "from pdb2pqr.main import build_main_parser\n"
+    "args = build_main_parser().parse_args(sys.argv[1:])\n"
+    "print(json.dumps(vars(args), default=str))\n"
+)
+
+
+@pytest.mark.skipif(
+    _pdb2pqr_version() is None,
+    reason="PDB2PQR is not installed: run these in the package's environment",
+)
+class TestCommandAgainstPdb2pqr:
+    """Check the built command against the program it drives.
+
+    The tests above compare the builder with itself, which is how they passed
+    while it wrote `--no-optimize`, a flag pdb2pqr does not have. Its parser is
+    strict (`parse_args`), so an unknown flag stops the run with exit status 2
+    before any work is done.
+    """
+
+    @staticmethod
+    def parse(output_dir, **options):
+        """Parse the built command's arguments with pdb2pqr's own parser."""
+        cmd = build_pdb2pqr_command("pdb2pqr", "in.pdb", "out.pqr", **options)
+        parsed = subprocess.run(
+            [sys.executable, "-c", _PARSE_WITH_PDB2PQR, *cmd[1:]],
+            capture_output=True,
+            text=True,
+            cwd=output_dir,
+        )
+        if parsed.returncode != 0:
+            error = parsed.stderr.strip().splitlines()[-1]
+            pytest.fail(f"pdb2pqr refuses {cmd[1:]}: {error}")
+        return json.loads(parsed.stdout)
+
+    def test_optimisation_off_uses_a_flag_pdb2pqr_has(self, output_dir):
+        assert self.parse(output_dir, optimize_hydrogens=False)["opt"] is False
+
+    def test_optimisation_on_is_pdb2pqr_default(self, output_dir):
+        assert self.parse(output_dir, optimize_hydrogens=True)["opt"] is True
+
+    def test_every_option_means_what_the_node_asks_for(self, output_dir):
+        args = self.parse(
+            output_dir,
+            force_field="CHARMM",
+            ph=5.5,
+            keep_chain=True,
+            optimize_hydrogens=False,
+            include_header=True,
+            use_propka=True,
+            log_level="DEBUG",
+        )
+        assert (args["ff"], args["ffout"]) == ("CHARMM", "CHARMM")
+        assert (args["pka_method"], args["ph"]) == ("propka", 5.5)
+        assert args["keep_chain"] and args["include_header"]
+        assert args["opt"] is False
+        assert args["log_level"] == "DEBUG"
+        assert (args["input_path"], args["output_pqr"]) == ("in.pdb", "out.pqr")
+
+    @pytest.mark.parametrize(
+        "force_field", ["AMBER", "CHARMM", "PARSE", "TYL06", "PEOEPB", "SWANSON"]
+    )
+    def test_every_force_field_the_node_offers(self, output_dir, force_field):
+        assert self.parse(output_dir, force_field=force_field)["ff"] == force_field
+
+    def test_pdb2pqr_runs_with_optimisation_off(self, output_dir):
+        """The case the unknown flag broke, run for real on the demo file."""
+        output_pqr = os.path.join(output_dir, "mini.pqr")
+        cmd = build_pdb2pqr_command(
+            find_pdb2pqr_executable(),
+            str(DEMO_PDB),
+            output_pqr,
+            optimize_hydrogens=False,
+        )
+        stdout, returncode = run_pdb2pqr(cmd, output_dir)
+        assert returncode == 0, stdout[-500:]
+        assert os.path.exists(output_pqr)
 
 
 # ---------------------------------------------------------------------------

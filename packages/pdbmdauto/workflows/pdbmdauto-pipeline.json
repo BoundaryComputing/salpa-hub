@@ -995,7 +995,7 @@
                 "type": "emoji",
                 "data": "📦"
               },
-              "doc": "\n    Fix missing residues in PDB structures using ProMod3.\n\n    Uses the ProMod3 homology modeling engine (SWISS-MODEL) to fill\n    gaps in protein structures. ProMod3 searches a fragment database\n    (~19.7M fragments), performs loop modeling, rebuilds sidechains,\n    and runs energy minimization.\n\n    Requires:\n    - ProMod3 installed (`pixi add promod3` from bioconda channel)\n    - Per-chain .ali alignment files (from gen_ali)\n    - Merged PDB structure (from merge_pdb_chains)\n\n    Only protein chains are modeled — DNA/RNA chains are preserved as-is.\n\n    Input: predecessor data (working_path, output_pdb, chain_types)\n    Output: Repaired PDB file in Merge/ subdirectory\n    ",
+              "doc": "\n    Fix missing residues in PDB structures using ProMod3.\n\n    Uses the ProMod3 homology modeling engine (SWISS-MODEL) to fill\n    gaps in protein structures. ProMod3 searches a fragment database\n    (~19.7M fragments), performs loop modeling and rebuilds sidechains.\n    It does not minimize the model; the GROMACS steps downstream do.\n\n    Requires:\n    - ProMod3 installed (`pixi add promod3` from bioconda channel)\n    - Per-chain .ali alignment files (from gen_ali)\n    - Merged PDB structure (from merge_pdb_chains)\n\n    Only protein chains are modeled. DNA and RNA chains are left out of\n    the output, and the node warns when it finds them.\n\n    Input: predecessor data (working_path, output_pdb, chain_types)\n    Output: Repaired PDB file in Merge/ subdirectory\n    ",
               "options": {
                 "case_name": "",
                 "model_termini": false,
