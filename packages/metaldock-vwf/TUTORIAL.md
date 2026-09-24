@@ -123,7 +123,8 @@ Open `analysis/hsa_fe_analysis.json`. Three things matter.
 **`binding_energies`** — one number per pose, in kcal/mol, more negative meaning
 better. On this example they come out at **−3.0**. The number is modest because
 ferrocene is small and carries no charge. The poses are listed in the order the search
-ran them, not best first; the best is the one with the most negative number.
+ran them, not best first. The best is the one with the most negative number, and
+`best_pose_index` says which that is, counting the first pose as 0.
 
 > **Read these as a ranking, never as an affinity.** A docking score is a fast
 > approximation, and the error bars on the absolute number are larger than the

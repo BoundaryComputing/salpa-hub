@@ -89,7 +89,9 @@ partly the box's doing.
 
 Poses are numbered in the order AutoDock ran them, not by score: `_1` is the
 first run's result, and the energies in `analysis/1jzi_re_analysis.json` follow
-the same order. Find the best pose by its binding energy.
+the same order. `best_pose_index` in that file names the best-scoring pose,
+counting from 0; in the third run it was 1, pose `_2`, while pose `_1` scored
+−4.58 kcal/mol.
 
 **RMSD values before 0.4.2 are not comparable.** Results Analysis used to pair
 the atoms of a pose with those of the reference by their line in the two files,

@@ -93,7 +93,7 @@ Protein Prep → Ligand Prep → QM Charges → Ligand PDBQT → AutoDock Run �
 | **mdock_qm_charges** | `qm_charges.run_qm_and_enrich_graph` | xtb / ORCA / Gaussian / ADF | `graph_json` (enriched), `qm_energy`, `qm_run_type` |
 | **mdock_ligand_pdbqt** | `ligand_pdbqt.create_ligand_pdbqt` | — | `ligand_pdbqt` |
 | **mdock_autodock_run** | `autodock_run.run_autodock` | autogrid4, autodock4, MGLTools | `dlg_path`, `pose_xyz_paths`, `pose_pdbqt_paths` |
-| **mdock_results_analysis** | `results_analysis.analyze_docking_results` | — | `binding_energies`, `interacting_residues`, `rmsd_values` |
+| **mdock_results_analysis** | `results_analysis.analyze_docking_results` | — | `binding_energies`, `interacting_residues`, `best_pose_index`, `rmsd_values` |
 
 File-input fields on nodes 3–6 may be left empty; each auto-discovers what it
 needs (`graph_json`, `canonical_xyz`, `ligand_pdbqt`, `receptor_pdbqt`,
@@ -184,7 +184,11 @@ a page from it for anyone who has not installed anything.
 - **AutoDock Run** → a `.dlg` plus per-pose `.xyz` and `.pdbqt`, numbered in the
   order AutoDock ran them, not by score.
 - **Results Analysis** → `<case>_analysis.json` with binding energies, ligand
-  efficiencies, interacting residues, and RMSD when a reference was supplied.
+  efficiencies, interacting residues, and RMSD when a reference was supplied,
+  each listed in the order AutoDock ran the poses. `best_pose_index` names the
+  best-scoring pose, counting from 0 (the first of equals), and the node's
+  message reports that pose, as in
+  `Best ΔG -4.65 kcal/mol (pose 2), 12 contacting residues`.
   The RMSD is taken where the pose lies, without superposition, over heavy
   atoms, with each atom of the pose paired with the reference atom it
   corresponds to chemically. Before 0.4.2 the atoms were paired by their order

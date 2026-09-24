@@ -144,8 +144,8 @@ vmd protein/clean_1ao6_A.pdb docking/hsa_fe_ligand_1.xyz
 ```
 
 `_1` … `_10` are numbered in the order AutoDock ran them, not by score;
-`binding_energies` in `hsa_fe_analysis.json` lists them in the same order, so the
-best is the one with the most negative value. Here all ten land in the same place
+`binding_energies` in `hsa_fe_analysis.json` lists them in the same order, and
+`best_pose_index` names the best, counting from 0. Here all ten land in the same place
 (within 0.08 Å of each other), so `_1` shows the result. The `.pdbqt` poses hold
 identical coordinates and also open, but VMD needs telling they are PDB
 (`mol new … type pdb`).

@@ -32,6 +32,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versioning is
   2026-03-18 re-scores from 3.34 Å to 0.45 Å. The paper reports 0.475 Å. That case
   was reproduced all along; the old RMSD hid it.
 
+- **Results Analysis reports the best-scoring pose, and says which it is.** Its
+  message paired the lowest binding energy with the contact count of pose 1, but
+  AutoDock numbers poses by GA run, not by score. In one of three 1JZI runs the
+  message read `Best ΔG -4.65 kcal/mol, 9 contacting residues (pose 1)`: pose 1
+  had scored −4.58 with 9 contacts, the best pose −4.65 with 12. It now reads
+  `Best ΔG -4.65 kcal/mol (pose 2), 12 contacting residues`, and `best_pose_index`,
+  counting from 0 (the first of equals), is in the node's output and in
+  `<case>_analysis.json`. The choice is made among the poses analysed, since the
+  energy pattern also matches the log's cluster summary.
+
 - **AutoDock Run stops when autogrid4 or autodock4 fails.** Both report failure only
   through their exit code, and neither was checked. A failed autogrid4 let
   autodock4 run on missing maps, and the node reported "Docked 0 pose(s)" as a

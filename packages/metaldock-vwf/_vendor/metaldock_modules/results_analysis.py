@@ -54,10 +54,14 @@ def analyze_docking_results(
         cutoff: Distance cutoff (Angstrom) for interacting residues.
 
     Returns:
-        Dict with keys:
+        Dict with keys, every per-pose list in the order AutoDock ran the poses,
+        which is not the order of their scores:
         - ``binding_energies``: list of floats (kcal/mol).
         - ``binding_efficiencies``: list of floats (kcal/mol per heavy atom).
         - ``interacting_residues``: list of lists of (residue_name, residue_id) tuples.
+        - ``best_pose_index``: 0-based index of the lowest binding energy, the
+          first of equals; pose file ``_{best_pose_index + 1}``. None if no
+          analysed pose has an energy.
         - ``rmsd_values``: list of floats (only if reference_xyz is provided);
           atoms are paired by chemistry, see ``calculate_rmsd``.
         - ``rmsd_stats``: dict with mean, std, var (only if reference_xyz is provided).
@@ -77,10 +81,16 @@ def analyze_docking_results(
         res = extract_interacting_residues(pose_path, protein_pdb, cutoff=cutoff)
         residues_per_pose.append(res)
 
+    # The energy pattern also matches the log's cluster summary, so choose only
+    # among energies that belong to a pose that was analysed.
+    scored = energies[: len(residues_per_pose)]
     result: dict = {
         "binding_energies": energies,
         "binding_efficiencies": efficiencies,
         "interacting_residues": residues_per_pose,
+        "best_pose_index": (
+            min(range(len(scored)), key=scored.__getitem__) if scored else None
+        ),
     }
 
     # 3. RMSD (optional)
