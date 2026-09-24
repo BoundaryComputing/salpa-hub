@@ -27,25 +27,25 @@ Reference: https://github.com/chaidiscovery/chai-lab
 import base64
 import os
 from datetime import datetime
+from pathlib import Path
 
 import requests
 from bocoflow_core.logger import log_message
 from bocoflow_core.node import Node, NodeResult
-from bocoflow_core.stream_logger import post_with_progress, stream_log
 from bocoflow_core.parameters import (
     BooleanParameter,
     FolderParameter,
     IntegerParameter,
     TextParameter,
 )
-
+from bocoflow_core.stream_logger import post_with_progress, stream_log
 
 #: How to run this node on its own -- the values `salpa smoke` feeds it. Strings
 #: starting with `demo_data/` resolve relative to this directory. Running needs a
 #: Salpa account with cloud access; without one the node stops at authentication,
 #: which is what `salpa smoke` will report. See demo_data/README.md.
 DEMO_CONFIG = {
-    "fasta_input": '>protein|name=trp-cage\nNLYIQWLKDGGPSSGRPPPS',
+    "fasta_input": ">protein|name=trp-cage\nNLYIQWLKDGGPSSGRPPPS",
 }
 
 
@@ -367,7 +367,11 @@ class CloudModalChai1(Node):
                     # Write tarball
                     output_path.write_bytes(output_bytes)
                     log_message(f"Saved output to {output_path} ({output_size} bytes)")
-                    stream_log(f"Output saved: {output_path.name} ({output_size} bytes)", node_id=self.node_id, progress=75)
+                    stream_log(
+                        f"Output saved: {output_path.name} ({output_size} bytes)",
+                        node_id=self.node_id,
+                        progress=75,
+                    )
 
                     # Extract the best CIF file for convenience
                     best_idx = modal_result.get("best_sample_idx", 0)
@@ -426,7 +430,9 @@ class CloudModalChai1(Node):
                     )
 
                 result.data = {
-                    "output_file": str(output_path) if output_path and output_path.exists() else None,
+                    "output_file": (
+                        str(output_path) if output_path and output_path.exists() else None
+                    ),
                     "cif_file": str(cif_path) if cif_path and cif_path.exists() else None,
                     "output_folder": str(final_folder) if final_folder else None,
                     "output_prefix": file_prefix,
