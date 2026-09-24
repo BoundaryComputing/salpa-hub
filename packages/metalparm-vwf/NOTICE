@@ -13,13 +13,12 @@ metalparm-vwf packages the easyPARM force-field parameterization pipeline as
 visual workflow nodes. The scientific pipeline scripts bundled under each EasyParm
 node's scripts/ directory are redistributed from easyPARM:
 
-    easyPARM - Automated, Versatile, and Reliable Force Field Parameterization
-    Workflow for Metal-Containing Molecules with Unique Labeling of
-    Coordinating Atoms.
+    easyPARM: Automated, Versatile, and Reliable Force Field Parameters for
+    Metal-Containing Molecules with Unique Labeling of Coordinating Atoms.
     Abdelazim M. A. Abdelgawwad and Antonio Frances-Monerris.
     Institut de Ciencia Molecular (ICMol), Universitat de Valencia.
-    J. Chem. Theory Comput. 2025, 21, 4, 1817-1830.
-    https://github.com/abenmb/easyPARM
+    J. Chem. Theory Comput. 2025, 21, 4, 1817-1830. doi:10.1021/acs.jctc.4c01272
+    https://github.com/Abdelazim-Abdelgawwad/easyPARM
 
     Copyright 2024 Abdelazim M. A. Abdelgawwad, Universitat de Valencia.
     Distributed under the GNU Lesser General Public License, version 2.1.

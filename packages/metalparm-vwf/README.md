@@ -259,10 +259,10 @@ Both ship under `ep_fragment_fuse_topology/demo_data/linkages/` and are addressa
 
 ## License
 
-LGPL-2.1 — inherited from [easyPARM](https://github.com/abenmb/easyPARM). The bundled scripts in each node's `scripts/` directory are redistributed under the same license. Node wrappers (`*/node.py`), `snp_builder`, `ep_fragment_fuse_topology`, and `ep_apply_coords` are original work by the metal-md authors.
+LGPL-2.1 — inherited from [easyPARM](https://github.com/Abdelazim-Abdelgawwad/easyPARM). The bundled scripts in each node's `scripts/` directory are redistributed under the same license. Node wrappers (`*/node.py`), `snp_builder`, `ep_fragment_fuse_topology`, and `ep_apply_coords` are original work by the metal-md authors.
 
 ## Citations
 
-- Abdelazim M. A. Abdelgawwad, Antonio Francés-Monerris. *easyPARM: Automated, Versatile, and Reliable Force Field Parameterization Workflow for Metal-Containing Molecules with Unique Labeling of Coordinating Atoms.* J. Chem. Theory Comput. 2025, 21, 4, 1817–1830.
+- Abdelazim M. A. Abdelgawwad, Antonio Francés-Monerris. *easyPARM: Automated, Versatile, and Reliable Force Field Parameters for Metal-Containing Molecules with Unique Labeling of Coordinating Atoms.* J. Chem. Theory Comput. 2025, 21, 4, 1817–1830. [doi:10.1021/acs.jctc.4c01272](https://doi.org/10.1021/acs.jctc.4c01272)
 - Allen, A. E. A.; Payne, M. C.; Cole, D. J. *Harmonic Force Constants for Molecular Mechanics Force Fields via Hessian Matrix Projection.* J. Chem. Theory Comput. 2018, 14, 1, 274–281.
 - Case, D.A. et al. *AMBER 2024* — `tleap`, `ff19SB`, `gaff2`.

@@ -4,6 +4,17 @@ All notable changes to **metalparm-vwf** are recorded here. The format
 follows [Keep a Changelog](https://keepachangelog.com/) and the version
 matches `package.toml`. Dates are ISO-8601.
 
+## [1.29.3] — 2026-09-24
+
+**Fixed: the easyPARM citation now names the real repository and the paper's
+real title.** The NOTICE and the README linked `github.com/abenmb/easyPARM`,
+which answers 404 to anyone who is not signed in to GitHub; easyPARM lives at
+`github.com/Abdelazim-Abdelgawwad/easyPARM`. Both also called the JCTC paper
+"…Reliable Force Field Parameterization Workflow for Metal-Containing
+Molecules…", but its title, per Crossref and the upstream README, is
+"…Reliable Force Field Parameters for Metal-Containing Molecules…". Both now
+give the DOI, 10.1021/acs.jctc.4c01272. No node changed.
+
 ## [1.29.0] — 2026-07-05
 
 **Removed: the deprecated monolithic `ep_fragment_fuse` node.** It was
