@@ -1,6 +1,7 @@
 """Module 1: Protein preparation.
 
-Clean PDB → protonate with pdb2pqr → convert to PDBQT with prepare_receptor4.
+Clean PDB → protonate with pdb2pqr and PROPKA → convert to PDBQT with
+prepare_receptor4.
 
 All functions take explicit paths and tool locations as arguments.
 No os.chdir(), no global env vars, no god-object.
@@ -42,7 +43,15 @@ def protonate_pdb(
     drop_water: bool = True,
     pdb2pqr_path: str = "pdb2pqr30",
 ) -> Path:
-    """Protonate a protein PDB at a given pH using pdb2pqr.
+    """Protonate a protein PDB at a given pH with pdb2pqr and PROPKA.
+
+    PROPKA predicts each titratable group's pKa, and pdb2pqr protonates the
+    group or not by comparing that pKa with *ph*. pdb2pqr applies --with-ph
+    only to the results of a titration-state method and names none by
+    default, so without --titration-state-method the pH changes nothing.
+
+    The output is always made afresh: a file left by an earlier run may have
+    been protonated at another pH.
 
     Args:
         input_pdb: Source PDB file.
@@ -53,17 +62,18 @@ def protonate_pdb(
 
     Returns:
         The output_pdb path.
-    """
-    if output_pdb.exists():
-        logger.info("Protonated PDB already exists: %s", output_pdb)
-        return output_pdb
 
+    Raises:
+        RuntimeError: pdb2pqr failed, with its own reason (its ERROR lines).
+    """
     output_pdb.parent.mkdir(parents=True, exist_ok=True)
+    output_pdb.unlink(missing_ok=True)
 
     cmd = [
         pdb2pqr_path,
         "--noopt",
         "--pdb-output", str(output_pdb),
+        "--titration-state-method", "propka",
         "--with-ph", str(ph),
     ]
     if drop_water:
@@ -75,9 +85,17 @@ def protonate_pdb(
         capture_output=True,
         text=True,
     )
-    if result.returncode != 0:
-        logger.warning("pdb2pqr stderr: %s", result.stderr)
-    logger.info("Protonated PDB at pH %.1f → %s", ph, output_pdb)
+    if result.returncode != 0 or not output_pdb.exists():
+        output_pdb.unlink(missing_ok=True)
+        # pdb2pqr logs to stderr and ends with a traceback whose last line is a
+        # bare "RuntimeError"; its reason is on the lines it logs as ERROR.
+        lines = result.stderr.strip().splitlines()
+        reason = [line for line in lines if line.startswith("ERROR:")] or lines[-15:]
+        raise RuntimeError(
+            f"pdb2pqr failed (exit {result.returncode}) on {input_pdb.name}:\n"
+            + "\n".join(reason)
+        )
+    logger.info("Protonated PDB at pH %.1f (PROPKA) → %s", ph, output_pdb)
     return output_pdb
 
 
@@ -102,13 +120,11 @@ def create_receptor_pdbqt(
             prepare_receptor4.py (used only if *prepare_receptor_script* is None).
 
     Returns:
-        The pdbqt_path.
+        The pdbqt_path, always made afresh: one left by an earlier run may
+        come from a receptor protonated at another pH.
     """
-    if pdbqt_path.exists():
-        logger.info("Receptor PDBQT already exists: %s", pdbqt_path)
-        return pdbqt_path
-
     pdbqt_path.parent.mkdir(parents=True, exist_ok=True)
+    pdbqt_path.unlink(missing_ok=True)
 
     if prepare_receptor_script is None:
         if mgltools_dir is None:

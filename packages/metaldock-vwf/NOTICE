@@ -19,9 +19,9 @@ permits NON-COMMERCIAL USE ONLY and forbids commercial redistribution.
 Because that required dependency is non-commercial, metaldock-vwf as shipped
 must NOT be used for commercial purposes and carries no permissive/commercial
 license label, regardless of the LGPL-2.1 license of its own code. A planned
-migration to Meeko (Apache-2.0) will remove the MGLTools dependency and make
-the package commercially clean; until that lands, treat this package as
-academic / non-commercial only.
+migration to Meeko (LGPL-2.1, like this package's own code) will remove the
+MGLTools dependency and make the package commercially clean; until that lands,
+treat this package as academic / non-commercial only.
 
 This is not legal advice — confirm the exact MGLTools terms and any AutoDock /
 Meeko obligations with counsel before relying on this for a commercial release.
@@ -47,8 +47,19 @@ The scientific modules under _vendor/metaldock_modules/ are a refactored
 Bundled demonstration data
 ===============================================================================
 
-The demo_data/ directories carry the inputs for the 1JZI Re case so the shipped
-workflow template runs with nothing to download:
+The demo_data/ directories carry the inputs for both workflows, the HSA +
+Ferrocene template and the 1JZI redocking, so each runs with nothing to
+download:
+
+  - mdock_protein_prep/demo_data/1ao6_A.pdb
+    Human serum albumin, RCSB Protein Data Bank entry 1AO6 (Sugio et al.,
+    Protein Eng. 1999), chain A only. PDB structure data are released without
+    restriction (CC0-equivalent); cite the depositors and the PDB when reusing
+    them.
+
+  - mdock_ligand_prep/demo_data/ferrocene.xyz
+    Ferrocene, Fe(C5H5)2: a GFN1-xTB geometry made for this package, not
+    extracted from any protein. Original to metal-docking.
 
   - mdock_protein_prep/demo_data/1jzi.pdb
     Azurin from Pseudomonas aeruginosa, RCSB Protein Data Bank entry 1JZI.
@@ -61,13 +72,14 @@ workflow template runs with nothing to download:
     repository's example_runs (MIT License; see Upstream above).
 
   - mdock_qm_charges/demo_data/1jzi_re_orca_reference_graph.json
-    CM5 charges and bond orders for the same complex computed with ORCA 6.1 in
-    this project, kept as the accuracy reference the default xtb engine is
-    compared against. Original to metal-docking.
+    CM5 charges and bond orders for the same complex computed with ORCA 6.1.1
+    (B3LYP/def2-SVP, single point) in this project, kept as the accuracy
+    reference the default xtb engine is compared against. Original to
+    metal-docking.
 
   - Intermediate artefacts, so that each node can also be run on its own rather
     than only as a link in the chain. All are outputs of a real run of this
-    pipeline on the two inputs above, not fabricated files; original to
+    pipeline on the two 1JZI inputs above, not fabricated files; original to
     metal-docking:
       mdock_qm_charges/demo_data/1jzi_D_REP_c.xyz
       mdock_qm_charges/demo_data/1jzi_re_mol_graph.json

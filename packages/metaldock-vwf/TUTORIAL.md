@@ -5,7 +5,7 @@ protein you think it binds, and you would like a testable hypothesis about *wher
 *how* before you spend another month at the bench. No simulation background assumed.
 Every acronym is defined the first time it appears.
 
-**Time:** about five minutes of computer time. The example is bundled — nothing to
+**Time:** two to three minutes of computer time. The example is bundled — nothing to
 download, no accounts, no command line.
 
 > Prefer the formal version? `README.md` is the methods-section treatment: scope,
@@ -55,9 +55,10 @@ has physically sensible numbers near the metal.
 
 One more idea you will meet. A metal atom has a fixed number of "slots" for
 neighbouring atoms — its **coordination sphere**. Sometimes a slot is left empty, and
-that vacancy is exactly where the protein binds. The bundled example is one of these
-cases, and the pipeline marks the empty slot explicitly so the docking search knows to
-put something there.
+that vacancy is exactly where the protein binds. The pipeline can mark the empty slot
+explicitly, so the docking search knows to put something there. The bundled example
+has no empty slot: its iron is held on both sides by a ring of carbon atoms, so the
+marking is switched off.
 
 ## How it works, step by step
 
@@ -69,9 +70,9 @@ next.
 | 1 | **Protein Prep** | Strips out water and anything that isn't the protein, works out which acidic and basic groups are charged at your chosen pH, adds the hydrogen atoms crystallography can't see, and writes the result in the format the docking program reads. | pdb2pqr, AutoDockTools | A crystal structure is a sketch, not a finished model. Hydrogens and charges are missing and they decide what sticks to what. |
 | 2 | **Ligand Prep** | Reads your compound's 3D coordinates and works out which atoms are bonded to which, building a map of the molecule. | OpenBabel | Everything downstream needs to know the molecule's connectivity, not just a cloud of coordinates. |
 | 3 | **QM Charges** | Runs a quantum-chemistry calculation on your compound alone and records how much charge sits on each atom. | xtb (default) or ORCA | This is the step that makes the metal behave. See *Fast or careful* below. |
-| 4 | **Ligand PDBQT** | Packages the compound with its new charges, decides which bonds are allowed to rotate during the search, and freezes the ones around the metal. Marks any empty coordination slot. | — | Bonds to a metal don't swivel freely. Letting them would waste the search on impossible shapes. |
+| 4 | **Ligand PDBQT** | Packages the compound with its new charges, decides which bonds are allowed to rotate during the search, and freezes the ones around the metal. Marks any empty coordination slot, if you ask it to. | — | Bonds to a metal don't swivel freely. Letting them would waste the search on impossible shapes. |
 | 5 | **AutoDock Run** | The search itself. Builds a 3D grid of "how attractive is this spot" around the target region, then tries many positions and orientations, keeping the best. | AutoGrid4, AutoDock4 | This is the docking. Everything before it was preparation. |
-| 6 | **Results Analysis** | Ranks the poses, lists which residues each one touches, and — if you gave it a known answer — measures how far off it was. | — | Turns a pile of coordinates into something you can act on. |
+| 6 | **Results Analysis** | Scores the poses, lists which residues each one touches, and — if you gave it a known answer — measures how far off it was. | — | Turns a pile of coordinates into something you can act on. |
 
 ### Fast or careful
 
@@ -79,64 +80,75 @@ Step 3 offers a choice, and it is the only one you really need to think about.
 
 | | **xtb** (the default) | **ORCA** |
 |---|---|---|
-| Speed | Under a second | Minutes to hours |
+| Speed | About a second | Minutes to hours |
 | Method | Semi-empirical — a fast approximation with experimental shortcuts baked in | Density functional theory (DFT) — a full quantum calculation |
 | Setup | Installed with the package | Download separately, free for academic use |
 | Use it for | Getting going, screening, exploring | Numbers going into a paper |
 
-On the bundled example, xtb puts the charge on the rhenium atom at **+0.749** where
-the full DFT calculation gives **+0.704** — a difference of about 0.05 in units where
-a whole electron is 1.0. Close enough to find the same binding site; not what you'd
-publish a charge value from.
+How close is the fast one? Take the rhenium complex from the crystal structure 1JZI,
+whose DFT charges ship with the package. xtb puts the charge on the rhenium atom at
+**+0.749** where our DFT calculation gives **+0.704** — a difference of about 0.05 in
+units where a whole electron is 1.0. Docked, the two sets of charges put the complex in
+the same place: the best pose with xtb charges lies 0.1 Å from the best pose with DFT
+charges. They score that pose differently, −4.65 against −5.55 kcal/mol, which is one
+more reason to read scores as rankings. Close enough to find the same pose; not what
+you'd publish a charge value from.
 
 ## Try it: the bundled example
 
-The example is the **1JZI** case from the MetalDock paper: a rhenium complex binding
-azurin, a small copper protein from *Pseudomonas aeruginosa*. Both input files ship
+The example docks **ferrocene** — an iron atom held between two five-membered rings of
+carbon — into **human serum albumin**, the blood protein that carries many drugs, at the
+pocket where the drug warfarin binds (known as Sudlow site I). Both input files ship
 inside the package.
 
-1. Open Salpa, and from the workflow templates choose **MetalDock 1JZI Re Pipeline**
+1. Open Salpa, and from the workflow templates choose **HSA + Ferrocene (Sudlow site I)**
    (it's under the *molecular-docking* category).
 2. Pick a folder for the results. This is the only thing you have to supply.
 3. Press run.
 
-About three minutes later — most of it the docking search in step 5 — you'll have six
+Two to three minutes later — most of it the docking search in step 5 — you'll have six
 folders. The interesting ones:
 
 ```
-qm/enriched_graph.json         the per-atom charges
-pdbqt/1jzi_re_ligand.pdbqt     the compound, ready to dock
-docking/…dlg                   the raw search output, ten poses
-analysis/1jzi_re_analysis.json the answer
+qm/enriched_graph.json          the per-atom charges
+pdbqt/hsa_fe_ligand.pdbqt       the compound, ready to dock
+docking/…dlg                    the raw search output, ten poses
+analysis/hsa_fe_analysis.json   the answer
 ```
 
 ## Reading the results
 
-Open `analysis/1jzi_re_analysis.json`. Three things matter.
+Open `analysis/hsa_fe_analysis.json`. Three things matter.
 
 **`binding_energies`** — one number per pose, in kcal/mol, more negative meaning
-better. On this example they land around **−4.6**.
+better. On this example they come out at **−3.0**. The number is modest because
+ferrocene is small and carries no charge. The poses are listed in the order the search
+ran them, not best first; the best is the one with the most negative number.
 
 > **Read these as a ranking, never as an affinity.** A docking score is a fast
 > approximation, and the error bars on the absolute number are larger than the
 > differences you'll typically care about. Pose A scoring better than pose B is
-> informative. "−4.6 kcal/mol" as a measured binding strength is not — do not convert
+> informative. "−3.0 kcal/mol" as a measured binding strength is not — do not convert
 > it to a Kd. Treat the ranking as a hypothesis to test at the bench.
 
 **`interacting_residues`** — which amino acids each pose touches. This is the most
-actionable output: it's your mutagenesis shortlist. On this example the top pose
-contacts about **12** residues, clustered around one face of the protein.
+actionable output: it's your mutagenesis shortlist. On this example each pose touches
+**11 or 12** residues, all lining the warfarin pocket.
 
-**`rmsd_values`** — only meaningful if you supplied a known structure to compare
-against, as the bundled example does. Root-mean-square deviation is the average
-distance between the predicted atoms and the real ones, in ångströms. Here it comes
-out **5.5–5.9 Å**.
+**`rmsd_values`** — how far each pose is from a known answer: the average distance, in
+ångströms, between the predicted atoms and the real ones. It needs a known structure to
+compare against, and this example has none — the albumin structure was solved without
+ferrocene in it — so the field is simply absent. That is what a prediction looks like.
 
-Is that good? Honestly: it's the same answer the published DFT calculation gives
-(5.91 Å), so the pipeline is behaving. But 5–6 Å is a *region*, not a pose — it means
-the search found the right neighbourhood and not the exact orientation. That is a
-normal and useful outcome for a hard metal-containing case, and it is worth knowing
-before you over-read a picture.
+When there is a known answer, this is how to read it. The package keeps one such case
+beside the templates, a redocking: a rhenium complex taken out of the crystal structure
+1JZI and docked back into it. Its best-scoring poses land **5.4–5.5 Å** from where the
+crystal has them. The MetalDock paper counts a pose as reproducing its crystal structure
+when it is closer than that structure's resolution — about 1.8 Å for its rhenium
+structures — so 5 Å is a miss: the complex lands beside its site, not in it. Earlier
+versions of this page gave 5.5–5.9 Å and called 5.91 Å the published DFT result. Both
+were wrong: the calculation paired the atoms up wrongly until version 0.4.2, and 5.91 Å
+was our own run, not the paper's, which reports no result for 1JZI.
 
 ### When something looks wrong
 
@@ -158,17 +170,33 @@ before you over-read a picture.
   confident and wrong answer. Garbage in, confident garbage out.
 - **This is a hypothesis generator.** Its output is a list of things worth testing.
 
+## Where the numbers on this page come from
+
+- **Times, scores and residues for the example:** three runs of the template on an
+  Intel Mac on 2026-09-24, with version 0.4.2 of the package. Each took 148–155 s, and
+  every pose scored −3.00 kcal/mol.
+- **The rhenium charges and poses:** the xtb charges and poses are three runs of the
+  1JZI workflow on the same machine and day. The DFT charges are our own ORCA
+  calculation (B3LYP/def2-SVP) of 2026-03-18, shipped in
+  `mdock_qm_charges/demo_data/`; the DFT poses are our runs with those charges,
+  re-scored on 2026-09-24. The details are in `workflows/1jzi-redocking-notes.md`.
+- **The resolution benchmark:** Table 2 of the MetalDock paper, which gives 1.786 Å
+  as the average resolution of the rhenium structures it was fitted to.
+
 ## Going deeper
 
 - Hakkennes, M. et al. *MetalDock: An Open-Source Docking Tool for Metal-Organic
   Compounds.* J. Chem. Inf. Model. 2023. doi:10.1021/acs.jcim.3c01582 — the method this
-  package implements, including the 1JZI case above.
+  package implements.
 - Morris, G. M. et al. *AutoDock4 and AutoDockTools4.* J. Comput. Chem. 2009.
   doi:10.1002/jcc.21256 — the docking engine and its scoring function.
 - Bannwarth, C. et al. *Extended tight-binding quantum chemistry methods.* WIREs
   Comput. Mol. Sci. 2021. doi:10.1002/wcms.1493 — what xtb actually does.
 - Marenich, A. V. et al. *Charge Model 5.* J. Chem. Theory Comput. 2012.
   doi:10.1021/ct200866d — where the partial charges come from.
+- Ghuman, J. et al. *Structural basis of the drug-binding specificity of human serum
+  albumin.* J. Mol. Biol. 2005. doi:10.1016/j.jmb.2005.07.075 — the warfarin-bound
+  albumin structure (2BXD) that locates the example's pocket.
 
 For the formal treatment — per-stage methodology, the full node table, platform and
 licensing constraints — see `README.md`.

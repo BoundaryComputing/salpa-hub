@@ -873,7 +873,7 @@
                 "output_dir": null,
                 "graph_json": "",
                 "metal_symbol": "",
-                "vacant_site": true,
+                "vacant_site": false,
                 "max_torsions": 32,
                 "freeze_coordination_sphere": true,
                 "force_to_run": false
@@ -907,7 +907,7 @@
                 "vacant_site": {
                   "type": "boolean",
                   "label": "Add Vacant-Site Dummy",
-                  "value": true,
+                  "value": false,
                   "docstring": "Add a dummy atom (DD) at the vacant coordination site."
                 },
                 "max_torsions": {
@@ -942,7 +942,7 @@
                 "output_dir": "rel:pdbqt",
                 "graph_json": "",
                 "metal_symbol": "",
-                "vacant_site": true,
+                "vacant_site": false,
                 "max_torsions": 32,
                 "freeze_coordination_sphere": true,
                 "force_to_run": false
@@ -953,7 +953,7 @@
               "output_dir": "rel:pdbqt",
               "graph_json": "",
               "metal_symbol": "",
-              "vacant_site": true,
+              "vacant_site": false,
               "max_torsions": 32,
               "freeze_coordination_sphere": true,
               "force_to_run": false
@@ -1473,7 +1473,7 @@
           "output_dir": "rel:pdbqt",
           "graph_json": "",
           "metal_symbol": "",
-          "vacant_site": true,
+          "vacant_site": false,
           "max_torsions": 32,
           "freeze_coordination_sphere": true,
           "force_to_run": false

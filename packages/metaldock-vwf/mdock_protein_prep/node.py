@@ -133,7 +133,8 @@ class MdockProteinPrep(Node):
         ),
         "ph": FloatParameter(
             "Protonation pH", default=7.4,
-            docstring="pH used by pdb2pqr for protonation.",
+            docstring="pH for protonation: pdb2pqr protonates each acidic and "
+                      "basic group whose PROPKA-predicted pKa lies above it.",
         ),
         "clean": BooleanParameter(
             "Remove HETATM", default=True,

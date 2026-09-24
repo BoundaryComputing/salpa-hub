@@ -4,27 +4,32 @@
      package and off salpa.app. The 1JZI case is a redocking kept for
      reference; the HSA template is the one users are pointed at. -->
 
-# Demo workflow — 1JZI Re complex docking
+# 1JZI redocking — Re(phen)(CO)₃ back into azurin
 
-Reproduces the **1JZI Re-complex** case from the MetalDock paper as a Salpa
-workflow built from the six `metaldock-vwf` nodes.
+A redocking: the rhenium complex is taken out of the crystal structure 1JZI and
+docked back into it, so the right answer is known and each pose can be scored as
+RMSD against it. It checks the method on a solved structure; it predicts nothing.
 
 - **Protein:** 1JZI (*Pseudomonas aeruginosa* azurin)
 - **Ligand:** Re(phen)(CO)₃(His83) — 29 atoms, metal = **Re**, one vacant
   coordination site
-- **Published reference (ORCA/DFT charges):** ΔG ≈ −5.54 kcal/mol, ~12
-  interacting residues, RMSD ≈ 5.9 Å
+- **Where the case comes from:** the inputs are the ORCA example in MetalDock's
+  repository (`examples/example_runs/vacancy_coordination_sphere/ORCA/`). The
+  MetalDock paper (Hakkennes et al., *J. Chem. Inf. Model.* 2023) does not report
+  1JZI, so there is no published value to reproduce. Every number on this page
+  comes from our own runs, and says which.
 
-## Just run it
+## Running it
 
-`workflows/metaldock-1jzi-re-pipeline.json` is the installable template — load
-**MetalDock 1JZI Re Pipeline** from the template library, set a working
-directory, and execute. Nothing to download: the inputs ship inside the nodes'
+`workflows/metaldock-1jzi-re-pipeline.json` stays in this package but is not in
+the template library: `package.toml` lists only the HSA + Ferrocene template.
+To run it, open **Load Workflow → Upload File** in Salpa, choose this file, and
+pick a working folder. Nothing to download: the inputs ship inside the nodes'
 `demo_data/` directories and the charges come from GFN1-xTB, which installs with
 the package.
 
-Everything below describes what that template contains, and how to run the same
-case with DFT charges instead.
+Everything below describes what that workflow contains, what it gives, and how
+to run the same case with DFT charges instead.
 
 ## Inputs
 
@@ -63,24 +68,69 @@ Leave the file-input fields on nodes 3–5 **empty** — they auto-discover
 `graph_json`, `canonical_xyz`, `ligand_pdbqt`, `receptor_pdbqt`, `dlg_path`,
 `pose_xyz_paths`, `cleaned_pdb` and `n_heavy_atoms` from upstream `data`.
 
+## What it gives
+
+Measured on an Intel Mac (osx-64) on 2026-09-24 with metaldock-vwf 0.4.2: three
+runs of this workflow, each node run by `bocoflow_core.node_runner` in the
+package's own environment, as the app runs it. Ten poses per run, thirty in all.
+
+| Poses | ΔG (kcal/mol) | RMSD from the crystal pose | Residues within 4 Å |
+|---|---|---|---|
+| 21 of 30 | −4.64 to −4.65 | 5.44–5.48 Å | 12 |
+| 9 of 30 | −4.57 to −4.58 | 4.56–4.59 Å | 9 |
+
+Each run took 169–172 s, 159–162 s of it in AutoDock.
+
+No pose is near the crystal pose, and the best-scoring ones are not the closest.
+The twelve residues of the better-scoring poses include His83, the residue the
+rhenium binds in the crystal, so the complex lands beside its site, not in it.
+The box is centred on the crystal position of the metal, so landing nearby is
+partly the box's doing.
+
+Poses are numbered in the order AutoDock ran them, not by score: `_1` is the
+first run's result, and the energies in `analysis/1jzi_re_analysis.json` follow
+the same order. Find the best pose by its binding energy.
+
+**RMSD values before 0.4.2 are not comparable.** Results Analysis used to pair
+the atoms of a pose with those of the reference by their line in the two files,
+and the two files list them in different orders. It reported 5.50–5.91 Å for the
+same thirty poses, and scored the crystal pose itself at 3.30 Å from its own
+coordinates. It now pairs atoms by chemistry. See `CHANGELOG.md`, 0.4.2.
+
 ## Running it with ORCA instead
 
-The default engine is semi-empirical. To reproduce the paper's numbers, download
-ORCA (free for academic use) from [orcaforum.kofo.mpg.de](https://orcaforum.kofo.mpg.de),
-then on **QM Charges** set:
+The default engine is semi-empirical. For DFT charges, download ORCA (free for
+academic use) from [orcaforum.kofo.mpg.de](https://orcaforum.kofo.mpg.de), then
+on **QM Charges** set:
 
 - `engine` → `orca`
 - `orca_path` → the extracted directory (e.g. `external/orca_6_1_1_macosx_intel_openmpi411`)
-- `orcasimpleinput` → `B3LYP def2-SVP` (what the validated runs used)
+- `orcasimpleinput` → the method line. The workflow carries `B3LYP def2-SVP`, the
+  line our reference charges were computed with (below). MetalDock's own ORCA
+  example for this case uses `B3LYP D3BJ def2-TZVP`.
 
 On macOS, clear the download quarantine first: `xattr -dr com.apple.quarantine external/orca_*/`.
+
+Our runs with ORCA 6.1.1 charges, three poses each, re-scored with the corrected
+RMSD on 2026-09-24:
+
+| ORCA method line | Runs | ΔG (kcal/mol) | RMSD from the crystal pose |
+|---|---|---|---|
+| `B3LYP def2-SVP` | 4 (2026-03-18, 2026-06-01, 2026-06-01, 2026-06-02) | −5.55 | 5.48–5.49 Å |
+| `B3LYP D3BJ def2-TZVP` | 1 (2026-03-18) | −5.53 to −5.54 | 5.49 Å |
+
+These are the "−5.54 kcal/mol, RMSD 5.91 Å" that earlier versions of this page
+gave as the paper's reference values. They were our def2-TZVP run of 2026-03-18,
+not the paper's, and 5.91 Å was the mis-paired RMSD. The MetalDock paper computes
+its charges with ADF (AMS 2021, TZP/B3LYP/COSMO with D3-BJ and ZORA), not ORCA.
 
 ## Expected outputs
 
 - **QM Charges** → `qm/enriched_graph.json` with CM5 charges. With xtb the Re
-  charge is ≈ **+0.749**; with ORCA it is ≈ **+0.704**. The full ORCA reference
-  for all 29 atoms is in `mdock_qm_charges/demo_data/1jzi_re_orca_reference_graph.json`
-  — mean absolute deviation between the two is 0.065 e.
+  charge is **+0.749**; our ORCA calculation (ORCA 6.1.1, B3LYP/def2-SVP) gives
+  **+0.704**, and its charges for all 29 atoms ship as
+  `mdock_qm_charges/demo_data/1jzi_re_orca_reference_graph.json`. The mean
+  absolute deviation between the two is 0.065 e.
 - **Ligand PDBQT** → `pdbqt/1jzi_re_ligand.pdbqt` with `ROOT`/`ENDROOT`, an `Re`
   atom, and a `DD` dummy atom at the vacant site.
 - **AutoDock Run** → `docking/*.dlg` plus the affinity maps (including
@@ -90,11 +140,15 @@ On macOS, clear the download quarantine first: `xattr -dr com.apple.quarantine e
 
 ## Notes
 
-- **Single-point vs geometry optimization:** these settings use a single point
-  (`geom_opt=false`) for speed. Set `geom_opt=true` to match the paper exactly
-  (much slower, and with ORCA considerably so).
+- **Single point, not an optimisation:** these settings compute the charges at
+  the crystal geometry (`geom_opt=false`), as MetalDock's own example for this
+  case does. `geom_opt=true` optimises the complex first, which is much slower,
+  and with ORCA considerably so.
 - **Targeted box:** `box_center` is given explicitly. Left empty, the docking box
   centres on the metal atom's coordinates instead — nearly the same thing here,
   but not reproducible across inputs.
+- **Genetic algorithm:** AutoDock Run uses its own fixed settings (population 150,
+  2,500,000 evaluations). MetalDock's example for this case overrides them
+  (population 200, 30,000 generations, elitism 2, mutation rate 0.2).
 - **Scores are rankings.** AutoDock4 binding energies are approximate. Treat them
   as hypotheses to test, not as measured affinities.

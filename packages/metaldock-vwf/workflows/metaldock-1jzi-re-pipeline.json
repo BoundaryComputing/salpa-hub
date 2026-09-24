@@ -3,7 +3,7 @@
   "template_info": {
     "id": "metaldock-1jzi-re-pipeline",
     "name": "MetalDock 1JZI Re Pipeline",
-    "description": "Metal-aware docking of the Re(phen)(CO)3 complex into azurin (PDB 1JZI) \u2014 the vacancy-coordination-sphere case from the MetalDock paper. Receptor preparation, ligand molecular graph, GFN1-xTB CM5 charges, metal-aware ligand PDBQT, AutoDock4 search and pose analysis. The inputs ship inside the nodes and the charge engine installs with them, so it runs as loaded with nothing to download.",
+    "description": "Metal-aware docking of the Re(phen)(CO)3 complex into azurin (PDB 1JZI) \u2014 a redocking of the vacancy-coordination-sphere example in MetalDock's repository; the MetalDock paper reports no result for it. Receptor preparation, ligand molecular graph, GFN1-xTB CM5 charges, metal-aware ligand PDBQT, AutoDock4 search and pose analysis. The inputs ship inside the nodes and the charge engine installs with them, so it runs as loaded with nothing to download.",
     "required_packages": [
       "metaldock-vwf"
     ],
@@ -27,7 +27,7 @@
   "metadata": {
     "id": "bacfa2f8-65b4-4c7a-b3a2-747b90ff8f9e",
     "name": "MetalDock 1JZI Re Pipeline",
-    "description": "Metal-aware docking of the Re(phen)(CO)3 complex into azurin (PDB 1JZI), reproducing the vacancy-coordination-sphere case from the MetalDock paper. Inputs are bundled with the nodes and charges come from GFN1-xTB, so it runs as loaded.",
+    "description": "Metal-aware docking of the Re(phen)(CO)3 complex into azurin (PDB 1JZI): a redocking of the vacancy-coordination-sphere example in MetalDock's repository, which the MetalDock paper reports no result for. Inputs are bundled with the nodes and charges come from GFN1-xTB, so it runs as loaded.",
     "environment": "local",
     "status": "draft",
     "nodeCount": 6,

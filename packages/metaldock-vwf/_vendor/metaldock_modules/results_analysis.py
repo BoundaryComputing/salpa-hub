@@ -3,24 +3,35 @@
 Extract binding energies, ligand efficiencies, interacting residues,
 and (optionally) RMSD values from AutoDock4 output.
 
-Pure Python — no external tool dependencies (except numpy/scipy).
+Pure Python — no external tool dependencies (except numpy/scipy/networkx).
 """
 
 import logging
 import re
 import subprocess
+from collections import Counter
 from pathlib import Path
 
 import networkx as nx
 import numpy as np
+from networkx.algorithms.isomorphism.isomorphvf2 import GraphMatcher
+from scipy.optimize import linear_sum_assignment
 from scipy.spatial.distance import cdist
 
+from .xyz2graph import ATOMIC_RADII
+
 logger = logging.getLogger(__name__)
+
+# The factor xyz2graph applies to summed covalent radii when ligand prep builds
+# the molecular graph. The RMSD perceives bonds by the same rule, so the
+# molecule it matches is the molecule the pipeline docked.
+_BOND_TOLERANCE = 1.4
 
 
 # ===================================================================
 # Public interface
 # ===================================================================
+
 
 def analyze_docking_results(
     dlg_path: Path,
@@ -47,7 +58,8 @@ def analyze_docking_results(
         - ``binding_energies``: list of floats (kcal/mol).
         - ``binding_efficiencies``: list of floats (kcal/mol per heavy atom).
         - ``interacting_residues``: list of lists of (residue_name, residue_id) tuples.
-        - ``rmsd_values``: list of floats (only if reference_xyz is provided).
+        - ``rmsd_values``: list of floats (only if reference_xyz is provided);
+          atoms are paired by chemistry, see ``calculate_rmsd``.
         - ``rmsd_stats``: dict with mean, std, var (only if reference_xyz is provided).
     """
     if num_poses is None:
@@ -55,7 +67,9 @@ def analyze_docking_results(
 
     # 1. Extract binding energies
     energies = extract_binding_energies(dlg_path, num_poses)
-    efficiencies = [e / n_heavy_atoms for e in energies] if n_heavy_atoms > 0 else energies
+    efficiencies = (
+        [e / n_heavy_atoms for e in energies] if n_heavy_atoms > 0 else energies
+    )
 
     # 2. Interacting residues
     residues_per_pose = []
@@ -89,6 +103,7 @@ def analyze_docking_results(
 # Binding energy extraction
 # ===================================================================
 
+
 def extract_binding_energies(dlg_path: Path, num_poses: int) -> list[float]:
     """Extract estimated free energies of binding from the DLG file."""
     with open(dlg_path) as f:
@@ -105,6 +120,7 @@ def extract_binding_energies(dlg_path: Path, num_poses: int) -> list[float]:
 # ===================================================================
 # Interacting residues
 # ===================================================================
+
 
 def extract_interacting_residues(
     pose_xyz: Path,
@@ -142,9 +158,13 @@ def extract_interacting_residues(
             if line.startswith("ATOM") or line.startswith("HETATM"):
                 parts = line.strip().split()
                 residue_info.append((parts[3], parts[5]))  # (name, id)
-                protein_coords.append([
-                    float(parts[6]), float(parts[7]), float(parts[8]),
-                ])
+                protein_coords.append(
+                    [
+                        float(parts[6]),
+                        float(parts[7]),
+                        float(parts[8]),
+                    ]
+                )
 
     if not protein_coords:
         return []
@@ -165,12 +185,27 @@ def extract_interacting_residues(
 # RMSD calculation
 # ===================================================================
 
+
 def calculate_rmsd(
     reference_xyz: Path,
     pose_xyz: Path,
     ignore_h: bool = True,
 ) -> float:
-    """Calculate RMSD between two XYZ structures (no rotation/translation).
+    """RMSD of a docked pose from a reference geometry of the same molecule.
+
+    The pose is scored where it lies, with no rotation or translation: a docked
+    pose is right only if it sits in the right place in the receptor.
+
+    Atoms are paired by chemistry, not by their line in the file. AutoDock Run
+    writes poses in the ligand PDBQT's torsion-tree order, which is not the
+    order of an input XYZ, so pairing by line compares unrelated atoms. Both
+    structures become bond graphs, and of the pairings that keep every element
+    and every bond, the one with the lowest RMSD is used. Taking the lowest
+    makes the value symmetry-corrected: a ring flipped onto itself has not moved.
+
+    Pairing each atom with the nearest atom of its element instead, as upstream
+    MetalDock does, allows pairings no bond pattern does, and reports a
+    misplaced pose as closer to the reference than it is.
 
     Args:
         reference_xyz: Reference structure XYZ file.
@@ -179,47 +214,221 @@ def calculate_rmsd(
 
     Returns:
         RMSD value in Angstrom.
+
+    Raises:
+        ValueError: If the two files do not hold the same molecule: other
+            elements, another atom count, or the same atoms bonded otherwise.
+        RuntimeError: If the molecule has so many symmetric equivalents that
+            the search gives up; no RMSD is better than one that may be wrong.
     """
-    ref_coords = _read_xyz_coords(reference_xyz, ignore_h=ignore_h)
-    pose_coords = _read_xyz_coords(pose_xyz, ignore_h=ignore_h)
+    ref_elements, ref_coords = _read_xyz_atoms(reference_xyz, ignore_h=ignore_h)
+    pose_elements, pose_coords = _read_xyz_atoms(pose_xyz, ignore_h=ignore_h)
+    names = f"{Path(pose_xyz).name} and {Path(reference_xyz).name}"
 
-    if len(ref_coords) != len(pose_coords):
-        logger.warning(
-            "Atom count mismatch: ref=%d, pose=%d. Using min.",
-            len(ref_coords), len(pose_coords),
+    if Counter(ref_elements) != Counter(pose_elements):
+        raise ValueError(
+            f"{names} do not hold the same molecule: "
+            f"{_formula(pose_elements)} against {_formula(ref_elements)}."
         )
-        n = min(len(ref_coords), len(pose_coords))
-        ref_coords = ref_coords[:n]
-        pose_coords = pose_coords[:n]
+    if not ref_elements:
+        raise ValueError(f"{names} hold no atoms to compare.")
 
-    if len(ref_coords) == 0:
-        return 0.0
+    ref_graph = _bond_graph(ref_elements, ref_coords)
+    pose_graph = _bond_graph(pose_elements, pose_coords)
+    ref_classes, pose_classes = _symmetry_classes(ref_graph, pose_graph)
+    bonded_differently = ValueError(
+        f"{names} do not hold the same molecule: the same atoms, bonded differently."
+    )
+    if Counter(ref_classes) != Counter(pose_classes):
+        raise bonded_differently
 
-    ref = np.array(ref_coords)
-    pose = np.array(pose_coords)
-    diff = ref - pose
-    return float(np.sqrt(np.mean(np.sum(diff**2, axis=1))))
+    squared = cdist(ref_coords, pose_coords, "sqeuclidean")
+    matcher = _ClosestPairing(ref_graph, pose_graph, squared, ref_classes, pose_classes)
+    try:
+        for pairing in matcher.isomorphisms_iter():
+            total = sum(squared[r, p] for r, p in pairing.items())
+            matcher.best = min(matcher.best, total)
+    except _SearchLimitReached:
+        raise RuntimeError(
+            f"Gave up pairing the atoms of {names} after {_SEARCH_LIMIT:,} "
+            "candidate pairs: the molecule has too many symmetric equivalents "
+            "to search. No RMSD is reported rather than one that may be too high."
+        ) from None
+
+    if not np.isfinite(matcher.best):
+        raise bonded_differently
+    return float(np.sqrt(matcher.best / len(ref_elements)))
 
 
-def _read_xyz_coords(xyz_path: Path, ignore_h: bool = True) -> list[list[float]]:
-    """Read coordinates from an XYZ file, optionally skipping H atoms."""
-    coords = []
+# The most extensions one pairing search may weigh. The searches this package
+# meets weigh a few hundred; a search that needs this many has met a symmetry
+# the bound below cannot cut, and would otherwise run for hours.
+_SEARCH_LIMIT = 20_000
+
+
+class _SearchLimitReached(Exception):
+    pass
+
+
+class _ClosestPairing(GraphMatcher):
+    """Search the bond-preserving pairings of two structures for the closest.
+
+    VF2 builds a pairing one atom pair at a time and asks
+    ``semantic_feasibility`` whether each extension may stand. Here that also
+    rejects an extension that cannot beat the best complete pairing found so
+    far. Its bound is the squared deviation of the pairs made so far plus the
+    cheapest assignment of the atoms still unpaired, where an atom may go only
+    to an atom of its symmetry class that lies as many bonds from each paired
+    atom as it does. An isomorphism keeps every such distance, so no completion
+    can undercut the bound, and an extension that leaves some atom nowhere to
+    go is abandoned at once.
+
+    Extensions are tried in order of their bound, so the first pairing found
+    follows the cheapest assignment, and most symmetric alternatives are cut
+    off before they are built. Nothing that could be better is ever cut, so
+    the result is the exact minimum.
+    """
+
+    def __init__(
+        self,
+        reference: nx.Graph,
+        pose: nx.Graph,
+        squared: np.ndarray,
+        ref_classes: list[int],
+        pose_classes: list[int],
+    ):
+        super().__init__(reference, pose)
+        self.squared = squared
+        self.ref_classes = np.array(ref_classes)
+        self.pose_classes = np.array(pose_classes)
+        self.ref_hops = _bond_distances(reference)
+        self.pose_hops = _bond_distances(pose)
+        self.best = np.inf
+        self.weighed = 0
+        self.bounds: dict[tuple[int, int], float] = {}
+
+    def candidate_pairs_iter(self):
+        pairs = [
+            (r, p)
+            for r, p in super().candidate_pairs_iter()
+            if self.ref_classes[r] == self.pose_classes[p]
+            and self.syntactic_feasibility(r, p)
+        ]
+        for pair in pairs:
+            self.bounds[pair] = self._bound(*pair)
+        pairs.sort(key=self.bounds.__getitem__)
+        return iter(pairs)
+
+    def semantic_feasibility(self, ref_atom, pose_atom):
+        return self.bounds[ref_atom, pose_atom] < self.best
+
+    def _bound(self, ref_atom: int, pose_atom: int) -> float:
+        """Least squared deviation of any pairing that extends this one."""
+        self.weighed += 1
+        if self.weighed > _SEARCH_LIMIT:
+            raise _SearchLimitReached
+        paired_ref = [*self.core_1, ref_atom]
+        paired_pose = [*self.core_1.values(), pose_atom]
+        total = self.squared[paired_ref, paired_pose].sum()
+        free_ref = np.setdiff1d(np.arange(len(self.squared)), paired_ref)
+        free_pose = np.setdiff1d(np.arange(len(self.squared)), paired_pose)
+        for cls in np.unique(self.ref_classes[free_ref]):
+            refs = free_ref[self.ref_classes[free_ref] == cls]
+            poses = free_pose[self.pose_classes[free_pose] == cls]
+            consistent = (
+                self.ref_hops[np.ix_(refs, paired_ref)][:, None, :]
+                == self.pose_hops[np.ix_(poses, paired_pose)][None, :, :]
+            ).all(axis=2)
+            cost = np.where(consistent, self.squared[np.ix_(refs, poses)], np.inf)
+            try:
+                rows, cols = linear_sum_assignment(cost)
+            except ValueError:  # some atom has nowhere left to go
+                return np.inf
+            total += cost[rows, cols].sum()
+        return float(total)
+
+
+def _bond_distances(graph: nx.Graph) -> np.ndarray:
+    """Bonds on the shortest path between each two atoms; -1 if none joins them."""
+    hops = np.full((len(graph), len(graph)), -1, dtype=int)
+    for source, lengths in nx.all_pairs_shortest_path_length(graph):
+        for target, length in lengths.items():
+            hops[source, target] = length
+    return hops
+
+
+def _symmetry_classes(first: nx.Graph, second: nx.Graph) -> tuple[list[int], list[int]]:
+    """Colour refinement, run on both graphs with one palette.
+
+    Each atom starts with its element as its colour; each round recolours it
+    by its colour and its neighbours' colours, until no class splits further.
+    An isomorphism can only pair atoms of the same final colour, so the colours
+    of the two graphs must also come out in the same numbers.
+    """
+    graphs = (first, second)
+    colours = [[g.nodes[n]["element"] for n in range(len(g))] for g in graphs]
+    classes = 0
+    while True:
+        keys = [
+            [(c[n], tuple(sorted(c[m] for m in g[n]))) for n in range(len(g))]
+            for g, c in zip(graphs, colours)
+        ]
+        palette = {
+            key: i
+            for i, key in enumerate(sorted(set(keys[0]) | set(keys[1]), key=repr))
+        }
+        colours = [[palette[key] for key in graph_keys] for graph_keys in keys]
+        if len(palette) == classes:
+            return colours[0], colours[1]
+        classes = len(palette)
+
+
+def _bond_graph(elements: list[str], coords: np.ndarray) -> nx.Graph:
+    """Bond graph of one structure, by the covalent-radius rule of ligand prep."""
+    unknown = sorted({el for el in elements if el not in ATOMIC_RADII})
+    if unknown:
+        raise ValueError(
+            f"No covalent radius for {', '.join(unknown)}, so its bonds cannot be told."
+        )
+    radii = np.array([ATOMIC_RADII[el] for el in elements])
+    distance = cdist(coords, coords)
+    limit = _BOND_TOLERANCE * (radii[:, None] + radii[None, :])
+    bonded = np.triu((distance > 0.1) & (distance < limit), k=1)
+    graph = nx.Graph()
+    graph.add_nodes_from((i, {"element": el}) for i, el in enumerate(elements))
+    graph.add_edges_from(zip(*(idx.tolist() for idx in np.nonzero(bonded))))
+    return graph
+
+
+def _formula(elements: list[str]) -> str:
+    counts = Counter(elements)
+    return " ".join(f"{el}{n if n > 1 else ''}" for el, n in sorted(counts.items()))
+
+
+def _read_xyz_atoms(
+    xyz_path: Path, ignore_h: bool = True
+) -> tuple[list[str], np.ndarray]:
+    """Read elements and coordinates from an XYZ file, optionally skipping H atoms."""
+    elements, coords = [], []
     with open(xyz_path) as f:
         for _ in range(2):
             next(f)
         for line in f:
-            parts = line.strip().split()
+            parts = line.split()
             if len(parts) < 4:
                 continue
-            if ignore_h and parts[0] == "H":
+            element = parts[0].capitalize()
+            if ignore_h and element == "H":
                 continue
+            elements.append(element)
             coords.append([float(parts[1]), float(parts[2]), float(parts[3])])
-    return coords
+    return elements, np.array(coords, dtype=float).reshape(-1, 3)
 
 
 # ===================================================================
 # Pose format conversion
 # ===================================================================
+
 
 def write_pose_pdb(
     xyz_path: Path,
@@ -249,7 +458,9 @@ def write_pose_pdb(
         for line in f:
             parts = line.strip().split()
             if len(parts) >= 4:
-                atoms.append((parts[0], [float(parts[1]), float(parts[2]), float(parts[3])]))
+                atoms.append(
+                    (parts[0], [float(parts[1]), float(parts[2]), float(parts[3])])
+                )
 
     with open(pdb_path, "w") as f:
         for i, (el, xyz) in enumerate(atoms, 1):

@@ -9,8 +9,8 @@ No os.chdir() — uses cwd= parameter for subprocess calls.
 
 import logging
 import math
-import re
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -18,7 +18,7 @@ from pathlib import Path
 import networkx as nx
 import numpy as np
 
-from .utils import get_lj_params, INTERNAL_PARAM_METALS, resolve_mgltools_interpreter
+from .utils import INTERNAL_PARAM_METALS, get_lj_params, resolve_mgltools_interpreter
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 # ===================================================================
 # Public interface
 # ===================================================================
+
 
 def run_autodock(
     ligand_pdbqt: Path,
@@ -118,8 +119,15 @@ def run_autodock(
     # GPF
     gpf_path = output_dir / f"{name_ligand}_{name_protein}.gpf"
     _create_gpf_file(
-        dock_ligand, dock_receptor, gpf_path, parameter_file,
-        npts, box_center, metal_symbol, lj_params, internal_param,
+        dock_ligand,
+        dock_receptor,
+        gpf_path,
+        parameter_file,
+        npts,
+        box_center,
+        metal_symbol,
+        lj_params,
+        internal_param,
         prepare_gpf_script=prepare_gpf_script,
         python_path=python_path,
         mgltools_dir=mgltools_dir,
@@ -128,9 +136,17 @@ def run_autodock(
     # DPF
     dpf_path = output_dir / f"{name_ligand}_{name_protein}.dpf"
     _create_dpf_file(
-        dpf_path, gpf_path, parameter_file,
-        name_ligand, name_protein, num_poses,
-        random_pos, ga_dock, ga_settings, sa_dock, sa_settings,
+        dpf_path,
+        gpf_path,
+        parameter_file,
+        name_ligand,
+        name_protein,
+        num_poses,
+        random_pos,
+        ga_dock,
+        ga_settings,
+        sa_dock,
+        sa_settings,
     )
 
     # Run autogrid + autodock
@@ -159,6 +175,7 @@ def run_autodock(
 # Box parameter helpers
 # ===================================================================
 
+
 def _get_metal_position(graph: nx.Graph, metal_symbol: str) -> list[float]:
     for _, data in graph.nodes(data=True):
         if data.get("element") == metal_symbol:
@@ -184,7 +201,9 @@ def _calculate_npts(
     return [math.ceil(20 * 2.66)] * 3
 
 
-def _auto_box_size(graph: nx.Graph, metal_symbol: str, spacing: float, scale_factor: float) -> list[int]:
+def _auto_box_size(
+    graph: nx.Graph, metal_symbol: str, spacing: float, scale_factor: float
+) -> list[int]:
     """Auto-calculate box size from ligand extent."""
     x_all, y_all, z_all = [], [], []
     metal_xyz = None
@@ -212,6 +231,7 @@ def _auto_box_size(graph: nx.Graph, metal_symbol: str, spacing: float, scale_fac
 # ===================================================================
 # GPF / DPF file creation
 # ===================================================================
+
 
 def _stage_parameter_file(parameter_file: Path, output_dir: Path) -> Path:
     """Copy the parameter library into output_dir; return its bare filename.
@@ -258,14 +278,22 @@ def _create_gpf_file(
     cmd = [
         interpreter,
         str(prepare_gpf_script),
-        "-l", str(ligand_pdbqt),
-        "-r", str(receptor_pdbqt),
-        "-p", f"parameter_file={parameter_file}",
-        "-p", f"npts={npts[0]},{npts[1]},{npts[2]}",
-        "-p", f"gridcenter={box_center[0]:.6f},{box_center[1]:.6f},{box_center[2]:.6f}",
-        "-o", str(gpf_path),
+        "-l",
+        str(ligand_pdbqt),
+        "-r",
+        str(receptor_pdbqt),
+        "-p",
+        f"parameter_file={parameter_file}",
+        "-p",
+        f"npts={npts[0]},{npts[1]},{npts[2]}",
+        "-p",
+        f"gridcenter={box_center[0]:.6f},{box_center[1]:.6f},{box_center[2]:.6f}",
+        "-o",
+        str(gpf_path),
     ]
-    result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(gpf_path.parent), env=env)
+    result = subprocess.run(
+        cmd, capture_output=True, text=True, cwd=str(gpf_path.parent), env=env
+    )
     if result.returncode != 0:
         raise RuntimeError(
             f"prepare_gpf4 failed (exit {result.returncode}) writing {gpf_path.name}.\n"
@@ -325,8 +353,12 @@ def _create_dpf_file(
 
     # Default GA settings
     ga = {
-        "pop_size": 150, "num_evals": 2500000, "num_generations": 27000,
-        "elitism": 1, "mutation_rate": 0.02, "crossover_rate": 0.80,
+        "pop_size": 150,
+        "num_evals": 2500000,
+        "num_generations": 27000,
+        "elitism": 1,
+        "mutation_rate": 0.02,
+        "crossover_rate": 0.80,
         "window_size": 10,
     }
     if ga_settings:
@@ -338,10 +370,14 @@ def _create_dpf_file(
         sa.update(sa_settings)
 
     with open(dpf_path, "w") as f:
-        f.write("autodock_parameter_version 4.2       # used by autodock to validate parameter set\n")
+        f.write(
+            "autodock_parameter_version 4.2       # used by autodock to validate parameter set\n"
+        )
         f.write(f"parameter_file {parameter_file}     # parameter library filename\n")
         f.write("outlev 1                             # diagnostic output level\n")
-        f.write("intelec                              # calculate internal electrostatics\n")
+        f.write(
+            "intelec                              # calculate internal electrostatics\n"
+        )
         f.write("seed pid time                        # seeds for random generator\n")
         f.write(f"ligand_types {ligand_type_str}      # atoms types in ligand\n")
         f.write(f"fld {name_protein}.maps.fld         # grid_data_file\n")
@@ -354,21 +390,39 @@ def _create_dpf_file(
         f.write(f"move {name_ligand}.pdbqt            # small molecule\n")
 
         if random_pos:
-            f.write("tran0 random                         # initial coordinates/A or random\n")
+            f.write(
+                "tran0 random                         # initial coordinates/A or random\n"
+            )
             f.write("quaternion0 random                   # initial orientation\n")
-            f.write("dihe0 random                         # initial dihedrals (relative) or random\n")
+            f.write(
+                "dihe0 random                         # initial dihedrals (relative) or random\n"
+            )
 
         if ga_dock and not sa_dock:
             f.write("# GA parameters\n")
-            f.write(f"ga_pop_size {ga['pop_size']}          # number of individuals in population\n")
-            f.write(f"ga_num_evals {ga['num_evals']}        # maximum number of energy evaluations\n")
-            f.write(f"ga_num_generations {ga['num_generations']} # maximum number of generations\n")
-            f.write(f"ga_elitism {ga['elitism']}            # top individuals surviving to next generation\n")
+            f.write(
+                f"ga_pop_size {ga['pop_size']}          # number of individuals in population\n"
+            )
+            f.write(
+                f"ga_num_evals {ga['num_evals']}        # maximum number of energy evaluations\n"
+            )
+            f.write(
+                f"ga_num_generations {ga['num_generations']} # maximum number of generations\n"
+            )
+            f.write(
+                f"ga_elitism {ga['elitism']}            # top individuals surviving to next generation\n"
+            )
             f.write(f"ga_mutation_rate {ga['mutation_rate']} # rate of gene mutation\n")
             f.write(f"ga_crossover_rate {ga['crossover_rate']} # rate of crossover\n")
-            f.write(f"ga_window_size {ga['window_size']}    # window size for worst individual\n")
-            f.write("ga_cauchy_alpha 0.0                  # Alpha parameter of Cauchy distribution\n")
-            f.write("ga_cauchy_beta 1.0                   # Beta parameter Cauchy distribution\n")
+            f.write(
+                f"ga_window_size {ga['window_size']}    # window size for worst individual\n"
+            )
+            f.write(
+                "ga_cauchy_alpha 0.0                  # Alpha parameter of Cauchy distribution\n"
+            )
+            f.write(
+                "ga_cauchy_beta 1.0                   # Beta parameter Cauchy distribution\n"
+            )
             f.write("# Local Search Parameters\n")
             f.write("sw_max_its 300\n")
             f.write("sw_max_succ 4\n")
@@ -379,7 +433,9 @@ def _create_dpf_file(
             f.write("# Activate LGA\n")
             f.write("set_ga\n")
             f.write("set_psw1\n")
-            f.write(f"ga_run {num_poses}                   # number of hybrid GA-LS runs\n")
+            f.write(
+                f"ga_run {num_poses}                   # number of hybrid GA-LS runs\n"
+            )
 
         elif sa_dock and not ga_dock:
             f.write("# SA Parameters\n")
@@ -398,7 +454,9 @@ def _create_dpf_file(
             f.write("# Activate SA\n")
             f.write(f"simanneal {num_poses}\n")
 
-        f.write("analysis                             # perform a ranked cluster analysis\n")
+        f.write(
+            "analysis                             # perform a ranked cluster analysis\n"
+        )
 
     return dpf_path
 
@@ -407,25 +465,38 @@ def _create_dpf_file(
 # AutoGrid / AutoDock execution
 # ===================================================================
 
-def _run_autogrid(log_path: Path, gpf_path: Path, autogrid4_path: str, cwd: Path) -> None:
+
+def _run_autogrid(
+    log_path: Path, gpf_path: Path, autogrid4_path: str, cwd: Path
+) -> None:
     """Execute autogrid4."""
     logger.info("Running autogrid4...")
-    with open(log_path, "w") as log:
-        subprocess.run(
-            [autogrid4_path, "-p", str(gpf_path)],
-            stdout=log, stderr=subprocess.STDOUT,
-            cwd=str(cwd),
-        )
+    _run_logged([autogrid4_path, "-p", str(gpf_path)], log_path, cwd)
 
 
-def _run_autodock(log_path: Path, dpf_path: Path, autodock4_path: str, cwd: Path) -> None:
+def _run_autodock(
+    log_path: Path, dpf_path: Path, autodock4_path: str, cwd: Path
+) -> None:
     """Execute autodock4."""
     logger.info("Running autodock4...")
+    _run_logged([autodock4_path, "-p", str(dpf_path)], log_path, cwd)
+
+
+def _run_logged(cmd: list[str], log_path: Path, cwd: Path) -> None:
+    """Run an AutoDock binary with its output in log_path; raise if it failed.
+
+    autogrid4 and autodock4 report failure only through their exit code and
+    their own output. Unchecked, a failed autogrid4 left autodock4 to fail on
+    the missing maps, and the run returned normally with no poses, so the
+    failure surfaced one node later with nothing to say what caused it.
+    """
     with open(log_path, "w") as log:
-        subprocess.run(
-            [autodock4_path, "-p", str(dpf_path)],
-            stdout=log, stderr=subprocess.STDOUT,
-            cwd=str(cwd),
+        result = subprocess.run(cmd, stdout=log, stderr=subprocess.STDOUT, cwd=str(cwd))
+    if result.returncode != 0:
+        tail = log_path.read_text(errors="replace").strip().splitlines()[-5:]
+        raise RuntimeError(
+            f"{Path(cmd[0]).name} failed (exit {result.returncode}). "
+            f"The end of {log_path.name}:\n" + "\n".join(tail)
         )
 
 
@@ -433,7 +504,10 @@ def _run_autodock(log_path: Path, dpf_path: Path, autodock4_path: str, cwd: Path
 # Pose extraction
 # ===================================================================
 
-def _write_conformations(dlg_path: Path, output_dir: Path, name_ligand: str) -> list[Path]:
+
+def _write_conformations(
+    dlg_path: Path, output_dir: Path, name_ligand: str
+) -> list[Path]:
     """Extract docked poses from the DLG file into individual PDBQT files."""
     poses = []
     mol_id = 1
@@ -481,7 +555,9 @@ def _pdbqt_poses_to_xyz(pose_paths: list[Path], name_ligand: str) -> list[Path]:
             for line in f:
                 if line.startswith("ATOM") or line.startswith("HETATM"):
                     parts = line.strip().split()
-                    atoms.append(f"{parts[2]:>2} {float(parts[6]):>8.3f} {float(parts[7]):>8.3f} {float(parts[8]):>8.3f}\n")
+                    atoms.append(
+                        f"{parts[2]:>2} {float(parts[6]):>8.3f} {float(parts[7]):>8.3f} {float(parts[8]):>8.3f}\n"
+                    )
 
         with open(xyz_path, "w") as f:
             f.write(f"{len(atoms)}\n\n")

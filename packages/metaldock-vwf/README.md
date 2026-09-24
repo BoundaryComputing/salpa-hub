@@ -5,8 +5,8 @@ Visual workflow nodes for **metal–protein docking** — the
 chainable Salpa nodes.
 
 > **New to molecular docking?** Start with [`TUTORIAL.md`](TUTORIAL.md) — the same
-> pipeline explained without jargon, for a bench audience, in about five minutes of
-> compute. This README is the formal reference.
+> pipeline explained without jargon, for a bench audience, in two to three minutes
+> of compute. This README is the formal reference.
 
 ## Overview
 
@@ -41,7 +41,7 @@ AutoDock4 parameterises internally.
 
 | Stage | What happens |
 |---|---|
-| Receptor preparation | HETATM records are optionally stripped, the structure is protonated at a chosen pH with **pdb2pqr** (PROPKA), and converted to PDBQT by AutoDockTools' `prepare_receptor4.py`. |
+| Receptor preparation | HETATM records are optionally stripped, and the structure is protonated for a chosen pH: **PROPKA** predicts each acidic and basic group's pKa, and **pdb2pqr** protonates every group whose pKa lies above that pH and adds the hydrogens. The result is converted to PDBQT by AutoDockTools' `prepare_receptor4.py`. |
 | Ligand preparation | The metal-complex geometry is canonicalized with **OpenBabel** and converted to a molecular graph — atoms with elements and coordinates, edges from covalent-radius adjacency. |
 | Charge derivation | A quantum calculation on the complex yields **CM5 partial charges** and bond orders, which are written onto the graph. Bonds the calculation does not support are removed, so the torsion tree that follows is built on quantum connectivity rather than distance alone. |
 | Ligand PDBQT | The enriched graph becomes an AutoDock PDBQT with a ROOT/BRANCH torsion tree. Bonds in the metal's coordination sphere can be frozen, and a `DD` dummy atom marks a vacant coordination site. |
@@ -62,11 +62,14 @@ produce them.
 
 xtb is the default because it is the only one of the four that requires no
 user-supplied binary, which is what makes the bundled workflow runnable
-unattended. It is semi-empirical and therefore approximate. On the 1JZI Re
-reference case it reproduces the ORCA metal charge to 0.046 e (+0.749 against
-+0.704) with a mean absolute deviation of 0.065 e across all 29 atoms, in under a
-second rather than minutes. The largest deviations are on the carbonyl and
-pyridyl heteroatoms, where xtb is systematically more polar.
+unattended. It is semi-empirical and therefore approximate. On the 1JZI rhenium
+complex it reproduces the metal charge of our own ORCA calculation (ORCA 6.1.1,
+B3LYP/def2-SVP, shipped as `mdock_qm_charges/demo_data/1jzi_re_orca_reference_graph.json`)
+to 0.046 e (+0.749 against +0.704), with a mean absolute deviation of 0.065 e
+across all 29 atoms. The whole QM Charges node takes 1–2 s with xtb; our
+B3LYP-D3BJ/def2-TZVP single point on the same complex took 5 min 39 s on four
+cores. The largest deviations, up to 0.20 e, are on the carbonyl groups and the
+pyridyl nitrogens, where xtb is systematically more polar.
 
 Only **GFN1**-xTB reports CM5 charges; GFN2 reports Mulliken charges, which are
 not interchangeable. The engine rejects any other parametrisation rather than
@@ -99,8 +102,8 @@ needs (`graph_json`, `canonical_xyz`, `ligand_pdbqt`, `receptor_pdbqt`,
 
 ## Example workflows
 
-The package ships two installable templates. **HSA + Ferrocene** is the one to
-start from.
+The package ships one installable template, **HSA + Ferrocene**, and keeps a
+second workflow, the 1JZI redocking, as a check on the method.
 
 ### HSA + Ferrocene (Sudlow site I) — the default
 
@@ -110,7 +113,7 @@ start from.
 - **Ligand:** ferrocene, Fe(C₅H₅)₂, an independent GFN1-xTB geometry
 - **Site:** Sudlow site I, subdomain IIA
 - **Charges:** GFN1-xTB, neutral, closed shell
-- **Runtime:** about 11 minutes
+- **Runtime:** 2–3 minutes (148–155 s in three runs on an Intel Mac, 2026-09-24)
 
 Docking into a protein that does not already contain the complex is what a user
 normally does.
@@ -134,15 +137,25 @@ what it writes, and the handful of parameters that decide the result. The same
 page is published at
 [salpa.app/docs/workflows/metaldock-hsa-ferrocene](https://salpa.app/docs/workflows/metaldock-hsa-ferrocene).
 
-### MetalDock 1JZI Re Pipeline — the published reference case
+### 1JZI redocking — a check, not a template
 
-`workflows/metaldock-1jzi-re-pipeline.json`, reproducing the 1JZI case from the
-MetalDock paper: Re(phen)(CO)₃ redocked into azurin.
+`workflows/metaldock-1jzi-re-pipeline.json` redocks Re(phen)(CO)₃ into azurin
+(PDB 1JZI). Its inputs are the ORCA example in MetalDock's repository. The
+MetalDock paper does not report this case, so there is no published number for
+it to reproduce.
 
 A redocking: the complex comes out of the crystal it goes back into, so the site
-is known in advance and the result is scored as RMSD against the crystallographic
-pose. Useful for checking the method reproduces a published number. Notes in
-`workflows/1jzi-redocking-notes.md`.
+is known in advance and each pose is scored as RMSD against the crystallographic
+pose. It is not in the template library; `workflows/1jzi-redocking-notes.md`
+says how to load it, what it gives, and where each number comes from.
+
+The one case from the MetalDock paper we have docked with these modules is
+**2BZH**, the ruthenium kinase inhibitor DW12 in PIM1 (the paper's Case Study 2,
+0.475 Å averaged over its ten best poses). Our run of 2026-03-18, with ORCA
+charges (B3LYP-D3BJ/def2-SVP, def2-SD pseudopotential on Ru) and three poses,
+puts all three 0.45 Å from the crystal pose, as re-scored on 2026-09-24 with the
+corrected RMSD of 0.4.2. Its inputs are in MetalDock's repository, not in this
+package.
 
 ### Where a template's explanation lives
 
@@ -162,25 +175,32 @@ a page from it for anyone who has not installed anything.
 
 ## Outputs and interpretation
 
-- **QM Charges** → `enriched_graph.json`. On this case the Re charge should be
-  near +0.7 e; `mdock_qm_charges/demo_data/1jzi_re_orca_reference_graph.json`
-  holds the ORCA/DFT values for every atom to compare against.
-- **Ligand PDBQT** → a PDBQT with `ROOT`/`ENDROOT`, the metal atom, and a `DD`
-  dummy atom at the vacant coordination site.
-- **AutoDock Run** → a `.dlg` plus per-pose `.xyz` and `.pdbqt`.
+- **QM Charges** → `enriched_graph.json`, with CM5 charges and bond orders on
+  every atom. For the 1JZI rhenium complex,
+  `mdock_qm_charges/demo_data/1jzi_re_orca_reference_graph.json` holds our ORCA
+  charges (B3LYP/def2-SVP) to compare an xtb run against.
+- **Ligand PDBQT** → a PDBQT with `ROOT`/`ENDROOT` and the metal atom, plus a
+  `DD` dummy atom at the vacant coordination site when *Vacant Site* is on.
+- **AutoDock Run** → a `.dlg` plus per-pose `.xyz` and `.pdbqt`, numbered in the
+  order AutoDock ran them, not by score.
 - **Results Analysis** → `<case>_analysis.json` with binding energies, ligand
   efficiencies, interacting residues, and RMSD when a reference was supplied.
-
-Published reference values for this case with ORCA/DFT charges: ΔG ≈ −5.54
-kcal/mol, roughly 12 interacting residues, RMSD ≈ 5.9 Å against the
-crystallographic pose. Semi-empirical charges will not reproduce these exactly.
+  The RMSD is taken where the pose lies, without superposition, over heavy
+  atoms, with each atom of the pose paired with the reference atom it
+  corresponds to chemically. Before 0.4.2 the atoms were paired by their order
+  in the two files, which differs, so earlier RMSD values are not meaningful.
 
 For the HSA case there is **no** reference pose, so `reference_xyz` is left empty
 and `rmsd_values` comes back empty with it. That is correct: a prediction has no
 answer to be scored against, and reporting an RMSD anyway would be theatre.
 Judge it on binding energy and on which residues line the pose — here −3.00
-kcal/mol with 11–12 contacts in subdomain IIA. The exact count varies between
-runs — AutoDock seeds from `pid time` — while the energy and the pocket do not.
+kcal/mol with 11–12 contacts, the iron 3.6 Å from where warfarin sits in 2BXD
+(three runs on an Intel Mac, 2026-09-24). The exact count varies between runs —
+AutoDock seeds from `pid time` — while the energy and the pocket do not.
+
+For the 1JZI redocking, `workflows/1jzi-redocking-notes.md` tabulates what our
+runs gave with xtb and with ORCA charges. None of it is a published value: the
+MetalDock paper does not report 1JZI.
 
 ## Requirements and platforms
 
@@ -236,3 +256,6 @@ Each node resolves the import at runtime, in order:
   doi:10.1021/ct200866d
 - Dolinsky, T. J. et al. *PDB2PQR.* Nucleic Acids Res. 2004.
   doi:10.1093/nar/gkh381
+- Ghuman, J. et al. *Structural basis of the drug-binding specificity of human
+  serum albumin.* J. Mol. Biol. 2005, 353, 38–52. doi:10.1016/j.jmb.2005.07.075
+  — the warfarin complex 2BXD that locates the HSA template's box.

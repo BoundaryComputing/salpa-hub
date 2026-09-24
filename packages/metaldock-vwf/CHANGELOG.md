@@ -4,6 +4,84 @@ All notable changes to the `metaldock-vwf` package are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning is
 [SemVer](https://semver.org/).
 
+## [0.4.2] — 2026-09-24
+
+### Fixed
+
+- **RMSD pairs each atom of a pose with the same atom of the reference.** Results
+  Analysis paired them by their line in the two files. AutoDock Run writes poses in
+  the ligand PDBQT's torsion-tree order (Re, C, O, … for 1JZI), and a reference XYZ
+  keeps its own order (O, C, Re, …), so every pair was two different atoms and every
+  RMSD reported against a reference was wrong. Written out as a pose, the 1JZI
+  crystal pose scored 3.30 Å against its own coordinates. A reference with another
+  atom count was cut to fit, with a warning in the log.
+
+  Both structures now become bond graphs, and the RMSD is the lowest over every
+  pairing that keeps elements and bonds: symmetry-corrected, taken where the pose
+  lies without superposition, over heavy atoms. A reference that is not the same
+  molecule is refused rather than scored. The thirty poses of three 1JZI runs go
+  from 5.50–5.91 Å to 4.56–5.48 Å; the best-scoring ones sit at 5.44–5.48 Å.
+
+  Upstream MetalDock pairs each atom with the nearest atom of its element instead,
+  which allows pairings no bond pattern does and reads a misplaced pose as closer
+  than it is. On a pose far from the crystal this node therefore reports more than
+  MetalDock would.
+
+  On 2BZH, the one case from the MetalDock paper we have docked with these modules
+  (its inputs are in MetalDock's repository, not in this package), our run of
+  2026-03-18 re-scores from 3.34 Å to 0.45 Å. The paper reports 0.475 Å. That case
+  was reproduced all along; the old RMSD hid it.
+
+- **AutoDock Run stops when autogrid4 or autodock4 fails.** Both report failure only
+  through their exit code, and neither was checked. A failed autogrid4 let
+  autodock4 run on missing maps, and the node reported "Docked 0 pose(s)" as a
+  success; the failure surfaced one node later as "No pose_xyz_paths found in
+  predecessor data", with nothing to say why. It now stops at the failing step and
+  quotes the tool's own last lines.
+
+- **The protein-prep pH now changes the protonation.** `mdock_protein_prep` called
+  pdb2pqr with `--with-ph` but no `--titration-state-method`, and pdb2pqr applies
+  the pH only to a titration method's results, so PROPKA never ran: the 1JZI
+  receptor was identical at pH 4 and pH 10. It now passes
+  `--titration-state-method propka`. Upstream MetalDock passes the same flags as
+  before, so this is a deliberate departure from it. At the 1JZI workflow's pH 7.0
+  the receptor is unchanged. At the HSA template's pH 7.4 five residues change:
+  Lys106 and Lys199 lose a proton, and Glu244, His247 and His288 gain one. The HSA
+  result does not move: −3.00 kcal/mol and the same twelve contacts.
+
+- **Running protein prep again rebuilds its outputs.** A protonated PDB or receptor
+  PDBQT already in the output folder was returned untouched, so a changed pH had no
+  effect on a second run. A failed pdb2pqr is now an error that quotes pdb2pqr's
+  reason, instead of a warning followed by a missing file.
+
+- **The HSA template no longer puts a vacant-site dummy on ferrocene.** It set
+  `vacant_site=true`, so every run carried a `DD` dummy atom 1.0 Å from the iron,
+  scored as a hydrogen-bond donor, although ferrocene is saturated and the
+  walkthrough said none was added. It is now off. The best pose moved by 0.02 Å and
+  its score from −3.01 to −3.00 kcal/mol.
+
+### Documentation
+
+- **The 1JZI "paper reference" was our own run.** The README, tutorial and 1JZI notes
+  gave ΔG −5.54 kcal/mol and RMSD 5.91 Å as the MetalDock paper's ORCA/DFT values
+  for 1JZI. The paper does not report 1JZI, and it computes its charges with ADF,
+  not ORCA. The numbers were our validation run of 2026-03-18 (ORCA 6.1.1,
+  B3LYP-D3BJ/def2-TZVP), and 5.91 Å was the mis-paired RMSD; corrected, it is
+  5.49 Å. The notes also gave `B3LYP def2-SVP` as the line "the validated runs
+  used". That line made the shipped reference charges and our other ORCA runs; the
+  run quoted used upstream's `B3LYP D3BJ def2-TZVP`. Every number in the README, the
+  tutorial and both workflow docs now says where it comes from, and the 1JZI
+  workflow's own description no longer calls it the paper's case.
+- **The tutorial walks through the HSA template.** It sent readers to the 1JZI
+  template, which the Hub has not offered since 2026-08-26.
+- **Runtimes are measured.** The HSA template takes 2–3 minutes (148–155 s in three
+  runs on an Intel Mac), not "about 11 minutes".
+- **Poses are numbered in the order AutoDock ran them, not by score.** The
+  walkthrough said `_1` … `_10` were ranked best first.
+- **NOTICE** lists the HSA template's inputs, gives the ORCA level of the reference
+  charges, and names Meeko's licence correctly: LGPL-2.1, not Apache-2.0, as its
+  LICENSE, conda-forge and PyPI all state.
+
 ## [0.4.1] — 2026-09-14
 
 ### Fixed
