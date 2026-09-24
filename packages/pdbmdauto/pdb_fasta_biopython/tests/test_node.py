@@ -40,12 +40,17 @@ if not BOCOFLOW_AVAILABLE:
     )
 
 # ---------------------------------------------------------------------------
-# Import the node class (use package import for proper relative imports)
+# Import the node class as `pdb_fasta_biopython.node`, from the package root, so
+# node.py's own `from .core import ...` resolves. This used
+# `bocoflow_nodes.pdb_fasta_biopython.node`, a layout installed nodes no longer have,
+# and the file could not be collected anywhere.
 # ---------------------------------------------------------------------------
-from bocoflow_nodes.pdb_fasta_biopython.node import PdbFastaBiopython  # noqa: E402
+_node_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(_node_dir.parent))
+
+from pdb_fasta_biopython.node import PdbFastaBiopython  # noqa: E402
 
 # Demo data
-_node_dir = Path(__file__).parent.parent
 DEMO_DATA_DIR = _node_dir / "demo_data"
 DEMO_PDB = DEMO_DATA_DIR / "3LZ0.pdb"
 
@@ -53,6 +58,7 @@ DEMO_PDB = DEMO_DATA_DIR / "3LZ0.pdb"
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def node():
@@ -111,6 +117,7 @@ def make_flow_vars(
 # Tests: Node Metadata
 # ---------------------------------------------------------------------------
 
+
 class TestNodeMetadata:
     """Verify node class definition."""
 
@@ -144,7 +151,8 @@ class TestNodeMetadata:
 
     def test_select_parameter_options(self):
         assert PdbFastaBiopython.OPTIONS["input_mode"].options == [
-            "pdb_id", "local_file"
+            "pdb_id",
+            "local_file",
         ]
 
     def test_node_instantiation(self, node):
@@ -155,6 +163,7 @@ class TestNodeMetadata:
 # ---------------------------------------------------------------------------
 # Tests: Local file execution
 # ---------------------------------------------------------------------------
+
 
 class TestLocalFileExecution:
     """Test execute() with local PDB file."""
@@ -262,6 +271,7 @@ class TestLocalFileExecution:
 # Tests: Case name resolution
 # ---------------------------------------------------------------------------
 
+
 class TestCaseNameResolution:
     """Test case_name fallback logic."""
 
@@ -307,10 +317,11 @@ class TestCaseNameResolution:
 # Tests: PDB ID mode (mocked API)
 # ---------------------------------------------------------------------------
 
+
 class TestPdbIdMode:
     """Test pdb_id input mode with mocked RCSB API."""
 
-    @patch("bocoflow_nodes.pdb_fasta_biopython.core.requests.get")
+    @patch("pdb_fasta_biopython.core.requests.get")
     def test_pdb_id_execution(self, mock_get, node, output_dir):
         if not DEMO_PDB.exists():
             pytest.skip("Demo PDB not found")
@@ -342,8 +353,8 @@ class TestPdbIdMode:
         assert result["data"]["input_mode"] == "pdb_id"
         assert result["data"]["num_chains"] >= 8
 
-        # PDB file should be saved
-        pdb_path = os.path.join(output_dir, "3LZ0.pdb")
+        # PDB file should be saved, in the case folder the node makes for every output
+        pdb_path = os.path.join(output_dir, "3lz0", "3LZ0.pdb")
         assert os.path.exists(pdb_path)
 
     def test_pdb_id_missing_raises(self, node, output_dir):

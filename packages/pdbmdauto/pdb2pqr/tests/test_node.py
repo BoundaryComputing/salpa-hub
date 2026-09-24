@@ -41,12 +41,17 @@ if not BOCOFLOW_AVAILABLE:
     )
 
 # ---------------------------------------------------------------------------
-# Import the node class (use package import for proper relative imports)
+# Import the node class as `pdb2pqr.node`, from the package root, so node.py's own
+# `from .core import ...` resolves. This used `bocoflow_nodes.pdb2pqr.node`, a layout
+# installed nodes no longer have, and the file could not be collected anywhere. In this
+# process `pdb2pqr` is the node directory, not the PDB2PQR library (see test_core.py).
 # ---------------------------------------------------------------------------
-from bocoflow_nodes.pdb2pqr.node import PDB2PQR  # noqa: E402
+_node_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(_node_dir.parent))
+
+from pdb2pqr.node import PDB2PQR  # noqa: E402
 
 # Demo data
-_node_dir = Path(__file__).parent.parent
 DEMO_DATA_DIR = _node_dir / "demo_data"
 DEMO_PDB = DEMO_DATA_DIR / "mini.pdb"
 
@@ -212,11 +217,11 @@ class TestNodeMetadata:
 class TestExecution:
     """Test execute() with mocked core functions."""
 
-    @patch("bocoflow_nodes.pdb2pqr.node.convert_pqr_to_pdb")
-    @patch("bocoflow_nodes.pdb2pqr.node.extract_pqr_statistics")
-    @patch("bocoflow_nodes.pdb2pqr.node.run_pdb2pqr")
-    @patch("bocoflow_nodes.pdb2pqr.node.find_pdb2pqr_executable")
-    @patch("bocoflow_nodes.pdb2pqr.node.stream_log")
+    @patch("pdb2pqr.node.convert_pqr_to_pdb")
+    @patch("pdb2pqr.node.extract_pqr_statistics")
+    @patch("pdb2pqr.node.run_pdb2pqr")
+    @patch("pdb2pqr.node.find_pdb2pqr_executable")
+    @patch("pdb2pqr.node.stream_log")
     def test_execute_success(
         self,
         mock_stream_log,
@@ -268,7 +273,7 @@ class TestExecution:
         mock_stats.assert_called_once()
         mock_convert.assert_called_once()
 
-    @patch("bocoflow_nodes.pdb2pqr.node.stream_log")
+    @patch("pdb2pqr.node.stream_log")
     def test_execute_missing_input(self, mock_stream_log, node, output_dir):
         flow_vars = make_flow_vars(
             case_name="test",
@@ -278,9 +283,9 @@ class TestExecution:
         with pytest.raises(NodeException):
             node.execute([], flow_vars)
 
-    @patch("bocoflow_nodes.pdb2pqr.node.find_pdb2pqr_executable")
-    @patch("bocoflow_nodes.pdb2pqr.node.run_pdb2pqr")
-    @patch("bocoflow_nodes.pdb2pqr.node.stream_log")
+    @patch("pdb2pqr.node.find_pdb2pqr_executable")
+    @patch("pdb2pqr.node.run_pdb2pqr")
+    @patch("pdb2pqr.node.stream_log")
     def test_execute_pdb2pqr_failure(
         self, mock_stream_log, mock_run, mock_find_exe, node, output_dir
     ):
@@ -299,10 +304,10 @@ class TestExecution:
         with pytest.raises(NodeException, match="pdb2pqr failed"):
             node.execute([], flow_vars)
 
-    @patch("bocoflow_nodes.pdb2pqr.node.extract_pqr_statistics")
-    @patch("bocoflow_nodes.pdb2pqr.node.run_pdb2pqr")
-    @patch("bocoflow_nodes.pdb2pqr.node.find_pdb2pqr_executable")
-    @patch("bocoflow_nodes.pdb2pqr.node.stream_log")
+    @patch("pdb2pqr.node.extract_pqr_statistics")
+    @patch("pdb2pqr.node.run_pdb2pqr")
+    @patch("pdb2pqr.node.find_pdb2pqr_executable")
+    @patch("pdb2pqr.node.stream_log")
     def test_execute_without_generate_pdb(
         self,
         mock_stream_log,
@@ -342,11 +347,11 @@ class TestExecution:
         assert "protonated_pdb" not in result["data"]["output_files"]
         assert "protonated_pdb" not in result["files"]["output"]
 
-    @patch("bocoflow_nodes.pdb2pqr.node.convert_pqr_to_pdb")
-    @patch("bocoflow_nodes.pdb2pqr.node.extract_pqr_statistics")
-    @patch("bocoflow_nodes.pdb2pqr.node.run_pdb2pqr")
-    @patch("bocoflow_nodes.pdb2pqr.node.find_pdb2pqr_executable")
-    @patch("bocoflow_nodes.pdb2pqr.node.stream_log")
+    @patch("pdb2pqr.node.convert_pqr_to_pdb")
+    @patch("pdb2pqr.node.extract_pqr_statistics")
+    @patch("pdb2pqr.node.run_pdb2pqr")
+    @patch("pdb2pqr.node.find_pdb2pqr_executable")
+    @patch("pdb2pqr.node.stream_log")
     def test_execute_with_propka(
         self,
         mock_stream_log,
@@ -399,11 +404,11 @@ class TestExecution:
 class TestCaseNameResolution:
     """Test case_name fallback logic."""
 
-    @patch("bocoflow_nodes.pdb2pqr.node.convert_pqr_to_pdb")
-    @patch("bocoflow_nodes.pdb2pqr.node.extract_pqr_statistics")
-    @patch("bocoflow_nodes.pdb2pqr.node.run_pdb2pqr")
-    @patch("bocoflow_nodes.pdb2pqr.node.find_pdb2pqr_executable")
-    @patch("bocoflow_nodes.pdb2pqr.node.stream_log")
+    @patch("pdb2pqr.node.convert_pqr_to_pdb")
+    @patch("pdb2pqr.node.extract_pqr_statistics")
+    @patch("pdb2pqr.node.run_pdb2pqr")
+    @patch("pdb2pqr.node.find_pdb2pqr_executable")
+    @patch("pdb2pqr.node.stream_log")
     def test_case_name_from_predecessor(
         self,
         mock_stream_log,

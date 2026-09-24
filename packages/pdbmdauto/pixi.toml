@@ -52,16 +52,8 @@ mdanalysis = ">=2.0"         # pdb2pqr needs this at runtime
 # NOTE: GromacsWrapper removed — `import gromacs` prints config NOTEs to stdout,
 # corrupting node_runner JSON output. gen_gmx_ndx now writes NDX manually.
 
-[tasks]
-test = "pixi run -e dev pytest tests/ -v"
-
-[feature.dev.dependencies]
-pytest = ">=7.0"
-pytest-cov = "*"
-
 [environments]
 default = []
-dev = ["dev"]
 test = ["test"]
 
 # The environment `salpa validate`'s import checks and `salpa smoke` look for.
@@ -78,3 +70,9 @@ pytest = ">=7.0"
 
 [feature.test.pypi-dependencies]
 bocoflow-core-sdk = ">=0.1.2"
+
+# `pixi run test` runs every test in the package, from the package root: tests/ and each
+# node's own tests/, as pytest.ini lists them. It used to run `pytest tests/` in a `dev`
+# environment without bocoflow_core, so no node's own tests ran at all.
+[feature.test.tasks]
+test = "python -m pytest"

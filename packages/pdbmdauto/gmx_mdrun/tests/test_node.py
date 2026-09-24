@@ -139,7 +139,12 @@ class TestNodeOptions:
 
     def test_hpc_options_included(self):
         """Test that HPC options from HPCNodeBase are included."""
-        hpc_options = ["execution_mode", "hpc_profile", "slurm_script", "force_resubmit"]
+        hpc_options = [
+            "execution_mode",
+            "hpc_profile",
+            "slurm_script",
+            "force_resubmit",
+        ]
         for opt in hpc_options:
             assert opt in GmxMdRun.OPTIONS, f"Missing HPC option: {opt}"
 
@@ -154,10 +159,16 @@ class TestNodeOptions:
             "input_ndx_file",
             "num_threads",
             "max_warnings",
-            "force_to_run",
         ]
         for opt in node_options:
             assert opt in GmxMdRun.OPTIONS, f"Missing option: {opt}"
+
+    def test_force_to_run_is_inherited_not_declared(self):
+        """force_to_run comes from Node.BASE_OPTIONS; a node must not redeclare it."""
+        from bocoflow_core.node import Node
+
+        assert "force_to_run" in Node.BASE_OPTIONS
+        assert "force_to_run" not in GmxMdRun.OPTIONS
 
     def test_run_label_default(self):
         """Test run_label has correct default value."""

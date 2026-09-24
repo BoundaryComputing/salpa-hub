@@ -21,8 +21,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-# Import via package path (avoids bare "core" collision across packages)
-from bocoflow_nodes.pdb_fasta_biopython.core import (  # noqa: E402
+# Import as `pdb_fasta_biopython.core`, from the package root: a package path avoids a
+# bare "core" colliding with another node's. This used
+# `bocoflow_nodes.pdb_fasta_biopython.core`, a layout installed nodes no longer have, and
+# the file could not be collected anywhere.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+from pdb_fasta_biopython.core import (  # noqa: E402
     ChainInfo,
     MissingResidue,
     extract_missing_residues,
@@ -44,6 +49,7 @@ DEMO_FASTA = DEMO_DATA_DIR / "3LZ0.fasta"
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def output_dir():
@@ -70,10 +76,11 @@ def chains_3lz0(structure_3lz0):
 # Tests: RCSB API (mocked)
 # ---------------------------------------------------------------------------
 
+
 class TestRcsbApi:
     """Test RCSB API fetching with mocked HTTP requests."""
 
-    @patch("bocoflow_nodes.pdb_fasta_biopython.core.requests.get")
+    @patch("pdb_fasta_biopython.core.requests.get")
     def test_fetch_pdb_success(self, mock_get):
         mock_resp = MagicMock()
         mock_resp.status_code = 200
@@ -86,7 +93,7 @@ class TestRcsbApi:
         mock_get.assert_called_once()
         assert "3LZ0" in mock_get.call_args[0][0]
 
-    @patch("bocoflow_nodes.pdb_fasta_biopython.core.requests.get")
+    @patch("pdb_fasta_biopython.core.requests.get")
     def test_fetch_pdb_not_found(self, mock_get):
         mock_resp = MagicMock()
         mock_resp.status_code = 404
@@ -95,7 +102,7 @@ class TestRcsbApi:
         with pytest.raises(ValueError, match="Failed to fetch PDB"):
             fetch_pdb_from_rcsb("ZZZZ")
 
-    @patch("bocoflow_nodes.pdb_fasta_biopython.core.requests.get")
+    @patch("pdb_fasta_biopython.core.requests.get")
     def test_fetch_fasta_success(self, mock_get):
         mock_resp = MagicMock()
         mock_resp.status_code = 200
@@ -107,7 +114,7 @@ class TestRcsbApi:
         assert ">3LZ0" in result
         mock_get.assert_called_once()
 
-    @patch("bocoflow_nodes.pdb_fasta_biopython.core.requests.get")
+    @patch("pdb_fasta_biopython.core.requests.get")
     def test_fetch_fasta_not_found(self, mock_get):
         mock_resp = MagicMock()
         mock_resp.status_code = 404
@@ -116,7 +123,7 @@ class TestRcsbApi:
         with pytest.raises(ValueError, match="Failed to fetch FASTA"):
             fetch_fasta_from_rcsb("ZZZZ")
 
-    @patch("bocoflow_nodes.pdb_fasta_biopython.core.requests.get")
+    @patch("pdb_fasta_biopython.core.requests.get")
     def test_fetch_pdb_case_insensitive(self, mock_get):
         """PDB ID should be uppercased in the URL."""
         mock_resp = MagicMock()
@@ -133,6 +140,7 @@ class TestRcsbApi:
 # ---------------------------------------------------------------------------
 # Tests: PDB parsing (real data)
 # ---------------------------------------------------------------------------
+
 
 class TestPdbParsing:
     """Test PDB parsing with real 3LZ0 demo data."""
@@ -185,18 +193,19 @@ class TestPdbParsing:
         valid_na = set("ACGTUX")
         for cid, info in chains_3lz0.items():
             if info.chain_type == "protein":
-                assert all(c in valid_aa for c in info.sequence), (
-                    f"Chain {cid} has invalid AA: {info.sequence}"
-                )
+                assert all(
+                    c in valid_aa for c in info.sequence
+                ), f"Chain {cid} has invalid AA: {info.sequence}"
             else:
-                assert all(c in valid_na for c in info.sequence), (
-                    f"Chain {cid} has invalid NA: {info.sequence}"
-                )
+                assert all(
+                    c in valid_na for c in info.sequence
+                ), f"Chain {cid} has invalid NA: {info.sequence}"
 
 
 # ---------------------------------------------------------------------------
 # Tests: Missing residues
 # ---------------------------------------------------------------------------
+
 
 class TestMissingResidues:
     """Test missing residues extraction."""
@@ -220,13 +229,12 @@ class TestMissingResidues:
 # Tests: FASTA writing
 # ---------------------------------------------------------------------------
 
+
 class TestFastaWriting:
     """Test FASTA file output."""
 
     def test_write_split_chains(self, chains_3lz0, output_dir):
-        files = write_fasta_files(
-            chains_3lz0, output_dir, "3lz0", split_chains=True
-        )
+        files = write_fasta_files(chains_3lz0, output_dir, "3lz0", split_chains=True)
         # Should have one file per chain
         assert len(files) == len(chains_3lz0)
         for label, path in files.items():
@@ -236,9 +244,7 @@ class TestFastaWriting:
             assert content.startswith(">")
 
     def test_write_combined(self, chains_3lz0, output_dir):
-        files = write_fasta_files(
-            chains_3lz0, output_dir, "3lz0", split_chains=False
-        )
+        files = write_fasta_files(chains_3lz0, output_dir, "3lz0", split_chains=False)
         assert "combined" in files
         combined_path = files["combined"]
         assert os.path.exists(combined_path)
@@ -254,12 +260,16 @@ class TestFastaWriting:
         }
         files = write_fasta_files(chains, output_dir, "test_case", split_chains=True)
         assert "chain_A" in files
-        assert "test_case_chain_A.fasta" in files["chain_A"]
+        # chain_<id>.fasta, as the package README and the walkthrough list. It was
+        # <case>_chain_<id>.fasta before pdbmdauto; gen_ali's scan still looks for
+        # "_chain_" in the name, so it finds none of these files.
+        assert os.path.basename(files["chain_A"]) == "chain_A.fasta"
 
 
 # ---------------------------------------------------------------------------
 # Tests: Missing residues CSV writing
 # ---------------------------------------------------------------------------
+
 
 class TestMissingResiduesCsv:
     """Test CSV output for missing residues."""

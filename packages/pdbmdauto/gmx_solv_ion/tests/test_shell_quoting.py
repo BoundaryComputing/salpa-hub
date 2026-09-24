@@ -39,7 +39,11 @@ import sys
 
 import pytest
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# The package root, so `gmx_solv_ion` imports as a package from any working directory.
+# This used to insert the node directory, which made the import below work only when
+# pytest happened to run from the package root.
+PACKAGE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, PACKAGE)
 
 from gmx_solv_ion import core  # noqa: E402
 

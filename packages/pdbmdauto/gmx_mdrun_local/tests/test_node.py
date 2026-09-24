@@ -142,10 +142,16 @@ class TestNodeOptions:
             "num_threads",
             "max_warnings",
             "verbose",
-            "force_to_run",
         ]
         for opt in required:
             assert opt in GmxMdRunLocal.OPTIONS, f"Missing option: {opt}"
+
+    def test_force_to_run_is_inherited_not_declared(self):
+        """force_to_run comes from Node.BASE_OPTIONS; a node must not redeclare it."""
+        from bocoflow_core.node import Node
+
+        assert "force_to_run" in Node.BASE_OPTIONS
+        assert "force_to_run" not in GmxMdRunLocal.OPTIONS
 
     def test_run_label_default(self):
         """Test run_label has correct default value."""
@@ -221,6 +227,7 @@ class TestExecuteParameterExtraction:
             "input_gro_file": make_var("/path/to/conf.gro"),
             "input_mdp_file": make_var("/path/to/nvt.mdp"),
             "input_ndx_file": make_var(None),
+            "output_folder": make_var(""),
             "num_threads": make_var(4),
             "max_warnings": make_var(5),
             "verbose": make_var(True),
@@ -231,19 +238,22 @@ class TestExecuteParameterExtraction:
     def test_execute_extracts_run_label(self, mock_resolve, mock_flow_vars):
         """Test that execute extracts run_label correctly."""
         # Patch the core functions at module level
-        with patch.object(node_module, "check_gromacs_available", return_value=True), patch.object(
-            node_module,
-            "run_md_simulation",
-            return_value=MagicMock(
-                success=True,
-                message="OK",
-                tpr_file=None,
-                gro_file=None,
-                xtc_file=None,
-                edr_file=None,
-                log_file=None,
-            ),
-        ) as mock_sim:
+        with (
+            patch.object(node_module, "check_gromacs_available", return_value=True),
+            patch.object(
+                node_module,
+                "run_md_simulation",
+                return_value=MagicMock(
+                    success=True,
+                    message="OK",
+                    tpr_file=None,
+                    gro_file=None,
+                    xtc_file=None,
+                    edr_file=None,
+                    log_file=None,
+                ),
+            ) as mock_sim,
+        ):
             node_info = create_mock_node_info()
             node = GmxMdRunLocal(node_info)
             node.format_output_path = lambda x: x
@@ -257,19 +267,22 @@ class TestExecuteParameterExtraction:
     @patch.object(GmxMdRunLocal, "resolve_path", side_effect=lambda x: x)
     def test_execute_extracts_num_threads(self, mock_resolve, mock_flow_vars):
         """Test that execute extracts num_threads correctly."""
-        with patch.object(node_module, "check_gromacs_available", return_value=True), patch.object(
-            node_module,
-            "run_md_simulation",
-            return_value=MagicMock(
-                success=True,
-                message="OK",
-                tpr_file=None,
-                gro_file=None,
-                xtc_file=None,
-                edr_file=None,
-                log_file=None,
-            ),
-        ) as mock_sim:
+        with (
+            patch.object(node_module, "check_gromacs_available", return_value=True),
+            patch.object(
+                node_module,
+                "run_md_simulation",
+                return_value=MagicMock(
+                    success=True,
+                    message="OK",
+                    tpr_file=None,
+                    gro_file=None,
+                    xtc_file=None,
+                    edr_file=None,
+                    log_file=None,
+                ),
+            ) as mock_sim,
+        ):
             node_info = create_mock_node_info()
             node = GmxMdRunLocal(node_info)
             node.format_output_path = lambda x: x
@@ -304,6 +317,7 @@ class TestExecuteErrorHandling:
             "input_gro_file": make_var("/path/to/conf.gro"),
             "input_mdp_file": make_var("/path/to/md.mdp"),
             "input_ndx_file": make_var(None),
+            "output_folder": make_var(""),
             "num_threads": make_var(0),
             "max_warnings": make_var(10),
             "verbose": make_var(True),
@@ -324,12 +338,15 @@ class TestExecuteErrorHandling:
     @patch.object(GmxMdRunLocal, "resolve_path", side_effect=lambda x: x)
     def test_simulation_failure_raises_exception(self, mock_resolve, mock_flow_vars):
         """Test that simulation failure raises NodeException."""
-        with patch.object(node_module, "check_gromacs_available", return_value=True), patch.object(
-            node_module,
-            "run_md_simulation",
-            return_value=MagicMock(
-                success=False,
-                message="grompp failed: Error in topology",
+        with (
+            patch.object(node_module, "check_gromacs_available", return_value=True),
+            patch.object(
+                node_module,
+                "run_md_simulation",
+                return_value=MagicMock(
+                    success=False,
+                    message="grompp failed: Error in topology",
+                ),
             ),
         ):
             node_info = create_mock_node_info()
@@ -366,6 +383,7 @@ class TestExecuteResultFormatting:
             "input_gro_file": make_var("/work/conf.gro"),
             "input_mdp_file": make_var("/work/md.mdp"),
             "input_ndx_file": make_var(None),
+            "output_folder": make_var(""),
             "num_threads": make_var(8),
             "max_warnings": make_var(10),
             "verbose": make_var(True),
@@ -375,17 +393,20 @@ class TestExecuteResultFormatting:
     @patch.object(GmxMdRunLocal, "resolve_path", side_effect=lambda x: x)
     def test_result_is_valid_json(self, mock_resolve, mock_flow_vars):
         """Test that execute returns valid JSON."""
-        with patch.object(node_module, "check_gromacs_available", return_value=True), patch.object(
-            node_module,
-            "run_md_simulation",
-            return_value=MagicMock(
-                success=True,
-                message="Completed",
-                tpr_file="/work/production.tpr",
-                gro_file="/work/production.gro",
-                xtc_file=None,
-                edr_file=None,
-                log_file="/work/production.log",
+        with (
+            patch.object(node_module, "check_gromacs_available", return_value=True),
+            patch.object(
+                node_module,
+                "run_md_simulation",
+                return_value=MagicMock(
+                    success=True,
+                    message="Completed",
+                    tpr_file="/work/production.tpr",
+                    gro_file="/work/production.gro",
+                    xtc_file=None,
+                    edr_file=None,
+                    log_file="/work/production.log",
+                ),
             ),
         ):
             node_info = create_mock_node_info()
@@ -401,17 +422,20 @@ class TestExecuteResultFormatting:
     @patch.object(GmxMdRunLocal, "resolve_path", side_effect=lambda x: x)
     def test_result_contains_required_fields(self, mock_resolve, mock_flow_vars):
         """Test that result contains required fields."""
-        with patch.object(node_module, "check_gromacs_available", return_value=True), patch.object(
-            node_module,
-            "run_md_simulation",
-            return_value=MagicMock(
-                success=True,
-                message="Completed",
-                tpr_file="/work/production.tpr",
-                gro_file="/work/production.gro",
-                xtc_file=None,
-                edr_file=None,
-                log_file=None,
+        with (
+            patch.object(node_module, "check_gromacs_available", return_value=True),
+            patch.object(
+                node_module,
+                "run_md_simulation",
+                return_value=MagicMock(
+                    success=True,
+                    message="Completed",
+                    tpr_file="/work/production.tpr",
+                    gro_file="/work/production.gro",
+                    xtc_file=None,
+                    edr_file=None,
+                    log_file=None,
+                ),
             ),
         ):
             node_info = create_mock_node_info()
@@ -430,17 +454,20 @@ class TestExecuteResultFormatting:
     @patch.object(GmxMdRunLocal, "resolve_path", side_effect=lambda x: x)
     def test_result_data_contains_case_name(self, mock_resolve, mock_flow_vars):
         """Test that result data contains case_name."""
-        with patch.object(node_module, "check_gromacs_available", return_value=True), patch.object(
-            node_module,
-            "run_md_simulation",
-            return_value=MagicMock(
-                success=True,
-                message="OK",
-                tpr_file=None,
-                gro_file=None,
-                xtc_file=None,
-                edr_file=None,
-                log_file=None,
+        with (
+            patch.object(node_module, "check_gromacs_available", return_value=True),
+            patch.object(
+                node_module,
+                "run_md_simulation",
+                return_value=MagicMock(
+                    success=True,
+                    message="OK",
+                    tpr_file=None,
+                    gro_file=None,
+                    xtc_file=None,
+                    edr_file=None,
+                    log_file=None,
+                ),
             ),
         ):
             node_info = create_mock_node_info()
@@ -478,6 +505,7 @@ class TestPredecessorDataHandling:
             "input_gro_file": make_var("/path/to/conf.gro"),
             "input_mdp_file": make_var("/path/to/md.mdp"),
             "input_ndx_file": make_var(None),
+            "output_folder": make_var(""),
             "num_threads": make_var(0),
             "max_warnings": make_var(10),
             "verbose": make_var(True),
@@ -487,17 +515,20 @@ class TestPredecessorDataHandling:
     @patch.object(GmxMdRunLocal, "resolve_path", side_effect=lambda x: x)
     def test_case_name_from_predecessor(self, mock_resolve, mock_flow_vars_no_case):
         """Test that case_name falls back to predecessor data."""
-        with patch.object(node_module, "check_gromacs_available", return_value=True), patch.object(
-            node_module,
-            "run_md_simulation",
-            return_value=MagicMock(
-                success=True,
-                message="OK",
-                tpr_file=None,
-                gro_file=None,
-                xtc_file=None,
-                edr_file=None,
-                log_file=None,
+        with (
+            patch.object(node_module, "check_gromacs_available", return_value=True),
+            patch.object(
+                node_module,
+                "run_md_simulation",
+                return_value=MagicMock(
+                    success=True,
+                    message="OK",
+                    tpr_file=None,
+                    gro_file=None,
+                    xtc_file=None,
+                    edr_file=None,
+                    log_file=None,
+                ),
             ),
         ):
             node_info = create_mock_node_info()
@@ -512,19 +543,24 @@ class TestPredecessorDataHandling:
             assert result["data"]["case_name"] == "from_predecessor"
 
     @patch.object(GmxMdRunLocal, "resolve_path", side_effect=lambda x: x)
-    def test_default_case_name_when_no_predecessor(self, mock_resolve, mock_flow_vars_no_case):
+    def test_default_case_name_when_no_predecessor(
+        self, mock_resolve, mock_flow_vars_no_case
+    ):
         """Test default case_name when no predecessor data."""
-        with patch.object(node_module, "check_gromacs_available", return_value=True), patch.object(
-            node_module,
-            "run_md_simulation",
-            return_value=MagicMock(
-                success=True,
-                message="OK",
-                tpr_file=None,
-                gro_file=None,
-                xtc_file=None,
-                edr_file=None,
-                log_file=None,
+        with (
+            patch.object(node_module, "check_gromacs_available", return_value=True),
+            patch.object(
+                node_module,
+                "run_md_simulation",
+                return_value=MagicMock(
+                    success=True,
+                    message="OK",
+                    tpr_file=None,
+                    gro_file=None,
+                    xtc_file=None,
+                    edr_file=None,
+                    log_file=None,
+                ),
             ),
         ):
             node_info = create_mock_node_info()
@@ -561,6 +597,7 @@ class TestCoreIntegration:
             "input_gro_file": make_var("/sim/start.gro"),
             "input_mdp_file": make_var("/sim/em.mdp"),
             "input_ndx_file": make_var("/sim/index.ndx"),
+            "output_folder": make_var(""),
             "num_threads": make_var(2),
             "max_warnings": make_var(3),
             "verbose": make_var(False),
@@ -570,19 +607,22 @@ class TestCoreIntegration:
     @patch.object(GmxMdRunLocal, "resolve_path", side_effect=lambda x: x)
     def test_core_function_called_with_correct_args(self, mock_resolve, mock_flow_vars):
         """Test that core function is called with all correct arguments."""
-        with patch.object(node_module, "check_gromacs_available", return_value=True), patch.object(
-            node_module,
-            "run_md_simulation",
-            return_value=MagicMock(
-                success=True,
-                message="OK",
-                tpr_file=None,
-                gro_file=None,
-                xtc_file=None,
-                edr_file=None,
-                log_file=None,
-            ),
-        ) as mock_sim:
+        with (
+            patch.object(node_module, "check_gromacs_available", return_value=True),
+            patch.object(
+                node_module,
+                "run_md_simulation",
+                return_value=MagicMock(
+                    success=True,
+                    message="OK",
+                    tpr_file=None,
+                    gro_file=None,
+                    xtc_file=None,
+                    edr_file=None,
+                    log_file=None,
+                ),
+            ) as mock_sim,
+        ):
             node_info = create_mock_node_info()
             node = GmxMdRunLocal(node_info)
             node.format_output_path = lambda x: x

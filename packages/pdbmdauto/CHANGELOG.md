@@ -4,6 +4,23 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 versions are the `[package].version` in `package.toml`, which is what the Marketplace's Updates tab
 compares against.
 
+## [1.2.3] — 2026-09-24
+
+The package's own tests. No node changed. `pixi.toml` changed, so an installed environment is
+rebuilt once.
+
+### Fixed
+- **`pixi run test` runs every test in the package.** It ran only the 10 tests in the package's
+  own `tests/`, in an environment without the node-authoring API, so none of the 214 tests in the
+  nodes' own `tests/` ran. It now runs all of them, from the package root, in the `test`
+  environment; `pytest.ini` lists them. The `dev` environment, which only that task used, is gone.
+- **Three node test files load again.** pdb2pqr's and pdb_fasta_biopython's imported their nodes
+  through a module layout the app no longer installs. gmx_solv_ion's worked only when run from the
+  package root.
+- **Thirteen tests that had drifted from their nodes are updated.** They now expect the options
+  and output locations the nodes have: the inherited `force_to_run`, gmx_mdrun_local's
+  `output_folder`, pdb_fasta_biopython's case folder, and its `chain_<id>.fasta` file names.
+
 ## [1.2.2] — 2026-09-24
 
 Two node fixes and two corrections to what the package says. The environment is unchanged, so
