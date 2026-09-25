@@ -17,13 +17,14 @@ paywalled.
 
 ## metalparm-vwf
 
-- **License:** LGPL-2.1 — inherited from [easyPARM](https://github.com/abenmb/easyPARM).
+- **License:** LGPL-2.1 — inherited from [easyPARM](https://github.com/Abdelazim-Abdelgawwad/easyPARM).
 - **Attribution:** see [`packages/metalparm-vwf/NOTICE`](packages/metalparm-vwf/NOTICE).
   The bundled easyPARM scripts retain their original copyright/license headers; the
   node wrappers and metallopeptide fusion nodes are original metal-md work, also
   under LGPL-2.1.
 - **Upstream citation:** Abdelgawwad & Francés-Monerris, *easyPARM*, J. Chem. Theory
-  Comput. 2025, 21, 4, 1817–1830.
+  Comput. 2025, 21, 4, 1817–1830,
+  [doi:10.1021/acs.jctc.4c01272](https://doi.org/10.1021/acs.jctc.4c01272).
 - **Platforms:** linux-64, osx-64, osx-arm64. **No Windows** — AmberTools has no
   Windows conda package (use Docker or WSL2).
 - **Third-party tools invoked (not redistributed):** AmberTools, ORCA (free for
