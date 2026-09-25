@@ -4,6 +4,30 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 versions are the `[package].version` in `package.toml`, which is what the Marketplace's Updates tab
 compares against.
 
+## [1.2.4] — 2026-09-25
+
+One node fix. The environment is unchanged, so nothing is rebuilt.
+
+### Fixed
+- **Generate Alignment checks the sequences it rebuilds.** It reported "Sequence agreement: all
+  match" without comparing anything. It looked for per-chain FASTA files under a name
+  pdb_fasta_biopython stopped writing on 2026-03-31, and those files hold only the residues that
+  have coordinates, so they could not have checked the rebuild anyway. It now compares each
+  chain's rebuilt sequence (the residues with coordinates plus those REMARK 465 lists as missing)
+  with the deposited sequence, which pdb_fasta_biopython saves as `{PDB_ID}_rcsb.fasta` when it
+  fetches a structure. It reports one of three results: every chain matches; a named chain
+  differs, as a warning that says where (the files are still written); or nothing was compared,
+  as for a structure opened from a local file. Across seven entries (4Z8J, 3LZ0, 9AYN, 3I2V, 1UBQ,
+  2HHB, 6LU7), 20 of 22 chains match, 11 of them with gaps filled, and the two that differ are
+  real differences.
+
+### Known issue
+- **A modified residue recorded as HETATM is not rebuilt.** Selenomethionine (MSE) is the common
+  case: 3I2V chain A is rebuilt one residue short, without residue 113, so what goes to ProMod3
+  does not describe the chain as deposited. The check now reports this as a mismatch; the
+  rebuild itself is unchanged. 6LU7 chain C, a peptide of non-standard residues, differs for the
+  same reason.
+
 ## [1.2.3] — 2026-09-24
 
 The package's own tests. No node changed. `pixi.toml` changed, so an installed environment is

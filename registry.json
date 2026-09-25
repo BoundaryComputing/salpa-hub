@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-09-25T05:18:20.556393+00:00",
+  "generated_at": "2026-09-25T11:40:37.507571+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
@@ -579,7 +579,7 @@
     },
     {
       "name": "pdbmdauto",
-      "version": "1.2.3",
+      "version": "1.2.4",
       "description": "Automated protein structure preparation for molecular dynamics \u2014 homology modeling, solvation, relaxation",
       "category": "Molecular Dynamics",
       "hashtags": [

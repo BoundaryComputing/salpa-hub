@@ -25,8 +25,10 @@ try:
     from .core import (
         extract_missing_from_pdb,
         extract_present_residues,
+        find_reference_fasta,
         process_all_chains,
         read_fasta_sequence,
+        read_reference_sequences,
     )
 except ImportError:
     # Stage 2. node_runner puts the node's directory on sys.path and imports
@@ -37,12 +39,15 @@ except ImportError:
         from core import (
             extract_missing_from_pdb,
             extract_present_residues,
+            find_reference_fasta,
             process_all_chains,
             read_fasta_sequence,
+            read_reference_sequences,
         )
     except ImportError:
         extract_missing_from_pdb = extract_present_residues = None
         process_all_chains = read_fasta_sequence = None
+        find_reference_fasta = read_reference_sequences = None
 
 class GenAli(Node):
     """
@@ -140,21 +145,38 @@ class GenAli(Node):
             chain_info = input_data.get("chain_info", {})
             chain_ids = sorted(chain_info.keys()) if chain_info else None
 
-            # Scan for missing residues CSVs and FASTA files
+            # Scan for missing residues CSVs
             missing_csv_paths = {}
-            fasta_paths = {}
             for f in os.listdir(output_dir):
                 if f.startswith("missing_residues_chain_") and f.endswith(".csv"):
                     chain_id = f.replace("missing_residues_chain_", "").replace(".csv", "")
                     missing_csv_paths[chain_id] = os.path.join(output_dir, f)
-                elif f.endswith(".fasta") and "_chain_" in f:
-                    chain_id = f.split("_chain_")[-1].replace(".fasta", "")
-                    fasta_paths[chain_id] = os.path.join(output_dir, f)
 
             if missing_csv_paths:
                 log_message(f"Found missing residues CSVs for chains: {sorted(missing_csv_paths.keys())}")
             else:
                 log_message("No missing residues CSVs found; will extract from PDB header")
+
+            # The reconstructed sequences are checked against the deposited ones,
+            # which pdb_fasta_biopython saves as {PDB_ID}_rcsb.fasta when it fetches
+            # the structure. Its chain_<id>.fasta files hold only the residues that
+            # have coordinates, so they cannot check the residues filled in here;
+            # this node looked for them under an older name and, finding none,
+            # reported "all match" without comparing anything.
+            reference_path = find_reference_fasta(output_dir, pdb_path)
+            reference_seqs = (
+                read_reference_sequences(reference_path) if reference_path else {}
+            )
+            if reference_path:
+                log_message(
+                    f"Checking sequences against {os.path.basename(reference_path)} "
+                    f"(chains {', '.join(sorted(reference_seqs)) or 'none'})"
+                )
+            else:
+                log_message(
+                    "No RCSB sequence file in the folder (it is saved only when the "
+                    "structure is fetched by PDB ID); sequences will not be checked"
+                )
 
             stream_log("Generating alignments", node_id=self.node_id, progress=40)
 
@@ -165,12 +187,29 @@ class GenAli(Node):
                 case_name=case_name,
                 chain_ids=chain_ids,
                 missing_csv_paths=missing_csv_paths if missing_csv_paths else None,
-                fasta_paths=fasta_paths if fasta_paths else None,
                 append_end=append_end,
+                reference_seqs=reference_seqs,
             )
 
             chain_results = processing_result["chain_results"]
             seq_agree_all = processing_result["seq_agree_all"]
+            mismatched = processing_result["mismatched_chains"]
+            not_compared = processing_result["not_compared_chains"]
+            matched = sorted(c for c, cr in chain_results.items() if cr.seq_agree)
+
+            # A mismatch is a warning, not a failure: the files are written, but a
+            # chain whose reconstruction differs from the deposited sequence will be
+            # modelled from a wrong alignment.
+            for chain_id in mismatched:
+                stream_log(
+                    f"Chain {chain_id}: the reconstructed sequence differs from the "
+                    f"deposited one ({chain_results[chain_id].seq_mismatch}). Its "
+                    f"alignment may be wrong. A common cause is a modified residue "
+                    f"recorded as HETATM, such as selenomethionine (MSE), which is "
+                    f"not reconstructed.",
+                    level="warning",
+                    node_id=self.node_id,
+                )
 
             stream_log("Writing output files", node_id=self.node_id, progress=80)
 
@@ -189,10 +228,11 @@ class GenAli(Node):
                     "start_resid": cr.start_resid,
                 }
 
+                check = {True: "match", False: "MISMATCH", None: "not compared"}
                 log_message(
                     f"Chain {chain_id}: {cr.num_present} present, "
                     f"{cr.num_missing} missing, type={cr.chain_type}, "
-                    f"agree={cr.seq_agree}"
+                    f"sequence check: {check[cr.seq_agree]}"
                 )
 
             # Preserve input PDB file reference
@@ -206,7 +246,14 @@ class GenAli(Node):
                 "pdb_chain_list": sorted(chain_results.keys()),
                 "chain_info": chain_info,  # Preserved from predecessor
                 "chain_alignment_results": chain_alignment_results,
+                # True, False, or None when nothing was compared.
                 "seq_agree_pdb_fasta": seq_agree_all,
+                "sequence_check": {
+                    "reference": os.path.basename(reference_path) if reference_path else None,
+                    "matched": matched,
+                    "mismatched": mismatched,
+                    "not_compared": not_compared,
+                },
             })
 
             result.metadata.update({
@@ -215,10 +262,27 @@ class GenAli(Node):
                 "execution_time": datetime.now().isoformat(),
             })
 
+            if mismatched:
+                check_summary = (
+                    f"Sequence check against RCSB: MISMATCH in chain(s) "
+                    f"{', '.join(mismatched)}; their alignments may be wrong (see the log)."
+                )
+            elif matched and not not_compared:
+                check_summary = f"Sequence check against RCSB: all {len(matched)} chain(s) match."
+            elif matched:
+                check_summary = (
+                    f"Sequence check against RCSB: {len(matched)} chain(s) match; "
+                    f"not compared: {', '.join(not_compared)}."
+                )
+            else:
+                check_summary = (
+                    "Sequences not checked: no RCSB sequence to compare against "
+                    "(saved only when the structure is fetched by PDB ID)."
+                )
+
             result.success = True
             result.message = (
-                f"Generated alignment files for {len(chain_results)} chain(s). "
-                f"Sequence agreement: {'all match' if seq_agree_all else 'MISMATCH detected'}"
+                f"Generated alignment files for {len(chain_results)} chain(s). {check_summary}"
             )
 
             stream_log(result.message, node_id=self.node_id, progress=100)

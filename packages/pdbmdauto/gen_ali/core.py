@@ -19,9 +19,12 @@ Where '-' marks positions of residues missing in the template structure.
 """
 
 import csv
+import glob
 import os
+import re
 import textwrap
 from dataclasses import dataclass, field
+from typing import Optional
 
 from Bio.Data.PDBData import protein_letters_3to1
 from Bio.PDB import PDBParser
@@ -62,9 +65,12 @@ class ChainAlignmentResult:
     num_present: int
     num_missing: int
     start_resid: int
-    seq_agree: bool  # Whether reconstructed seq matches FASTA
+    # Whether full_seq matches the deposited sequence: True or False, or None when
+    # there was no reference sequence for this chain, so nothing was compared.
+    seq_agree: Optional[bool]
     seq_file: str = ""  # Path to .seq file
     ali_file: str = ""  # Path to .ali file
+    seq_mismatch: str = ""  # How the two differ, when seq_agree is False
 
 
 # ---------------------------------------------------------------------------
@@ -220,6 +226,81 @@ def read_fasta_sequence(fasta_path: str) -> str:
     return "".join(sequence_lines)
 
 
+# RCSB's entry FASTA names the chains each sequence belongs to: "Chain A",
+# "Chains A, B", and "Chain B[auth C]" where the PDB file calls the chain C.
+_RCSB_CHAINS = re.compile(r"^>[^|]*\|Chains? ([^|]*)\|")
+_AUTH_CHAIN = re.compile(r"^\S+?\[auth (\S+)\]$")
+
+
+def read_reference_sequences(fasta_path: str) -> dict:
+    """Read the deposited sequence of every chain from an RCSB entry FASTA.
+
+    This is the file pdb_fasta_biopython saves as ``{PDB_ID}_rcsb.fasta`` when it
+    fetches a structure by PDB ID: one record per entity, headed like
+    ``>4Z8J_1|Chains A, B|name|organism``, holding the full sequence, residues
+    without coordinates included. A chain is keyed by the name the PDB file uses
+    (the author's), so ``B[auth C]`` gives chain ``C``.
+
+    Returns:
+        dict of chain_id -> sequence. Empty if the file names no chains.
+    """
+    sequences = {}
+    chains, lines = None, []
+
+    def keep():
+        if chains:
+            for chain_id in chains:
+                sequences[chain_id] = "".join(lines)
+
+    with open(fasta_path, "r") as f:
+        for raw in f:
+            line = raw.strip()
+            if line.startswith(">"):
+                keep()
+                match = _RCSB_CHAINS.match(line)
+                chains = []
+                if match:
+                    for token in match.group(1).split(","):
+                        token = token.strip()
+                        auth = _AUTH_CHAIN.match(token)
+                        chains.append(auth.group(1) if auth else token)
+                lines = []
+            elif line:
+                lines.append(line)
+    keep()
+    return sequences
+
+
+def find_reference_fasta(output_dir: str, pdb_path: str = "") -> Optional[str]:
+    """The RCSB sequence file for this structure in ``output_dir``, if there is one.
+
+    ``{stem}_rcsb.fasta`` for the PDB file's stem first; otherwise the only
+    ``*_rcsb.fasta`` in the folder. None when there is none, as when the
+    structure came from a local file, or when there are several to choose from.
+    """
+    if pdb_path:
+        stem = os.path.splitext(os.path.basename(pdb_path))[0]
+        named = os.path.join(output_dir, f"{stem}_rcsb.fasta")
+        if os.path.isfile(named):
+            return named
+    found = sorted(glob.glob(os.path.join(glob.escape(output_dir), "*_rcsb.fasta")))
+    return found[0] if len(found) == 1 else None
+
+
+def describe_mismatch(full_seq: str, reference: str) -> str:
+    """Say how a reconstructed sequence differs from the deposited one."""
+    position = next(
+        (i for i, (a, b) in enumerate(zip(full_seq, reference)) if a != b),
+        min(len(full_seq), len(reference)),
+    )
+    here = full_seq[position] if position < len(full_seq) else "end"
+    there = reference[position] if position < len(reference) else "end"
+    return (
+        f"reconstructed {len(full_seq)} residues, deposited {len(reference)}; "
+        f"first difference at position {position + 1}: {here} here, {there} deposited"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Alignment generation
 # ---------------------------------------------------------------------------
@@ -275,10 +356,14 @@ def generate_chain_alignment(
     full_seq = "".join(full_seq_chars)
     template_seq = "".join(template_seq_chars)
 
-    # Validate against FASTA if provided
-    seq_agree = True
+    # Check against the deposited sequence, when there is one. It used to default
+    # to True, so a chain with nothing to compare against read as a match.
+    seq_agree = None
+    seq_mismatch = ""
     if fasta_sequence:
         seq_agree = full_seq == fasta_sequence
+        if not seq_agree:
+            seq_mismatch = describe_mismatch(full_seq, fasta_sequence)
 
     # Append end marker
     if append_end:
@@ -298,6 +383,7 @@ def generate_chain_alignment(
         num_missing=num_missing,
         start_resid=start_resid,
         seq_agree=seq_agree,
+        seq_mismatch=seq_mismatch,
     )
 
 
@@ -464,6 +550,7 @@ def process_all_chains(
     missing_csv_paths: dict = None,
     fasta_paths: dict = None,
     append_end: bool = True,
+    reference_seqs: dict = None,
 ) -> dict:
     """Process all chains in a PDB: extract data, generate alignments, write files.
 
@@ -473,13 +560,19 @@ def process_all_chains(
         case_name: Case identifier.
         chain_ids: Optional list of chain IDs to process (default: all).
         missing_csv_paths: Optional dict of chain_id -> CSV path (from predecessor).
-        fasta_paths: Optional dict of chain_id -> FASTA path (for validation).
+        fasta_paths: Optional dict of chain_id -> FASTA path holding that chain's
+            full sequence, first record (for validation).
         append_end: Whether to append '*' terminator.
+        reference_seqs: Optional dict of chain_id -> full deposited sequence
+            (read_reference_sequences). Wins over fasta_paths for a chain in both.
 
     Returns:
         dict with keys:
             - chain_results: dict of chain_id -> ChainAlignmentResult
-            - seq_agree_all: bool (True if all chains agree)
+            - seq_agree_all: True if every compared chain agrees, False if any
+              differs, None if no chain had a reference to compare against
+            - mismatched_chains: sorted chain ids whose sequence differs
+            - not_compared_chains: sorted chain ids with no reference
     """
     # Extract present residues from PDB
     present_by_chain = extract_present_residues(pdb_path, case_name)
@@ -505,6 +598,8 @@ def process_all_chains(
         for chain_id, fasta_path in fasta_paths.items():
             if os.path.exists(fasta_path):
                 fasta_seqs[chain_id] = read_fasta_sequence(fasta_path)
+    if reference_seqs:
+        fasta_seqs.update(reference_seqs)
 
     # Process each chain
     chain_results = {}
@@ -523,9 +618,12 @@ def process_all_chains(
         )
         chain_results[chain_id] = result
 
-    seq_agree_all = all(r.seq_agree for r in chain_results.values())
+    compared = {c: r.seq_agree for c, r in chain_results.items() if r.seq_agree is not None}
+    seq_agree_all = all(compared.values()) if compared else None
 
     return {
         "chain_results": chain_results,
         "seq_agree_all": seq_agree_all,
+        "mismatched_chains": sorted(c for c, agree in compared.items() if not agree),
+        "not_compared_chains": sorted(c for c in chain_results if c not in compared),
     }
