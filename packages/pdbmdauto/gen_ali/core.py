@@ -84,6 +84,26 @@ _NUCLEOTIDE_MAP = {
 }
 
 
+def read_modres(pdb_path: str) -> dict:
+    """The modified residues a PDB file's MODRES records declare, with their standard parents.
+
+    Returns:
+        dict of (chain_id, resid) -> (modified name, standard parent name),
+        e.g. ("A", 113) -> ("MSE", "MET").
+    """
+    modres = {}
+    with open(pdb_path, "r", errors="replace") as f:
+        for line in f:
+            if not line.startswith("MODRES"):
+                continue
+            try:
+                resid = int(line[18:22])
+            except ValueError:
+                continue
+            modres[(line[16:17], resid)] = (line[12:15].strip(), line[24:27].strip())
+    return modres
+
+
 def extract_present_residues(pdb_path: str, case_name: str = "structure") -> dict:
     """Extract residues present in a PDB structure, per chain.
 
@@ -96,6 +116,7 @@ def extract_present_residues(pdb_path: str, case_name: str = "structure") -> dic
     """
     parser = PDBParser(PERMISSIVE=1, QUIET=True)
     structure = parser.get_structure(case_name, pdb_path)
+    modres = read_modres(pdb_path)
 
     chains = {}
     for model in structure:
@@ -108,9 +129,17 @@ def extract_present_residues(pdb_path: str, case_name: str = "structure") -> dic
                 resname = residue.get_resname().strip()
                 resid = residue.get_full_id()[3][1]
 
-                # Skip water and non-standard HETATM
+                # A HETATM residue that the file's MODRES records declare as a
+                # modified residue (selenomethionine, MSE, above all) is part of
+                # the chain: rebuild it as its standard parent, which is how
+                # OpenStructure reads it in the template ProMod3 attaches. Skipped,
+                # the chain came out short and ProMod3 stopped on the mismatch.
+                # Water, ligands and undeclared modifications stay out.
                 if hetflag not in (" ", ""):
-                    continue
+                    declared = modres.get((chain_id, resid))
+                    if not declared or declared[0] != resname:
+                        continue
+                    resname = declared[1]
 
                 # DNA/RNA: 2-letter codes
                 if len(resname) <= 2 and resname in _NUCLEOTIDE_MAP:

@@ -4,6 +4,22 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 versions are the `[package].version` in `package.toml`, which is what the Marketplace's Updates tab
 compares against.
 
+## [1.2.5] — 2026-09-25
+
+One node fix. The environment is unchanged, so nothing is rebuilt.
+
+### Fixed
+- **Generate Alignment rebuilds a modified residue that the PDB file declares.** A HETATM
+  residue that the file's MODRES records name as a modified form of a standard one is now part of
+  the chain, rebuilt as its parent. Selenomethionine (MSE) is the common case, and it becomes M.
+  Such residues used to be skipped, so the chain came out one residue short, and Fix Residues then
+  stopped with ProMod3's "Alignment-structure mismatch", because OpenStructure reads the template's
+  MSE as M. On 3I2V chain A, the rebuild now has 127 residues and matches the deposited sequence.
+  ProMod3 builds a model with that sequence, and a standard MET at that position, which GROMACS
+  accepts. Across the seven entries 1.2.4 was checked on, 21 of 22 chains now match. A HETATM
+  residue that MODRES does not declare still stays out, with 1.2.4's warning; 6LU7 chain C, a
+  peptide of non-standard residues, is one.
+
 ## [1.2.4] — 2026-09-25
 
 One node fix. The environment is unchanged, so nothing is rebuilt.
