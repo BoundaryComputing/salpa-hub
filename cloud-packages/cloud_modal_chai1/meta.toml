@@ -1,10 +1,10 @@
-# Cloud Modal Chai-1 - Mode B (BoCoFlow Credits)
+# Cloud Modal Chai-1 - a Salpa Compute node
 # Multi-modal structure prediction using Chai-1 on Modal H100 GPU
-# This is a client stub that calls the API Gateway, not Modal directly.
+# This is a client stub that calls the Salpa Compute gateway, not Modal directly.
 
 [package]
 name = "cloud-modal-chai1"
-version = "1.0.4"
+version = "1.0.5"
 description = "Multi-modal structure prediction using Chai-1 on Modal H100 GPU"
 author = "BoundaryComputing"
 license = "MIT"
@@ -19,7 +19,7 @@ num_in = 1
 num_out = 1
 color = "purple"
 
-# cloud-modal hashtag indicates Mode B (BoCoFlow credits)
+# cloud-modal hashtag indicates a Salpa Compute node on Modal
 # UI can use this to show cloud/credits indicator
 hashtags = [
     "cloud-modal",
@@ -35,6 +35,11 @@ hashtags = [
 
 [node.metadata]
 icon = "🧬"
+
+[node.features]
+# The timeout a new node starts with (seconds): Chai-1's 15-minute limit, a cold start and the download.
+# A node already saved in a workflow keeps the timeout it was saved with.
+default_timeout = 1500
 
 [node.cloud]
 provider = "modal"
@@ -61,7 +66,10 @@ It can predict 3D structures of:
 - Multi-chain complexes
 
 Input: FASTA-format with entity type annotations, or simple protein sequence
-Output: 3D structure predictions in CIF format (5 diffusion samples)
+Output: 3D structure predictions in CIF format (5 diffusion samples), saved
+with the best sample and its scores in the workflow folder. A result too large
+for the reply is downloaded from Salpa Compute and then deleted there; an
+archive nobody downloads is deleted within 24 hours.
 
 Example FASTA input:
 >protein|name=example

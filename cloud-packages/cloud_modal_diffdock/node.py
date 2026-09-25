@@ -1,22 +1,18 @@
 """
-Cloud Modal DiffDock - Mode B (BoCoFlow Credits)
+Cloud Modal DiffDock — a Salpa Compute node.
 
-Blind protein-ligand docking using DiffDock on Modal's A10G GPU infrastructure.
+Blind protein-ligand docking using DiffDock on an A10G GPU.
 
-This node is a client stub that calls the BoCoFlow API Gateway,
-which then routes requests to Modal endpoints with Proxy Auth tokens.
+This node is a client stub. It sends the protein and ligand to the Salpa Compute gateway,
+which checks the user's sign-in and quota and runs DiffDock on Modal. No Modal account is
+needed.
 
-Unlike modal-user nodes (Mode A), users don't need their own Modal account.
-Instead, they pay with BoCoFlow credits.
-
-Architecture:
-    1. User authenticates with Firebase (token in BOCOFLOW_CLOUD_AUTH_TOKEN)
-    2. This node sends protein PDB + ligand to API Gateway with Firebase token
-    3. API Gateway verifies token, checks credits
-    4. API Gateway calls Modal with Proxy Auth tokens
-    5. DiffDock runs on A10G GPU, returns ranked docking poses
-    6. Result (tarball with SDF files) returns through this node
-    7. Credits are deducted from user's account
+How the result comes back:
+    - A result that fits in the reply (up to 16 MiB compressed, every run so far) arrives
+      whole.
+    - A larger one arrives as its SDF poses plus a link to the full archive. The node
+      downloads the archive into the workflow folder, checks its size and SHA-256, and
+      then has the server copy deleted. Salpa Compute never keeps it longer than 24 hours.
 
 IMPORTANT — Cold Start Warning:
     The first call after the GPU container scales to zero takes ~10 minutes
@@ -30,16 +26,15 @@ IMPORTANT — Cold Start Warning:
 Reference: Corso et al., ICLR 2023 (MIT License)
 """
 
-import base64
-import io
 import os
+import sys
 import tarfile
 from datetime import datetime
+from pathlib import Path
 
 import requests
 from bocoflow_core.logger import log_message
 from bocoflow_core.node import Node, NodeResult
-from bocoflow_core.stream_logger import post_with_progress, stream_log
 from bocoflow_core.parameters import (
     FileParameterEdit,
     FolderParameter,
@@ -47,14 +42,59 @@ from bocoflow_core.parameters import (
     StringParameter,
     TextParameter,
 )
+from bocoflow_core.stream_logger import post_with_progress, stream_log
+
+try:  # loaded as a package: node_runner, the server, tests
+    from . import _salpa_compute as sc
+except ImportError:
+    try:  # the node's folder is on sys.path
+        import _salpa_compute as sc
+    except ImportError:  # anything else: load the file that sits beside this one
+        import importlib.util
+
+        _spec = importlib.util.spec_from_file_location(
+            "_salpa_compute_cloud_modal_diffdock",
+            str(Path(__file__).with_name("_salpa_compute.py")),
+        )
+        sc = importlib.util.module_from_spec(_spec)
+        sys.modules[_spec.name] = sc
+        _spec.loader.exec_module(sc)
+
+#: Sent with every request, so the gateway records which version of this node called it.
+PACKAGE_NAME = "cloud-modal-diffdock"
+PACKAGE_VERSION = "1.0.3"
+SERVICE = "modal-diffdock"
+#: The timeout a run needs: DiffDock's 15-minute limit, a cold start, and the download.
+RECOMMENDED_TIMEOUT = 1500
+#: The gateway stops waiting for DiffDock at 900 s; wait a minute more for its answer.
+SERVICE_MAX_WAIT = 960
+
+
+def _main_files(names, folder, prefix):
+    """{member name: destination} for every SDF pose, and the top pose's destination."""
+    picks = {}
+    top = None
+    for name in names:
+        if not name.endswith(".sdf"):
+            continue
+        base = sc.safe_name(name)
+        dest = folder / f"{prefix}_{base}"
+        if dest in picks.values():
+            continue  # two complexes with the same pose name: keep the first
+        picks[name] = dest
+        if top is None and base.startswith("rank1"):
+            top = dest
+        if base == "rank1.sdf":
+            top = dest
+    return picks, top
 
 
 class CloudModalDiffdock(Node):
     """
-    DiffDock Blind Protein-Ligand Docking (BoCoFlow Credits - Mode B).
+    DiffDock blind protein-ligand docking on Salpa Compute (A10G GPU).
 
-    This is a CLIENT STUB - actual computation happens on Modal cloud (A10G GPU).
-    The workflow engine executes this node, which calls the API Gateway.
+    This is a client stub: the docking runs in the cloud, and this node sends the input
+    and saves the ranked poses into the workflow folder.
 
     DiffDock is a generative diffusion model that predicts how small molecules
     bind to protein targets — a critical step in drug discovery pipelines.
@@ -65,23 +105,16 @@ class CloudModalDiffdock(Node):
     - NOT suitable for batch processing of many protein-ligand pairs
 
     Prerequisites:
-    - User must be logged in with Firebase
-    - User must have sufficient BoCoFlow credits
+    - The user is signed in to Salpa.
+    - The user's Salpa Compute quota is not used up.
 
-    No Modal account or 'modal setup' required!
+    No Modal account or 'modal setup' is needed.
     """
 
     # NOTE: Metadata (name, hashtags, num_in, num_out) comes from meta.toml.
-    # NOTE: EXECUTION_STRATEGY and ENVIRONMENT are auto-detected from pixi.toml.
-
-    # API Gateway endpoint (unified route — not Modal directly!)
-    API_ENDPOINT = (
-        os.environ.get(
-            "BOCOFLOW_CLOUD_API_URL",
-            "https://bocoflow-api-gateway-823406908684.us-central1.run.app",
-        )
-        + "/api/cloud/nodes/modal-diffdock/execute"
-    )
+    # NOTE: EXECUTION_STRATEGY and ENVIRONMENT are auto-detected via shared_environment in meta.toml.
+    # NOTE: The gateway address is read when the node runs (_salpa_compute.api_base), so
+    #       BOCOFLOW_CLOUD_API_URL set after import still counts.
 
     OPTIONS = {
         "protein_pdb_file": FileParameterEdit(
@@ -119,7 +152,8 @@ class CloudModalDiffdock(Node):
             "Output Folder",
             default="",
             docstring=(
-                "Folder for output files. Leave empty to use the workflow's working directory. "
+                "Folder for output files. Leave empty to use the workflow's folder; a "
+                "relative folder is placed inside it. "
                 "Outputs: {prefix}.tar.gz and extracted SDF pose files"
             ),
         ),
@@ -147,11 +181,12 @@ class CloudModalDiffdock(Node):
     }
 
     def execute(self, predecessor_data, flow_vars):
-        """Execute by calling the API Gateway (which calls Modal)."""
+        """Send the input to Salpa Compute and save what comes back."""
         stream_log(
-            "Starting DiffDock cloud execution... "
+            "Starting DiffDock on Salpa Compute... "
             "First call may take ~10 min (cold start). Warm calls take ~40s.",
-            node_id=self.node_id, progress=0,
+            node_id=self.node_id,
+            progress=0,
         )
 
         result = NodeResult()
@@ -164,16 +199,11 @@ class CloudModalDiffdock(Node):
             }
         )
 
-        # Get auth token from environment (injected by BF2 worker)
+        # The worker passes the signed-in user's token in this variable.
         auth_token = os.environ.get("BOCOFLOW_CLOUD_AUTH_TOKEN")
-
         if not auth_token:
             result.success = False
-            result.message = (
-                "Cloud authentication required. Please sign in to use cloud nodes.\n"
-                "This node requires BoCoFlow cloud credits (Mode B).\n"
-                "Unlike Mode A nodes, you don't need your own Modal account."
-            )
+            result.message = sc.SIGN_IN_MESSAGE
             return result.to_json()
 
         # -- Read protein PDB content --
@@ -190,10 +220,7 @@ class CloudModalDiffdock(Node):
         if not protein_pdb and predecessor_data:
             pred_data = predecessor_data[0] if predecessor_data else {}
             if isinstance(pred_data, dict):
-                protein_pdb = (
-                    pred_data.get("pdb_content", "")
-                    or pred_data.get("protein_pdb", "")
-                )
+                protein_pdb = pred_data.get("pdb_content", "") or pred_data.get("protein_pdb", "")
                 if not protein_pdb:
                     output_file = pred_data.get("output_file", "")
                     if output_file and os.path.isfile(output_file):
@@ -223,8 +250,7 @@ class CloudModalDiffdock(Node):
         if not ligand_smiles and not ligand_sdf:
             result.success = False
             result.message = (
-                "No ligand provided. "
-                "Please enter a SMILES string or select an SDF file."
+                "No ligand provided. Please enter a SMILES string or select an SDF file."
             )
             return result.to_json()
 
@@ -235,11 +261,16 @@ class CloudModalDiffdock(Node):
         output_folder = flow_vars["output_folder"].get_value() or ""
         output_prefix = flow_vars["output_prefix"].get_value() or ""
 
-        # Prepare request payload
+        deadline = sc.deadline(flow_vars, RECOMMENDED_TIMEOUT, SERVICE_MAX_WAIT)
+        if deadline.warning:
+            stream_log(deadline.warning, node_id=self.node_id, level="warning")
+
         payload = {
             "node_info": {
                 "node_id": getattr(self, "node_id", "unknown"),
                 "node_type": "CloudModalDiffdock",
+                "package": PACKAGE_NAME,
+                "package_version": PACKAGE_VERSION,
             },
             "predecessor_data": {
                 "protein_pdb": protein_pdb,
@@ -252,7 +283,13 @@ class CloudModalDiffdock(Node):
                 "inference_steps": inference_steps,
                 "samples_per_complex": samples_per_complex,
             },
+            # A result too large for the reply comes as its poses plus a download link.
+            "result_delivery": "archive",
+            "client_request_id": sc.new_client_request_id(),
         }
+        inline_max = sc.requested_inline_max_bytes()
+        if inline_max is not None:
+            payload["inline_max_bytes"] = inline_max
 
         headers = {
             "Authorization": f"Bearer {auth_token}",  # Firebase token
@@ -261,190 +298,173 @@ class CloudModalDiffdock(Node):
 
         try:
             stream_log(
-                f"Calling DiffDock API (poses={num_poses}, steps={inference_steps})...",
-                node_id=self.node_id, progress=10,
+                f"Calling DiffDock (poses={num_poses}, steps={inference_steps})...",
+                node_id=self.node_id,
+                progress=10,
             )
-            log_message(f"Protein PDB: {len(protein_pdb)} chars, Ligand: {ligand_smiles[:50] if ligand_smiles else 'SDF file'}")
+            log_message(
+                f"Protein PDB: {len(protein_pdb)} chars, "
+                f"ligand: {'SMILES' if ligand_smiles else 'SDF file'}"
+            )
 
             # DiffDock: warm ~40s, cold start ~590s (ESM-2 model loading)
             response = post_with_progress(
-                url=self.API_ENDPOINT,
+                url=sc.execute_url(SERVICE),
                 json=payload,
                 headers=headers,
-                timeout=900,
+                timeout=deadline.post_timeout,
                 node_id=self.node_id,
                 service_name="DiffDock",
                 cold_start_hint="cold starts take up to 10 min",
             )
 
-            if response.status_code == 200:
-                cloud_result = response.json()
-                modal_result = cloud_result.get("result", {})
-                usage_info = cloud_result.get("usage", {})
+            if response.status_code != 200:
+                result.success = False
+                result.message = sc.http_error_message(response, "DiffDock")
+                stream_log(f"Error: {result.message}", node_id=self.node_id, level="error")
+                return result.to_json()
 
-                # Check if prediction succeeded
-                if modal_result.get("status") == "error":
-                    result.success = False
-                    result.message = (
-                        f"DiffDock prediction failed: {modal_result.get('error', 'Unknown error')}"
+            cloud_result = response.json()
+            job_id = cloud_result.get("job_id")
+            result.metadata["cloud_job_id"] = job_id
+
+            failure = sc.failure_message(cloud_result)
+            if failure:
+                tail = sc.log_tail(cloud_result)
+                if tail:
+                    stream_log(
+                        f"DiffDock output before it stopped:\n{tail}",
+                        node_id=self.node_id,
+                        level="error",
                     )
-                    return result.to_json()
-
-                # Extract result data
-                output_tarball = modal_result.get("output_tarball_base64", "")
-                actual_poses = modal_result.get("num_poses", 0)
-                top_confidence = modal_result.get("top_confidence", 0.0)
-                confidence_scores = modal_result.get("confidence_scores", [])
-                processing_time = modal_result.get("processing_time_seconds", 0)
-
-                output_path = None
-                output_size = 0
-                extracted_sdfs = []
-                final_folder = None
-                file_prefix = None
-
-                if output_tarball:
-                    # Decode the tarball
-                    output_bytes = base64.b64decode(output_tarball)
-                    output_size = len(output_bytes)
-
-                    # Determine output folder
-                    # Use working_path (set by worker) as the base for relative paths
-                    working_dir = getattr(self, "working_path", "") or os.environ.get("BOCOFLOW_WORKFLOW_DIR", "")
-                    if output_folder:
-                        if output_folder.startswith("abs:"):
-                            final_folder = output_folder[4:]
-                        elif output_folder.startswith("rel:"):
-                            rel_part = output_folder[4:]
-                            if working_dir:
-                                final_folder = os.path.join(working_dir, rel_part)
-                            else:
-                                final_folder = rel_part
-                        else:
-                            final_folder = output_folder
-                    else:
-                        if working_dir:
-                            final_folder = working_dir
-                        else:
-                            downloads_dir = os.path.join(os.path.expanduser("~"), "Downloads")
-                            if os.path.exists(downloads_dir):
-                                final_folder = downloads_dir
-                            else:
-                                final_folder = "/tmp"
-
-                    # Generate filename prefix
-                    if output_prefix:
-                        file_prefix = output_prefix
-                    else:
-                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                        file_prefix = f"diffdock_{timestamp}"
-
-                    # Save tarball
-                    os.makedirs(final_folder, exist_ok=True)
-                    output_path = os.path.join(final_folder, f"{file_prefix}.tar.gz")
-                    with open(output_path, "wb") as f:
-                        f.write(output_bytes)
-                    log_message(f"Saved output to {output_path} ({output_size} bytes)")
-
-                    # Extract SDF files for convenience
-                    try:
-                        with tarfile.open(fileobj=io.BytesIO(output_bytes), mode="r:gz") as tar:
-                            for member in tar.getmembers():
-                                if member.name.endswith(".sdf") and member.isfile():
-                                    sdf_name = os.path.basename(member.name)
-                                    sdf_dest = os.path.join(final_folder, f"{file_prefix}_{sdf_name}")
-                                    with tar.extractfile(member) as src:
-                                        with open(sdf_dest, "wb") as dst:
-                                            dst.write(src.read())
-                                    extracted_sdfs.append(sdf_dest)
-                                    log_message(f"Extracted SDF: {sdf_dest}")
-                    except Exception as e:
-                        log_message(f"Warning: Could not extract SDF files: {e}")
-                else:
-                    log_message("Warning: No output tarball received from Modal")
-
-                # Build result data
-                stream_log(
-                    f"DiffDock completed: {actual_poses} poses, top confidence={top_confidence:.4f}",
-                    node_id=self.node_id, progress=90,
+                result.success = False
+                result.message = f"DiffDock prediction failed: {failure}" + (
+                    f" (job {job_id})" if job_id else ""
                 )
-                result.success = True
-                if output_path and os.path.exists(output_path):
-                    msg_parts = [
-                        f"DiffDock generated {actual_poses} docking poses.",
-                        f"Top confidence: {top_confidence:.4f}.",
-                        f"Output: {output_path} ({output_size} bytes).",
-                    ]
-                    if extracted_sdfs:
-                        msg_parts.append(f"Extracted {len(extracted_sdfs)} SDF files.")
-                    msg_parts.append(f"Duration: {usage_info.get('duration_seconds', 0):.2f}s")
-                    result.message = " ".join(msg_parts)
-                else:
-                    result.message = (
-                        f"DiffDock generated {actual_poses} docking poses. "
-                        f"Top confidence: {top_confidence:.4f}. "
-                        f"Duration: {usage_info.get('duration_seconds', 0):.2f}s"
-                    )
-
-                result.data = {
-                    "output_file": output_path if output_path and os.path.exists(output_path) else None,
-                    "output_folder": final_folder,
-                    "output_prefix": file_prefix,
-                    "extracted_sdfs": extracted_sdfs,
-                    "output_file_size": output_size,
-                    "output_files": modal_result.get("output_files", []),
-                    "output_tarball_available": bool(output_tarball),
-                    "num_poses": actual_poses,
-                    "top_confidence": top_confidence,
-                    "confidence_scores": confidence_scores,
-                    "processing_time_seconds": processing_time,
-                    "modal_metadata": modal_result.get("modal_metadata", {}),
-                    "job_id": cloud_result.get("job_id"),
-                    "protein_pdb": protein_pdb,
-                    "ligand_smiles": ligand_smiles,
-                    "usage": {
-                        "duration_seconds": usage_info.get("duration_seconds", 0),
-                        "cost_usd": usage_info.get("cost_usd", 0),
-                    },
-                    "status": "completed",
-                    "credential_mode": "bocoflow",
-                }
-                result.metadata["cloud_job_id"] = cloud_result.get("job_id")
-
-            elif response.status_code == 401:
-                result.success = False
-                result.message = "Authentication failed. Please sign in again."
                 stream_log(f"Error: {result.message}", node_id=self.node_id, level="error")
+                return result.to_json()
 
-            elif response.status_code == 402:
+            modal_result = cloud_result.get("result") or {}
+            usage_info = cloud_result.get("usage") or {}
+            actual_poses = modal_result.get("num_poses", 0)
+            top_confidence = modal_result.get("top_confidence", 0.0) or 0.0
+            confidence_scores = modal_result.get("confidence_scores", [])
+            processing_time = modal_result.get("processing_time_seconds", 0)
+
+            final_folder, folder_note = sc.resolve_output_dir(self, output_folder)
+            if output_prefix:
+                file_prefix = output_prefix.replace("/", "_").replace("\\", "_")
+            else:
+                file_prefix = f"diffdock_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+            stream_log("Saving the result...", node_id=self.node_id, progress=60)
+            try:
+                saved = sc.save_result(
+                    cloud_result,
+                    final_folder,
+                    file_prefix,
+                    auth_token,
+                    node_id=self.node_id,
+                    deadline=deadline,
+                )
+            except sc.ResultError as exc:
                 result.success = False
-                result.message = "Insufficient credits. Please purchase more credits."
-                stream_log(f"Error: {result.message}", node_id=self.node_id, level="error")
+                result.message = f"DiffDock completed, but nothing could be saved. {exc}"
+                return result.to_json()
 
-            elif response.status_code == 503:
+            warnings = list(saved.warnings)
+            if folder_note:
+                warnings.append(folder_note)
+
+            extracted_sdfs = []
+            top_pose = None
+            try:
+                picks, top = _main_files(sc.members(saved.source), final_folder, file_prefix)
+                written = sc.extract(saved.source, picks)
+                extracted_sdfs = [str(picks[m]) for m in picks if m in written]
+                top_pose = str(top) if top is not None and str(top) in extracted_sdfs else None
+            except (tarfile.TarError, EOFError, OSError) as exc:
+                warnings.append(f"The poses could not be taken out of the result: {exc}")
+
+            for warning in warnings:
+                stream_log(warning, node_id=self.node_id, level="warning")
+
+            tarball = saved.tarball
+            if not extracted_sdfs:
+                # Docking without a pose is not a result, whatever the reply said.
                 result.success = False
                 result.message = (
-                    "Modal cloud service temporarily unavailable. "
-                    "The A10G GPU may be scaling up. Please try again in a few minutes."
+                    "DiffDock finished, but the result holds no pose"
+                    + (f" (job {job_id})" if job_id else "")
+                    + f". What came back was saved to {tarball}."
                 )
                 stream_log(f"Error: {result.message}", node_id=self.node_id, level="error")
-
+                return result.to_json()
+            duration = usage_info.get("duration_seconds", 0) or 0
+            stream_log(
+                f"DiffDock completed: {actual_poses} poses, top confidence={top_confidence:.4f}",
+                node_id=self.node_id,
+                progress=90,
+            )
+            parts = [
+                f"DiffDock generated {actual_poses} docking poses.",
+                f"Top confidence: {top_confidence:.4f}.",
+            ]
+            if saved.complete:
+                parts.append(f"Output: {tarball} ({saved.tarball_bytes} bytes).")
             else:
-                error_detail = ""
-                try:
-                    error_detail = response.json().get("detail", response.text)
-                except Exception:
-                    error_detail = response.text
-                result.success = False
-                result.message = f"API error ({response.status_code}): {error_detail}"
-                stream_log(f"Error: {result.message}", node_id=self.node_id, level="error")
+                parts.append(f"Main files: {tarball} ({saved.tarball_bytes} bytes).")
+            if extracted_sdfs:
+                parts.append(f"Extracted {len(extracted_sdfs)} SDF files.")
+            if saved.downloaded and saved.server_copy_deleted:
+                parts.append("The copy held by Salpa Compute was deleted.")
+            parts.append(f"Duration: {duration:.2f}s")
+            if warnings:
+                parts.append(f"Note: {warnings[0]}")
+
+            result.success = True
+            result.message = " ".join(parts)
+            result.data = {
+                "output_file": str(tarball) if tarball else None,
+                "output_folder": str(final_folder),
+                "output_prefix": file_prefix,
+                "extracted_sdfs": extracted_sdfs,
+                "output_file_size": saved.tarball_bytes,
+                "output_files": saved.files,
+                "output_tarball_available": bool(tarball),
+                "num_poses": actual_poses,
+                "top_confidence": top_confidence,
+                "confidence_scores": confidence_scores,
+                "processing_time_seconds": processing_time,
+                "modal_metadata": modal_result.get("modal_metadata", {}),
+                "job_id": job_id,
+                "protein_pdb": protein_pdb,
+                "ligand_smiles": ligand_smiles,
+                "usage": {
+                    "duration_seconds": usage_info.get("duration_seconds", 0),
+                    "cost_usd": usage_info.get("cost_usd", 0),
+                },
+                "status": "completed",
+                "credential_mode": "bocoflow",
+                "top_pose_file": top_pose,
+                "archive_complete": saved.complete,
+                "archive_sha256": saved.sha256,
+                "delivery": saved.content,
+                "warnings": warnings,
+            }
+            if tarball:
+                result.files["output"]["archive"] = self.format_output_path(str(tarball))
+            if top_pose:
+                result.files["output"]["top_pose"] = self.format_output_path(top_pose)
+            for index, path in enumerate(extracted_sdfs):
+                result.files["output"][f"pose_{index + 1}"] = self.format_output_path(path)
 
         except requests.Timeout:
             result.success = False
-            result.message = (
-                "Request timed out (15 min limit). "
-                "DiffDock cold starts take ~10 min (ESM-2 model loading). "
-                "Warm calls take ~40s. Please try again — the container may now be warm."
+            result.message = "No answer from Salpa Compute in time. " + (
+                deadline.warning
+                or "DiffDock cold starts take ~10 min (ESM-2 model loading); warm calls take "
+                "~40s. Try again: the container may now be warm."
             )
 
         except requests.RequestException as e:

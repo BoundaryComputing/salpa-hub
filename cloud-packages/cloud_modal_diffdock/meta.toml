@@ -1,10 +1,10 @@
-# Cloud Modal DiffDock - Mode B (BoCoFlow Credits)
+# Cloud Modal DiffDock - a Salpa Compute node
 # Blind protein-ligand docking using DiffDock on Modal A10G GPU
-# This is a client stub that calls the API Gateway, not Modal directly.
+# This is a client stub that calls the Salpa Compute gateway, not Modal directly.
 
 [package]
 name = "cloud-modal-diffdock"
-version = "1.0.2"
+version = "1.0.3"
 description = "Blind protein-ligand docking using DiffDock on Modal A10G GPU"
 author = "BoundaryComputing"
 license = "MIT"
@@ -19,7 +19,7 @@ num_in = 1
 num_out = 1
 color = "purple"
 
-# cloud-modal hashtag indicates Mode B (BoCoFlow credits)
+# cloud-modal hashtag indicates a Salpa Compute node on Modal
 # UI can use this to show cloud/credits indicator
 hashtags = [
     "cloud-modal",
@@ -35,6 +35,11 @@ hashtags = [
 
 [node.metadata]
 icon = "💊"
+
+[node.features]
+# The timeout a new node starts with (seconds): DiffDock's 15-minute limit, a cold start and the download.
+# A node already saved in a workflow keeps the timeout it was saved with.
+default_timeout = 1500
 
 [node.cloud]
 provider = "modal"
@@ -55,7 +60,8 @@ usage = """
 DiffDock is a generative diffusion model for blind protein-ligand docking.
 
 Input: Protein PDB + Ligand (SMILES or SDF)
-Output: Ranked binding poses as SDF files (in tarball)
+Output: Ranked binding poses as SDF files, extracted into the workflow folder
+next to the full result as a tarball.
 
 Example SMILES (Aspirin): CC(=O)Oc1ccccc1C(=O)O
 

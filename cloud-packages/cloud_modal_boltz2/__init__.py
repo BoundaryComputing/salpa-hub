@@ -1,4 +1,4 @@
-"""Cloud Modal Boltz-2 - Mode B (BoCoFlow Credits)"""
+"""Cloud Modal Boltz-2 - a Salpa Compute node"""
 
 from .node import CloudModalBoltz2
 

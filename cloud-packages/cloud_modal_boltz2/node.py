@@ -1,41 +1,58 @@
 """
-Cloud Modal Boltz-2 - Mode B (BoCoFlow Credits)
+Cloud Modal Boltz-2 — a Salpa Compute node.
 
-Protein structure prediction using Boltz-2 on Modal's H100 GPU infrastructure.
+Protein structure prediction using Boltz-2 on an H100 GPU.
 
-This node is a client stub that calls the BoCoFlow API Gateway,
-which then routes requests to Modal endpoints with Proxy Auth tokens.
+This node is a client stub. It sends the input to the Salpa Compute gateway, which checks
+the user's sign-in and quota and runs Boltz-2 on Modal. No Modal account is needed.
 
-Unlike modal-user nodes (Mode A), users don't need their own Modal account.
-Instead, they pay with BoCoFlow credits.
-
-Architecture:
-    1. User authenticates with Firebase (token in BOCOFLOW_CLOUD_AUTH_TOKEN)
-    2. This node sends sequence/YAML to API Gateway with Firebase token
-    3. API Gateway verifies token, checks credits
-    4. API Gateway calls Modal with Proxy Auth tokens
-    5. Boltz-2 runs on H100 GPU, returns structure prediction
-    6. Result (tarball with CIF files) returns through this node
-    7. Credits are deducted from user's account
+How the result comes back:
+    - A result that fits in the reply (up to 16 MiB compressed) arrives whole.
+    - A larger one (MSA-server runs, large complexes) arrives as its main files -- the
+      structure, confidence and pLDDT -- plus a link to the full archive. The node
+      downloads the archive into the workflow folder, checks its size and SHA-256, and
+      then has the server copy deleted. Salpa Compute never keeps it longer than 24 hours.
 
 Based on: https://modal.com/docs/examples/boltz_predict
 """
 
-import base64
 import os
+import re
+import sys
+import tarfile
 from datetime import datetime
 from pathlib import Path
 
 import requests
 from bocoflow_core.logger import log_message
 from bocoflow_core.node import Node, NodeResult
-from bocoflow_core.parameters import (
-    BooleanParameter,
-    FolderParameter,
-    StringParameter,
-    TextParameter,
-)
+from bocoflow_core.parameters import FolderParameter, TextParameter
 from bocoflow_core.stream_logger import post_with_progress, stream_log
+
+try:  # loaded as a package: node_runner, the server, tests
+    from . import _salpa_compute as sc
+except ImportError:
+    try:  # the node's folder is on sys.path
+        import _salpa_compute as sc
+    except ImportError:  # anything else: load the file that sits beside this one
+        import importlib.util
+
+        _spec = importlib.util.spec_from_file_location(
+            "_salpa_compute_cloud_modal_boltz2",
+            str(Path(__file__).with_name("_salpa_compute.py")),
+        )
+        sc = importlib.util.module_from_spec(_spec)
+        sys.modules[_spec.name] = sc
+        _spec.loader.exec_module(sc)
+
+#: Sent with every request, so the gateway records which version of this node called it.
+PACKAGE_NAME = "cloud-modal-boltz2"
+PACKAGE_VERSION = "1.0.5"
+SERVICE = "boltz2"
+#: The timeout a run needs: Boltz-2's 30-minute limit, a cold start, and the download.
+RECOMMENDED_TIMEOUT = 2400
+#: The gateway stops waiting for Boltz-2 at 1800 s; wait a minute more for its answer.
+SERVICE_MAX_WAIT = 1860
 
 #: How to run this node on its own -- the values `salpa smoke` feeds it. Strings
 #: starting with `demo_data/` resolve relative to this directory. Running needs a
@@ -47,34 +64,59 @@ DEMO_CONFIG = {
 }
 
 
+def _pick(names, *patterns):
+    """The first member name matching the first pattern that matches anything."""
+    for pattern in patterns:
+        rx = re.compile(pattern)
+        for name in names:
+            if rx.search(name):
+                return name
+    return None
+
+
+def _main_files(names, folder, prefix):
+    """{role: (member name, destination)} for the files a user opens first."""
+    chosen = {}
+    structure = _pick(
+        names,
+        r"(^|/)predictions/.*_model_0\.(cif|pdb)$",
+        r"(^|/)predictions/.*\.(cif|pdb)$",
+        r"\.(cif|pdb)$",
+    )
+    if structure:
+        chosen["structure"] = (structure, folder / f"{prefix}_model_0{Path(structure).suffix}")
+    confidence = _pick(
+        names, r"(^|/)confidence_[^/]*_model_0\.json$", r"(^|/)confidence_[^/]*\.json$"
+    )
+    if confidence:
+        chosen["confidence"] = (confidence, folder / f"{prefix}_confidence_model_0.json")
+    plddt = _pick(names, r"(^|/)plddt_[^/]*_model_0\.npz$", r"(^|/)plddt_[^/]*\.npz$")
+    if plddt:
+        chosen["plddt"] = (plddt, folder / f"{prefix}_plddt_model_0.npz")
+    affinity = _pick(names, r"(^|/)affinity_[^/]*\.json$")
+    if affinity:
+        chosen["affinity"] = (affinity, folder / f"{prefix}_affinity.json")
+    return chosen
+
+
 class CloudModalBoltz2(Node):
     """
-    Boltz-2 Protein Structure Prediction (BoCoFlow Credits - Mode B).
+    Boltz-2 protein structure prediction on Salpa Compute (H100 GPU).
 
-    This is a CLIENT STUB - actual computation happens on Modal cloud (H100 GPU).
-    The workflow engine executes this node, which calls the API Gateway.
-
-    Boltz-2 is a state-of-the-art protein structure prediction model that can
-    predict 3D structures from amino acid sequences.
+    This is a client stub: the prediction runs in the cloud, and this node sends the
+    input and saves the result into the workflow folder.
 
     Prerequisites:
-    - User must be logged in with Firebase
-    - User must have sufficient BoCoFlow credits
+    - The user is signed in to Salpa.
+    - The user's Salpa Compute quota is not used up.
 
-    No Modal account or 'modal setup' required!
+    No Modal account or 'modal setup' is needed.
     """
 
     # NOTE: Metadata (name, hashtags, num_in, num_out) comes from meta.toml.
     # NOTE: EXECUTION_STRATEGY and ENVIRONMENT are auto-detected via shared_environment in meta.toml.
-
-    # API Gateway endpoint (unified route — not Modal directly!)
-    API_ENDPOINT = (
-        os.environ.get(
-            "BOCOFLOW_CLOUD_API_URL",
-            "https://bocoflow-api-gateway-823406908684.us-central1.run.app",
-        )
-        + "/api/cloud/nodes/boltz2/execute"
-    )
+    # NOTE: The gateway address is read when the node runs (_salpa_compute.api_base), so
+    #       BOCOFLOW_CLOUD_API_URL set after import still counts.
 
     OPTIONS = {
         "sequence": TextParameter(
@@ -118,8 +160,10 @@ class CloudModalBoltz2(Node):
             "Output Folder",
             default="",
             docstring=(
-                "Folder for output files. Leave empty to use the workflow's working directory. "
-                "Outputs will be saved as: {prefix}.tar.gz and {prefix}_model_0.cif"
+                "Folder for output files. Leave empty to use the workflow's folder; a "
+                "relative folder is placed inside it. "
+                "Outputs: {prefix}.tar.gz (the full result), {prefix}_model_0.cif, "
+                "{prefix}_confidence_model_0.json and {prefix}_plddt_model_0.npz"
             ),
         ),
         "output_prefix": TextParameter(
@@ -146,8 +190,8 @@ class CloudModalBoltz2(Node):
     }
 
     def execute(self, predecessor_data, flow_vars):
-        """Execute by calling the API Gateway (which calls Modal)."""
-        log_message("Starting CloudModalBoltz2 execution (Mode B)")
+        """Send the input to Salpa Compute and save what comes back."""
+        log_message("Starting CloudModalBoltz2 (Salpa Compute)")
 
         result = NodeResult()
         result.metadata.update(
@@ -159,16 +203,11 @@ class CloudModalBoltz2(Node):
             }
         )
 
-        # Get auth token from environment (injected by BF2 worker)
+        # The worker passes the signed-in user's token in this variable.
         auth_token = os.environ.get("BOCOFLOW_CLOUD_AUTH_TOKEN")
-
         if not auth_token:
             result.success = False
-            result.message = (
-                "Cloud authentication required. Please sign in to use cloud nodes.\n"
-                "This node requires BoCoFlow cloud credits (Mode B).\n"
-                "Unlike Mode A nodes, you don't need your own Modal account."
-            )
+            result.message = sc.SIGN_IN_MESSAGE
             return result.to_json()
 
         # Get parameters
@@ -201,11 +240,16 @@ class CloudModalBoltz2(Node):
             )
             return result.to_json()
 
-        # Prepare request payload
+        deadline = sc.deadline(flow_vars, RECOMMENDED_TIMEOUT, SERVICE_MAX_WAIT)
+        if deadline.warning:
+            stream_log(deadline.warning, node_id=self.node_id, level="warning")
+
         payload = {
             "node_info": {
                 "node_id": getattr(self, "node_id", "unknown"),
                 "node_type": "CloudModalBoltz2",
+                "package": PACKAGE_NAME,
+                "package_version": PACKAGE_VERSION,
             },
             "predecessor_data": {
                 "sequence": sequence,
@@ -217,7 +261,13 @@ class CloudModalBoltz2(Node):
                 "msa_mode": msa_mode,
                 "msa_a3m": msa_a3m,
             },
+            # A result too large for the reply comes as its main files plus a download link.
+            "result_delivery": "archive",
+            "client_request_id": sc.new_client_request_id(),
         }
+        inline_max = sc.requested_inline_max_bytes()
+        if inline_max is not None:
+            payload["inline_max_bytes"] = inline_max
 
         headers = {
             "Authorization": f"Bearer {auth_token}",  # Firebase token
@@ -225,199 +275,157 @@ class CloudModalBoltz2(Node):
         }
 
         try:
-            log_message(f"Calling API Gateway: {self.API_ENDPOINT}")
+            url = sc.execute_url(SERVICE)
+            log_message(f"Calling Salpa Compute: {url}")
             log_message(f"Sequence length: {len(sequence)} amino acids")
             log_message(f"MSA mode: {msa_mode}")
 
-            # Boltz-2 can take several minutes - use longer timeout
             stream_log(
-                "Calling Boltz-2 API... First call may take 2-3 min (cold start).",
+                "Calling Boltz-2 on Salpa Compute... First call may take 2-3 min (cold start).",
                 node_id=self.node_id,
                 progress=10,
             )
             response = post_with_progress(
-                url=self.API_ENDPOINT,
+                url=url,
                 json=payload,
                 headers=headers,
-                timeout=1800,
+                timeout=deadline.post_timeout,
                 node_id=self.node_id,
                 service_name="Boltz-2",
                 cold_start_hint="cold starts take 2-3 min",
             )
 
-            if response.status_code == 200:
-                cloud_result = response.json()
-                modal_result = cloud_result.get("result", {})
-                usage_info = cloud_result.get("usage", {})
+            if response.status_code != 200:
+                result.success = False
+                result.message = sc.http_error_message(response, "Boltz-2")
+                return result.to_json()
 
-                # Check if prediction succeeded
-                if modal_result.get("status") == "error":
-                    result.success = False
-                    result.message = (
-                        f"Boltz-2 prediction failed: {modal_result.get('error', 'Unknown error')}"
+            cloud_result = response.json()
+            job_id = cloud_result.get("job_id")
+            result.metadata["cloud_job_id"] = job_id
+
+            failure = sc.failure_message(cloud_result)
+            if failure:
+                tail = sc.log_tail(cloud_result)
+                if tail:
+                    stream_log(
+                        f"Boltz-2 output before it stopped:\n{tail}",
+                        node_id=self.node_id,
+                        level="error",
                     )
-                    return result.to_json()
+                result.success = False
+                result.message = f"Boltz-2 prediction failed: {failure}" + (
+                    f" (job {job_id})" if job_id else ""
+                )
+                return result.to_json()
 
-                # Save output tarball if present
-                output_tarball = modal_result.get("output_tarball_base64", "")
-                output_path = None
-                output_size = 0
-                cif_path = None  # Will be set if CIF is extracted
-                file_prefix = None  # Will be set if we generate output files
-                final_folder = None  # Will be set if we generate output files
+            modal_result = cloud_result.get("result") or {}
+            usage_info = cloud_result.get("usage") or {}
 
-                if output_tarball:
-                    # Decode the tarball
-                    output_bytes = base64.b64decode(output_tarball)
-                    output_size = len(output_bytes)
+            final_folder, folder_note = sc.resolve_output_dir(self, output_folder)
+            if output_prefix:
+                file_prefix = output_prefix.replace("/", "_").replace("\\", "_")
+            else:
+                seq_short = "".join(c for c in (sequence or "")[:8] if c.isalnum())
+                file_prefix = f"boltz_{seq_short}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
-                    # === Determine output folder ===
-                    # Priority: user-specified > workflow dir > Downloads > /tmp
-                    if output_folder:
-                        # User specified output folder
-                        if output_folder.startswith(("abs:", "rel:")):
-                            # Handle path prefixes
-                            workflow_dir = os.environ.get("BOCOFLOW_WORKFLOW_DIR", "")
-                            if output_folder.startswith("abs:"):
-                                final_folder = Path(output_folder[4:])
-                            elif workflow_dir:
-                                final_folder = Path(workflow_dir) / output_folder[4:]
-                            else:
-                                final_folder = Path(output_folder[4:])
-                        else:
-                            final_folder = Path(output_folder)
-                    else:
-                        # No folder specified - use working directory
-                        workflow_dir = os.environ.get("BOCOFLOW_WORKFLOW_DIR", "")
-                        if workflow_dir:
-                            final_folder = Path(workflow_dir)
-                        else:
-                            # Fallback to user's Downloads folder
-                            downloads_dir = Path.home() / "Downloads"
-                            if downloads_dir.exists():
-                                final_folder = downloads_dir
-                            else:
-                                # Last resort: /tmp
-                                final_folder = Path("/tmp")
+            stream_log("Saving the result...", node_id=self.node_id, progress=60)
+            try:
+                saved = sc.save_result(
+                    cloud_result,
+                    final_folder,
+                    file_prefix,
+                    auth_token,
+                    node_id=self.node_id,
+                    deadline=deadline,
+                )
+            except sc.ResultError as exc:
+                result.success = False
+                result.message = f"Boltz-2 prediction completed, but nothing could be saved. {exc}"
+                return result.to_json()
 
-                    # === Generate filename prefix ===
-                    if output_prefix:
-                        # User specified prefix
-                        file_prefix = output_prefix
-                    else:
-                        # Auto-generate: boltz_{seq_start}_{timestamp}
-                        seq_short = sequence[:8] if len(sequence) >= 8 else sequence
-                        # Clean up sequence (remove non-alphanumeric)
-                        seq_short = "".join(c for c in seq_short if c.isalnum())
-                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                        file_prefix = f"boltz_{seq_short}_{timestamp}"
+            warnings = list(saved.warnings)
+            if folder_note:
+                warnings.append(folder_note)
 
-                    # === Build final paths ===
-                    final_folder.mkdir(parents=True, exist_ok=True)
-                    output_path = final_folder / f"{file_prefix}.tar.gz"
-
-                    # Write tarball
-                    output_path.write_bytes(output_bytes)
-                    log_message(f"Saved output to {output_path} ({output_size} bytes)")
-
-                    # Also extract the CIF file for convenience
-                    try:
-                        import io
-                        import tarfile
-
-                        cif_path = None
-                        with tarfile.open(fileobj=io.BytesIO(output_bytes), mode="r:gz") as tar:
-                            for member in tar.getmembers():
-                                if member.name.endswith(".cif"):
-                                    # Extract CIF with consistent naming
-                                    # Use file_prefix + _model_0.cif (matching Boltz output)
-                                    cif_path = final_folder / f"{file_prefix}_model_0.cif"
-                                    with tar.extractfile(member) as f:
-                                        cif_path.write_bytes(f.read())
-                                    log_message(f"Extracted CIF structure to {cif_path}")
-                                    break
-                    except Exception as e:
-                        log_message(f"Warning: Could not extract CIF file: {e}")
-                else:
-                    log_message("Warning: No output tarball received from Modal")
-
-                # Build result data
-                output_files_list = modal_result.get("output_files", [])
-
-                result.success = True
-                if output_path and output_path.exists():
-                    msg_parts = [
-                        f"Boltz-2 structure prediction completed.",
-                        f"Output saved to {output_path} ({output_size} bytes).",
-                    ]
-                    if cif_path and cif_path.exists():
-                        msg_parts.append(f"CIF structure: {cif_path}")
-                    msg_parts.append(f"Duration: {usage_info.get('duration_seconds', 0):.2f}s")
-                    result.message = " ".join(msg_parts)
-                elif output_tarball:
-                    result.message = (
-                        f"Boltz-2 structure prediction completed. "
-                        f"Output available ({output_size} bytes, {len(output_files_list)} files). "
-                        f"Duration: {usage_info.get('duration_seconds', 0):.2f}s"
-                    )
-                else:
-                    result.message = (
-                        f"Boltz-2 structure prediction completed but no output files found. "
-                        f"Duration: {usage_info.get('duration_seconds', 0):.2f}s"
-                    )
-
-                result.data = {
-                    "output_file": (
-                        str(output_path) if output_path and output_path.exists() else None
-                    ),
-                    "cif_file": str(cif_path) if cif_path and cif_path.exists() else None,
-                    "output_folder": str(final_folder) if final_folder else None,
-                    "output_prefix": file_prefix,
-                    "output_file_size": output_size,
-                    "output_files": output_files_list,
-                    "output_tarball_available": bool(output_tarball),
-                    "sequence_length": modal_result.get("sequence_length", len(sequence)),
-                    "processing_time_seconds": modal_result.get("processing_time_seconds", 0),
-                    "modal_metadata": modal_result.get("modal_metadata", {}),
-                    "job_id": cloud_result.get("job_id"),
-                    "usage": {
-                        "duration_seconds": usage_info.get("duration_seconds", 0),
-                        "cost_usd": usage_info.get("cost_usd", 0),
-                    },
-                    "status": "completed",
-                    "credential_mode": "bocoflow",
+            files = {}
+            try:
+                chosen = _main_files(sc.members(saved.source), final_folder, file_prefix)
+                written = sc.extract(saved.source, {m: dest for m, dest in chosen.values()})
+                files = {
+                    role: str(dest) for role, (member, dest) in chosen.items() if member in written
                 }
-                result.metadata["cloud_job_id"] = cloud_result.get("job_id")
+            except (tarfile.TarError, EOFError, OSError) as exc:
+                warnings.append(f"The main files could not be taken out of the result: {exc}")
 
-            elif response.status_code == 401:
-                result.success = False
-                result.message = "Authentication failed. Please sign in again."
+            for warning in warnings:
+                stream_log(warning, node_id=self.node_id, level="warning")
 
-            elif response.status_code == 402:
-                result.success = False
-                result.message = "Insufficient credits. Please purchase more credits."
-
-            elif response.status_code == 503:
+            tarball = saved.tarball
+            if "structure" not in files:
+                # A prediction without a structure is not a result, whatever the reply said.
                 result.success = False
                 result.message = (
-                    "Modal cloud service temporarily unavailable. "
-                    "The H100 GPU may be scaling up. Please try again in a few minutes."
+                    "Boltz-2 finished, but the result holds no structure"
+                    + (f" (job {job_id})" if job_id else "")
+                    + f". What came back was saved to {tarball}."
                 )
-
+                return result.to_json()
+            structure = files.get("structure")
+            duration = usage_info.get("duration_seconds", 0) or 0
+            parts = ["Boltz-2 structure prediction completed."]
+            if structure:
+                parts.append(f"Structure: {structure}.")
+            if saved.complete:
+                parts.append(f"Full result saved to {tarball} ({saved.tarball_bytes} bytes).")
             else:
-                error_detail = ""
-                try:
-                    error_detail = response.json().get("detail", response.text)
-                except Exception:
-                    error_detail = response.text
-                result.success = False
-                result.message = f"API error ({response.status_code}): {error_detail}"
+                parts.append(f"Main files saved to {tarball} ({saved.tarball_bytes} bytes).")
+            if saved.downloaded and saved.server_copy_deleted:
+                parts.append("The copy held by Salpa Compute was deleted.")
+            parts.append(f"Duration: {duration:.2f}s")
+            if warnings:
+                parts.append(f"Note: {warnings[0]}")
+
+            result.success = True
+            result.message = " ".join(parts)
+            result.data = {
+                "output_file": str(tarball) if tarball else None,
+                "cif_file": structure if structure and structure.endswith(".cif") else None,
+                "output_folder": str(final_folder),
+                "output_prefix": file_prefix,
+                "output_file_size": saved.tarball_bytes,
+                "output_files": saved.files,
+                "output_tarball_available": bool(tarball),
+                "sequence_length": modal_result.get("sequence_length", len(sequence)),
+                "processing_time_seconds": modal_result.get("processing_time_seconds", 0),
+                "modal_metadata": modal_result.get("modal_metadata", {}),
+                "job_id": job_id,
+                "usage": {
+                    "duration_seconds": usage_info.get("duration_seconds", 0),
+                    "cost_usd": usage_info.get("cost_usd", 0),
+                },
+                "status": "completed",
+                "credential_mode": "bocoflow",
+                "structure_file": structure,
+                "confidence_file": files.get("confidence"),
+                "plddt_file": files.get("plddt"),
+                "affinity_file": files.get("affinity"),
+                "archive_complete": saved.complete,
+                "archive_sha256": saved.sha256,
+                "delivery": saved.content,
+                "warnings": warnings,
+            }
+            if tarball:
+                result.files["output"]["archive"] = self.format_output_path(str(tarball))
+            for role, path in files.items():
+                result.files["output"][role] = self.format_output_path(path)
+            stream_log("Boltz-2 result saved.", node_id=self.node_id, progress=100)
 
         except requests.Timeout:
             result.success = False
-            result.message = (
-                "Request timed out. Boltz-2 predictions can take several minutes. "
-                "Please try again or use a shorter sequence."
+            result.message = "No answer from Salpa Compute in time. " + (
+                deadline.warning
+                or "Boltz-2 predictions can take up to 30 minutes; try again, or use a shorter sequence."
             )
 
         except requests.RequestException as e:

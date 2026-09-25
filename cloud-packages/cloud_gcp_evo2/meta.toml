@@ -1,9 +1,9 @@
 # Cloud GCP Evo2 — DNA foundation model.
-# This is a client stub that calls the BoCoFlow API Gateway -> GCP Cloud Run (L4 GPU).
+# This is a client stub that calls the Salpa Compute gateway -> GCP Cloud Run (L4 GPU).
 
 [package]
 name = "cloud-gcp-evo2"
-version = "1.0.3"
+version = "1.0.4"
 description = "DNA sequence scoring, embeddings, and generation using Evo2 on GCP (L4 GPU)"
 author = "BoundaryComputing"
 license = "MIT"
@@ -34,6 +34,9 @@ category = "Genomics"
 tooltip = "DNA sequence scoring, embeddings, and generation using Evo2 7B (GCP Cloud Run, L4 GPU)"
 
 [node.features]
+# The timeout a new node starts with (seconds): the gateway's 15-minute limit for Evo2 and a few minutes more.
+# A node already saved in a workflow keeps the timeout it was saved with.
+default_timeout = 1200
 supports_resume = false
 requires_gpu = true
 gpu_type = "L4"

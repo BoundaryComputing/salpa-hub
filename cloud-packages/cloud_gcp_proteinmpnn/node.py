@@ -1,17 +1,19 @@
 """
-cloud-gcp-proteinmpnn — BoCoFlow cloud client stub for GCP Cloud Run.
+cloud-gcp-proteinmpnn — a Salpa Compute node running on GCP Cloud Run.
 
 Designs amino acid sequences from protein backbone structures using ProteinMPNN.
 CPU-only cloud service — lightweight model (~7 MB), fast inference (1-30s).
 
-Pattern: Standard Node class with pixi.toml for auto-detected PIXI_SUBPROCESS.
-Same architecture as cloud-gcp-hello-world.
+Pattern: Standard Node class with shared_environment for auto-detected PIXI_SUBPROCESS.
+The gateway address is read when the node runs (_salpa_compute.api_base).
 
 Reference: Dauparas et al., Science 378:49-56 (2022)
 """
 
 import os
+import sys
 from datetime import datetime
+from pathlib import Path
 
 import requests
 from bocoflow_core.node import Node, NodeException, NodeResult
@@ -25,6 +27,31 @@ from bocoflow_core.parameters import (
     TextParameter,
 )
 from bocoflow_core.stream_logger import post_with_progress, stream_log
+
+try:  # loaded as a package: node_runner, the server, tests
+    from . import _salpa_compute as sc
+except ImportError:
+    try:  # the node's folder is on sys.path
+        import _salpa_compute as sc
+    except ImportError:  # anything else: load the file that sits beside this one
+        import importlib.util
+
+        _spec = importlib.util.spec_from_file_location(
+            "_salpa_compute_cloud_gcp_proteinmpnn",
+            str(Path(__file__).with_name("_salpa_compute.py")),
+        )
+        sc = importlib.util.module_from_spec(_spec)
+        sys.modules[_spec.name] = sc
+        _spec.loader.exec_module(sc)
+
+#: Sent with every request, so the gateway records which version of this node called it.
+PACKAGE_NAME = "cloud-gcp-proteinmpnn"
+PACKAGE_VERSION = "1.0.4"
+SERVICE = "proteinmpnn"
+#: The timeout a run needs: the gateway's 5-minute limit for ProteinMPNN and a few minutes more.
+RECOMMENDED_TIMEOUT = 600
+#: The gateway stops waiting for ProteinMPNN at 300 s; wait a minute more for its answer.
+SERVICE_MAX_WAIT = 360
 
 
 class CloudGcpProteinmpnn(Node):
@@ -41,15 +68,8 @@ class CloudGcpProteinmpnn(Node):
     # NOTE: Metadata (name, hashtags, num_in, num_out) comes from meta.toml.
     # NOTE: force_to_run is inherited from Node.BASE_OPTIONS — do NOT add it here.
     # NOTE: EXECUTION_STRATEGY and ENVIRONMENT are auto-detected via shared_environment in meta.toml.
-
-    # Cloud API endpoint — configurable via environment
-    API_ENDPOINT = (
-        os.environ.get(
-            "BOCOFLOW_CLOUD_API_URL",
-            "https://bocoflow-api-gateway-823406908684.us-central1.run.app",
-        )
-        + "/api/cloud/nodes/proteinmpnn/execute"
-    )
+    # NOTE: The gateway address is read when the node runs (_salpa_compute.api_base), so
+    #       BOCOFLOW_CLOUD_API_URL set after import still counts.
 
     OPTIONS = {
         "pdb_input": FileParameterEdit(
@@ -100,7 +120,10 @@ class CloudGcpProteinmpnn(Node):
         ),
         "output_folder": FolderParameter(
             "Output Folder",
-            docstring="Directory for output FASTA files",
+            docstring=(
+                "Directory for output FASTA files. A relative folder is placed inside the "
+                "workflow's folder. Leave empty to write no file."
+            ),
         ),
         "output_prefix": StringParameter(
             "Output Prefix",
@@ -121,10 +144,11 @@ class CloudGcpProteinmpnn(Node):
     def execute(self, predecessor_data, flow_vars):
         """Execute the cloud API call for ProteinMPNN sequence design."""
         stream_log(
-            "Starting ProteinMPNN cloud execution...",
+            "Starting ProteinMPNN on Salpa Compute...",
             node_id=self.node_id,
             progress=0,
         )
+        deadline = None
 
         try:
             result = NodeResult()
@@ -138,10 +162,7 @@ class CloudGcpProteinmpnn(Node):
             # ── Auth token ───────────────────────────────────────────────
             auth_token = os.environ.get("BOCOFLOW_CLOUD_AUTH_TOKEN")
             if not auth_token:
-                raise NodeException(
-                    "cloud-gcp-proteinmpnn",
-                    "Cloud authentication required. Please sign in to use cloud nodes.",
-                )
+                raise NodeException("cloud-gcp-proteinmpnn", sc.SIGN_IN_MESSAGE)
 
             # ── Read PDB content ─────────────────────────────────────────
             pdb_path = flow_vars["pdb_input"].get_value()
@@ -183,12 +204,19 @@ class CloudGcpProteinmpnn(Node):
             output_folder = flow_vars["output_folder"].get_value()
             output_prefix = flow_vars["output_prefix"].get_value()
 
+            deadline = sc.deadline(flow_vars, RECOMMENDED_TIMEOUT, SERVICE_MAX_WAIT)
+            if deadline.warning:
+                stream_log(deadline.warning, node_id=self.node_id, level="warning")
+
             # ── Prepare request payload ──────────────────────────────────
             payload = {
                 "node_info": {
                     "node_id": getattr(self, "node_id", "unknown"),
                     "node_type": "CloudGcpProteinmpnn",
+                    "package": PACKAGE_NAME,
+                    "package_version": PACKAGE_VERSION,
                 },
+                "client_request_id": sc.new_client_request_id(),
                 "predecessor_data": {},
                 "options": {
                     "pdb_content": pdb_content,
@@ -209,21 +237,21 @@ class CloudGcpProteinmpnn(Node):
             }
 
             stream_log(
-                f"Calling ProteinMPNN API ({model_variant}/{checkpoint}, "
+                f"Calling ProteinMPNN on Salpa Compute ({model_variant}/{checkpoint}, "
                 f"{num_sequences} sequences, T={sampling_temperature})...",
                 node_id=self.node_id,
                 progress=20,
             )
 
-            # ── Call API Gateway ─────────────────────────────────────────
+            # ── Call the gateway ─────────────────────────────────────────
             # `requests` stays imported — the except clauses below still catch
             # requests.Timeout / requests.RequestException, which post_with_progress
             # re-raises from its worker thread.
             response = post_with_progress(
-                url=self.API_ENDPOINT,
+                url=sc.execute_url(SERVICE),
                 json=payload,
                 headers=headers,
-                timeout=300,
+                timeout=deadline.post_timeout,
                 node_id=self.node_id,
                 service_name="ProteinMPNN",
                 # No minutes figure here on purpose: this is the CPU service with a ~7 MB
@@ -235,8 +263,22 @@ class CloudGcpProteinmpnn(Node):
             # ── Handle response ──────────────────────────────────────────
             if response.status_code == 200:
                 cloud_result = response.json()
-                cloud_data = cloud_result.get("result", {})
-                usage_info = cloud_result.get("usage", {})
+                job_id = cloud_result.get("job_id")
+                failure = sc.failure_message(cloud_result)
+                if failure:
+                    raise NodeException(
+                        "cloud-gcp-proteinmpnn",
+                        f"ProteinMPNN failed: {failure}" + (f" (job {job_id})" if job_id else ""),
+                    )
+                cloud_data = cloud_result.get("result")
+                if not isinstance(cloud_data, dict) or not cloud_data:
+                    # An empty result is never a success: older gateways relayed a failed
+                    # service run this way.
+                    raise NodeException(
+                        "cloud-gcp-proteinmpnn",
+                        "ProteinMPNN returned no result" + (f" (job {job_id})." if job_id else "."),
+                    )
+                usage_info = cloud_result.get("usage") or {}
 
                 sequences = cloud_data.get("sequences", [])
                 native_sequence = cloud_data.get("native_sequence", "")
@@ -251,12 +293,17 @@ class CloudGcpProteinmpnn(Node):
                 # ── Save FASTA output ────────────────────────────────────
                 output_file_path = ""
                 if output_folder:
-                    resolved_folder = self.resolve_path(output_folder)
+                    resolved_folder, folder_note = sc.resolve_output_dir(self, output_folder)
+                    if folder_note:
+                        stream_log(folder_note, node_id=self.node_id, level="warning")
                     os.makedirs(resolved_folder, exist_ok=True)
 
-                    prefix = output_prefix or "proteinmpnn"
+                    prefix = (output_prefix or "proteinmpnn").replace("/", "_").replace("\\", "_")
                     fasta_filename = f"{prefix}_designed.fasta"
-                    output_file_path = os.path.join(resolved_folder, fasta_filename)
+                    output_file_path = os.path.join(str(resolved_folder), fasta_filename)
+                    result.files["output"]["designed_fasta"] = self.format_output_path(
+                        output_file_path
+                    )
 
                     with open(output_file_path, "w") as f:
                         # Write native sequence
@@ -301,7 +348,7 @@ class CloudGcpProteinmpnn(Node):
                     "model_name": cloud_data.get("model_name", checkpoint),
                     "processing_time_seconds": processing_time,
                     "backend": cloud_data.get("backend", "cpu"),
-                    "job_id": cloud_result.get("job_id"),
+                    "job_id": job_id,
                     "output_file": output_file_path,
                     "pdb_content": pdb_content,
                     "usage": {
@@ -309,7 +356,7 @@ class CloudGcpProteinmpnn(Node):
                         "cost_usd": usage_info.get("cost_usd", 0),
                     },
                 }
-                result.metadata["cloud_job_id"] = cloud_result.get("job_id")
+                result.metadata["cloud_job_id"] = job_id
 
                 stream_log(
                     result.message,
@@ -318,51 +365,22 @@ class CloudGcpProteinmpnn(Node):
                 )
                 return result.to_json()
 
-            elif response.status_code == 401:
-                raise NodeException(
-                    "cloud-gcp-proteinmpnn",
-                    "Authentication failed. Please sign in again.",
-                )
-
-            elif response.status_code == 402:
-                raise NodeException(
-                    "cloud-gcp-proteinmpnn",
-                    "Insufficient credits. Please purchase more credits.",
-                )
-
-            elif response.status_code == 403:
-                raise NodeException(
-                    "cloud-gcp-proteinmpnn",
-                    "Usage quota exceeded. Please upgrade your plan.",
-                )
-
-            elif response.status_code == 503:
-                raise NodeException(
-                    "cloud-gcp-proteinmpnn",
-                    "Cloud service temporarily unavailable. Please try again.",
-                )
-
-            else:
-                error_detail = ""
-                try:
-                    error_detail = response.json().get("detail", response.text)
-                except Exception:
-                    error_detail = response.text
-                raise NodeException(
-                    "cloud-gcp-proteinmpnn",
-                    f"Cloud API error ({response.status_code}): {error_detail}",
-                )
+            raise NodeException(
+                "cloud-gcp-proteinmpnn", sc.http_error_message(response, "ProteinMPNN")
+            )
 
         except NodeException:
             raise
         except requests.Timeout:
             raise NodeException(
                 "cloud-gcp-proteinmpnn",
-                "Cloud request timed out. The service may be scaling up — please retry.",
+                "No answer from Salpa Compute in time. "
+                + (
+                    (deadline.warning if deadline else None)
+                    or "The service may be scaling up — please retry."
+                ),
             )
         except requests.RequestException as e:
             raise NodeException("cloud-gcp-proteinmpnn", f"Network error: {e}")
         except Exception as e:
-            raise NodeException(
-                "cloud-gcp-proteinmpnn", f"Unexpected error: {e}"
-            )
+            raise NodeException("cloud-gcp-proteinmpnn", f"Unexpected error: {e}")

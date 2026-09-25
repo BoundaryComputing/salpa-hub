@@ -1,10 +1,10 @@
-# Cloud Modal Boltz-2 - Mode B (BoCoFlow Credits)
+# Cloud Modal Boltz-2 - a Salpa Compute node
 # Protein structure prediction using Boltz-2 on Modal H100 GPU
-# This is a client stub that calls the API Gateway, not Modal directly.
+# This is a client stub that calls the Salpa Compute gateway, not Modal directly.
 
 [package]
 name = "cloud-modal-boltz2"
-version = "1.0.4"
+version = "1.0.5"
 description = "Protein structure prediction using Boltz-2 on Modal H100 GPU"
 author = "BoundaryComputing"
 license = "MIT"
@@ -19,7 +19,7 @@ num_in = 1
 num_out = 1
 color = "purple"
 
-# cloud-modal hashtag indicates Mode B (BoCoFlow credits)
+# cloud-modal hashtag indicates a Salpa Compute node on Modal
 # UI can use this to show cloud/credits indicator
 hashtags = [
     "cloud-modal",
@@ -33,6 +33,11 @@ hashtags = [
 
 [node.metadata]
 icon = "🧬"
+
+[node.features]
+# The timeout a new node starts with (seconds): Boltz-2's 30-minute limit, a cold start and the download.
+# A node already saved in a workflow keeps the timeout it was saved with.
+default_timeout = 2400
 
 [node.cloud]
 provider = "modal"
@@ -53,7 +58,10 @@ usage = """
 Boltz-2 is a state-of-the-art protein structure prediction model.
 
 Input: Protein amino acid sequence (one-letter codes)
-Output: 3D structure prediction in CIF format (as tarball)
+Output: 3D structure prediction in CIF format, with confidence and pLDDT,
+plus the full result as a tarball in the workflow folder. A result too large
+for the reply is downloaded from Salpa Compute and then deleted there; an
+archive nobody downloads is deleted within 24 hours.
 
 Example sequence:
 MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSH

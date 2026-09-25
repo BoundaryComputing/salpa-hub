@@ -1,4 +1,4 @@
-"""Cloud Modal DiffDock - Mode B (BoCoFlow Credits)"""
+"""Cloud Modal DiffDock - a Salpa Compute node"""
 
 from .node import CloudModalDiffdock
 

@@ -1,31 +1,28 @@
 """
-Cloud Modal Chai-1 - Mode B (BoCoFlow Credits)
+Cloud Modal Chai-1 — a Salpa Compute node.
 
-Multi-modal structure prediction using Chai-1 on Modal's H100 GPU infrastructure.
+Multi-modal structure prediction using Chai-1 on an H100 GPU.
 
-This node is a client stub that calls the BoCoFlow API Gateway,
-which then routes requests to Modal endpoints with Proxy Auth tokens.
-
-Unlike modal-user nodes (Mode A), users don't need their own Modal account.
-Instead, they pay with BoCoFlow credits.
+This node is a client stub. It sends the input to the Salpa Compute gateway, which checks
+the user's sign-in and quota and runs Chai-1 on Modal. No Modal account is needed.
 
 Chai-1 can predict structures of proteins, nucleic acids, small molecules,
 and their complexes from FASTA-format input with entity type annotations.
 
-Architecture:
-    1. User authenticates with Firebase (token in BOCOFLOW_CLOUD_AUTH_TOKEN)
-    2. This node sends FASTA/sequence to API Gateway with Firebase token
-    3. API Gateway verifies token, checks credits
-    4. API Gateway calls Modal with Proxy Auth tokens
-    5. Chai-1 runs on H100 GPU, returns structure predictions
-    6. Result (tarball with CIF files) returns through this node
-    7. Credits are deducted from user's account
+How the result comes back:
+    - A result that fits in the reply (up to 16 MiB compressed, nearly every run) arrives
+      whole.
+    - A larger one arrives as its structure samples and scores plus a link to the full
+      archive. The node downloads the archive into the workflow folder, checks its size
+      and SHA-256, and then has the server copy deleted. Salpa Compute never keeps it
+      longer than 24 hours.
 
 Reference: https://github.com/chaidiscovery/chai-lab
 """
 
-import base64
 import os
+import sys
+import tarfile
 from datetime import datetime
 from pathlib import Path
 
@@ -40,6 +37,31 @@ from bocoflow_core.parameters import (
 )
 from bocoflow_core.stream_logger import post_with_progress, stream_log
 
+try:  # loaded as a package: node_runner, the server, tests
+    from . import _salpa_compute as sc
+except ImportError:
+    try:  # the node's folder is on sys.path
+        import _salpa_compute as sc
+    except ImportError:  # anything else: load the file that sits beside this one
+        import importlib.util
+
+        _spec = importlib.util.spec_from_file_location(
+            "_salpa_compute_cloud_modal_chai1",
+            str(Path(__file__).with_name("_salpa_compute.py")),
+        )
+        sc = importlib.util.module_from_spec(_spec)
+        sys.modules[_spec.name] = sc
+        _spec.loader.exec_module(sc)
+
+#: Sent with every request, so the gateway records which version of this node called it.
+PACKAGE_NAME = "cloud-modal-chai1"
+PACKAGE_VERSION = "1.0.5"
+SERVICE = "chai1"
+#: The timeout a run needs: Chai-1's 15-minute limit, a cold start, and the download.
+RECOMMENDED_TIMEOUT = 1500
+#: The gateway stops waiting at 1800 s; wait a minute more for its answer.
+SERVICE_MAX_WAIT = 1860
+
 #: How to run this node on its own -- the values `salpa smoke` feeds it. Strings
 #: starting with `demo_data/` resolve relative to this directory. Running needs a
 #: Salpa account with cloud access; without one the node stops at authentication,
@@ -49,12 +71,26 @@ DEMO_CONFIG = {
 }
 
 
+def _main_files(names, folder, prefix, best_idx):
+    """{role: (member name, destination)}: the best sample's structure and scores."""
+    chosen = {}
+    cifs = [n for n in names if n.endswith(".cif")]
+    best = [n for n in cifs if f"pred.model_idx_{best_idx}." in n]
+    structure = (best or cifs or [None])[0]
+    if structure:
+        chosen["structure"] = (structure, folder / f"{prefix}_best.cif")
+    scores = [n for n in names if f"scores.model_idx_{best_idx}." in n and n.endswith(".npz")]
+    if scores:
+        chosen["scores"] = (scores[0], folder / f"{prefix}_best_scores.npz")
+    return chosen
+
+
 class CloudModalChai1(Node):
     """
-    Chai-1 Multi-Modal Structure Prediction (BoCoFlow Credits - Mode B).
+    Chai-1 multi-modal structure prediction on Salpa Compute (H100 GPU).
 
-    This is a CLIENT STUB - actual computation happens on Modal cloud (H100 GPU).
-    The workflow engine executes this node, which calls the API Gateway.
+    This is a client stub: the prediction runs in the cloud, and this node sends the
+    input and saves the result into the workflow folder.
 
     Chai-1 can predict 3D structures of:
     - Proteins (from amino acid sequences)
@@ -63,23 +99,16 @@ class CloudModalChai1(Node):
     - Multi-chain complexes
 
     Prerequisites:
-    - User must be logged in with Firebase
-    - User must have sufficient BoCoFlow credits
+    - The user is signed in to Salpa.
+    - The user's Salpa Compute quota is not used up.
 
-    No Modal account or 'modal setup' required!
+    No Modal account or 'modal setup' is needed.
     """
 
     # NOTE: Metadata (name, hashtags, num_in, num_out) comes from meta.toml.
     # NOTE: EXECUTION_STRATEGY and ENVIRONMENT are auto-detected via shared_environment in meta.toml.
-
-    # API Gateway endpoint (unified route — not Modal directly!)
-    API_ENDPOINT = (
-        os.environ.get(
-            "BOCOFLOW_CLOUD_API_URL",
-            "https://bocoflow-api-gateway-823406908684.us-central1.run.app",
-        )
-        + "/api/cloud/nodes/chai1/execute"
-    )
+    # NOTE: The gateway address is read when the node runs (_salpa_compute.api_base), so
+    #       BOCOFLOW_CLOUD_API_URL set after import still counts.
 
     OPTIONS = {
         "fasta_input": TextParameter(
@@ -148,8 +177,10 @@ class CloudModalChai1(Node):
             "Output Folder",
             default="",
             docstring=(
-                "Folder for output files. Leave empty to use the workflow's working directory. "
-                "Outputs: {prefix}.tar.gz (all samples) and {prefix}_best.cif (best structure)"
+                "Folder for output files. Leave empty to use the workflow's folder; a "
+                "relative folder is placed inside it. "
+                "Outputs: {prefix}.tar.gz (all samples), {prefix}_best.cif (best structure) "
+                "and {prefix}_best_scores.npz"
             ),
         ),
         "output_prefix": TextParameter(
@@ -176,8 +207,8 @@ class CloudModalChai1(Node):
     }
 
     def execute(self, predecessor_data, flow_vars):
-        """Execute by calling the API Gateway (which calls Modal)."""
-        log_message("Starting CloudModalChai1 execution (Mode B)")
+        """Send the input to Salpa Compute and save what comes back."""
+        log_message("Starting CloudModalChai1 (Salpa Compute)")
 
         result = NodeResult()
         result.metadata.update(
@@ -189,16 +220,11 @@ class CloudModalChai1(Node):
             }
         )
 
-        # Get auth token from environment (injected by BF2 worker)
+        # The worker passes the signed-in user's token in this variable.
         auth_token = os.environ.get("BOCOFLOW_CLOUD_AUTH_TOKEN")
-
         if not auth_token:
             result.success = False
-            result.message = (
-                "Cloud authentication required. Please sign in to use cloud nodes.\n"
-                "This node requires BoCoFlow cloud credits (Mode B).\n"
-                "Unlike Mode A nodes, you don't need your own Modal account."
-            )
+            result.message = sc.SIGN_IN_MESSAGE
             return result.to_json()
 
         # Get parameters
@@ -236,11 +262,16 @@ class CloudModalChai1(Node):
             )
             return result.to_json()
 
-        # Prepare request payload
+        deadline = sc.deadline(flow_vars, RECOMMENDED_TIMEOUT, SERVICE_MAX_WAIT)
+        if deadline.warning:
+            stream_log(deadline.warning, node_id=self.node_id, level="warning")
+
         payload = {
             "node_info": {
                 "node_id": getattr(self, "node_id", "unknown"),
                 "node_type": "CloudModalChai1",
+                "package": PACKAGE_NAME,
+                "package_version": PACKAGE_VERSION,
             },
             "predecessor_data": {
                 "fasta_input": fasta_input,
@@ -256,7 +287,13 @@ class CloudModalChai1(Node):
                 "seed": seed,
                 "use_esm_embeddings": use_esm_embeddings,
             },
+            # A result too large for the reply comes as its main files plus a download link.
+            "result_delivery": "archive",
+            "client_request_id": sc.new_client_request_id(),
         }
+        inline_max = sc.requested_inline_max_bytes()
+        if inline_max is not None:
+            payload["inline_max_bytes"] = inline_max
 
         headers = {
             "Authorization": f"Bearer {auth_token}",  # Firebase token
@@ -264,25 +301,23 @@ class CloudModalChai1(Node):
         }
 
         try:
-            log_message(f"Calling API Gateway: {self.API_ENDPOINT}")
+            url = sc.execute_url(SERVICE)
+            log_message(f"Calling Salpa Compute: {url}")
             if fasta_input:
                 log_message(f"FASTA input length: {len(fasta_input)} chars")
             else:
                 log_message(f"Protein sequence length: {len(protein_sequence)} amino acids")
-                if ligand_smiles:
-                    log_message(f"Ligand SMILES: {ligand_smiles[:50]}...")
 
-            # Chai-1 can take several minutes - use longer timeout
             stream_log(
-                "Calling Chai-1 API... First call may take 2-3 min (cold start).",
+                "Calling Chai-1 on Salpa Compute... First call may take 2-3 min (cold start).",
                 node_id=self.node_id,
                 progress=10,
             )
             response = post_with_progress(
-                url=self.API_ENDPOINT,
+                url=url,
                 json=payload,
                 headers=headers,
-                timeout=1800,
+                timeout=deadline.post_timeout,
                 node_id=self.node_id,
                 service_name="Chai-1",
                 cold_start_hint="cold starts take 2-3 min",
@@ -290,201 +325,160 @@ class CloudModalChai1(Node):
 
             stream_log("Received response from cloud", node_id=self.node_id, progress=50)
 
-            if response.status_code == 200:
-                cloud_result = response.json()
-                modal_result = cloud_result.get("result", {})
-                usage_info = cloud_result.get("usage", {})
+            if response.status_code != 200:
+                result.success = False
+                result.message = sc.http_error_message(response, "Chai-1")
+                return result.to_json()
 
-                # Check if prediction succeeded
-                if modal_result.get("status") == "error":
-                    result.success = False
-                    result.message = (
-                        f"Chai-1 prediction failed: {modal_result.get('error', 'Unknown error')}"
-                    )
-                    return result.to_json()
+            cloud_result = response.json()
+            job_id = cloud_result.get("job_id")
+            result.metadata["cloud_job_id"] = job_id
 
-                # Save output tarball if present
-                output_tarball = modal_result.get("output_tarball_base64", "")
-                stream_log("Processing output files...", node_id=self.node_id, progress=60)
-                output_path = None
-                output_size = 0
-                cif_path = None
-                file_prefix = None
-                final_folder = None
-
-                if output_tarball:
-                    output_bytes = base64.b64decode(output_tarball)
-                    output_size = len(output_bytes)
-
-                    # === Determine output folder ===
-                    if output_folder:
-                        if output_folder.startswith(("abs:", "rel:")):
-                            workflow_dir = os.environ.get("BOCOFLOW_WORKFLOW_DIR", "")
-                            if output_folder.startswith("abs:"):
-                                final_folder = Path(output_folder[4:])
-                            elif workflow_dir:
-                                final_folder = Path(workflow_dir) / output_folder[4:]
-                            else:
-                                final_folder = Path(output_folder[4:])
-                        else:
-                            final_folder = Path(output_folder)
-                    else:
-                        workflow_dir = os.environ.get("BOCOFLOW_WORKFLOW_DIR", "")
-                        if workflow_dir:
-                            final_folder = Path(workflow_dir)
-                        else:
-                            downloads_dir = Path.home() / "Downloads"
-                            if downloads_dir.exists():
-                                final_folder = downloads_dir
-                            else:
-                                final_folder = Path("/tmp")
-
-                    # === Generate filename prefix ===
-                    if output_prefix:
-                        file_prefix = output_prefix
-                    else:
-                        # Auto-generate from sequence or fasta
-                        if protein_sequence:
-                            seq_short = protein_sequence[:8]
-                        elif fasta_input:
-                            # Extract first sequence from FASTA
-                            lines = fasta_input.strip().split("\n")
-                            seq_short = ""
-                            for line in lines:
-                                if not line.startswith(">"):
-                                    seq_short = line[:8]
-                                    break
-                        else:
-                            seq_short = "unknown"
-                        seq_short = "".join(c for c in seq_short if c.isalnum())
-                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                        file_prefix = f"chai1_{seq_short}_{timestamp}"
-
-                    # === Build final paths ===
-                    final_folder.mkdir(parents=True, exist_ok=True)
-                    output_path = final_folder / f"{file_prefix}.tar.gz"
-
-                    # Write tarball
-                    output_path.write_bytes(output_bytes)
-                    log_message(f"Saved output to {output_path} ({output_size} bytes)")
+            failure = sc.failure_message(cloud_result)
+            if failure:
+                tail = sc.log_tail(cloud_result)
+                if tail:
                     stream_log(
-                        f"Output saved: {output_path.name} ({output_size} bytes)",
+                        f"Chai-1 output before it stopped:\n{tail}",
                         node_id=self.node_id,
-                        progress=75,
+                        level="error",
                     )
+                result.success = False
+                result.message = f"Chai-1 prediction failed: {failure}" + (
+                    f" (job {job_id})" if job_id else ""
+                )
+                return result.to_json()
 
-                    # Extract the best CIF file for convenience
-                    best_idx = modal_result.get("best_sample_idx", 0)
-                    try:
-                        import io
-                        import tarfile
+            modal_result = cloud_result.get("result") or {}
+            usage_info = cloud_result.get("usage") or {}
 
-                        with tarfile.open(fileobj=io.BytesIO(output_bytes), mode="r:gz") as tar:
-                            cif_members = [m for m in tar.getmembers() if m.name.endswith(".cif")]
-                            if cif_members:
-                                # Try to find the best sample CIF, otherwise use first
-                                target_member = cif_members[0]
-                                for m in cif_members:
-                                    if f"pred.model_idx_{best_idx}" in m.name:
-                                        target_member = m
-                                        break
-
-                                cif_path = final_folder / f"{file_prefix}_best.cif"
-                                with tar.extractfile(target_member) as f:
-                                    cif_path.write_bytes(f.read())
-                                log_message(f"Extracted best CIF structure to {cif_path}")
-                    except Exception as e:
-                        log_message(f"Warning: Could not extract CIF file: {e}")
+            final_folder, folder_note = sc.resolve_output_dir(self, output_folder)
+            if output_prefix:
+                file_prefix = output_prefix.replace("/", "_").replace("\\", "_")
+            else:
+                # Auto-generate from sequence or fasta
+                if protein_sequence:
+                    seq_short = protein_sequence[:8]
+                elif fasta_input:
+                    seq_short = ""
+                    for line in fasta_input.strip().split("\n"):
+                        if not line.startswith(">"):
+                            seq_short = line[:8]
+                            break
                 else:
-                    log_message("Warning: No output tarball received from Modal")
+                    seq_short = "unknown"
+                seq_short = "".join(c for c in seq_short if c.isalnum())
+                file_prefix = f"chai1_{seq_short}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
-                # Build result data
-                output_files_list = modal_result.get("output_files", [])
-                num_samples = modal_result.get("num_samples", 0)
-                best_score = modal_result.get("best_aggregate_score", 0.0)
-                scores = modal_result.get("scores", [])
+            stream_log("Saving the result...", node_id=self.node_id, progress=60)
+            try:
+                saved = sc.save_result(
+                    cloud_result,
+                    final_folder,
+                    file_prefix,
+                    auth_token,
+                    node_id=self.node_id,
+                    deadline=deadline,
+                )
+            except sc.ResultError as exc:
+                result.success = False
+                result.message = f"Chai-1 prediction completed, but nothing could be saved. {exc}"
+                return result.to_json()
 
-                result.success = True
-                if output_path and output_path.exists():
-                    msg_parts = [
-                        f"Chai-1 structure prediction completed.",
-                        f"{num_samples} samples generated.",
-                        f"Best score: {best_score:.4f} (sample {best_idx}).",
-                        f"Output saved to {output_path} ({output_size} bytes).",
-                    ]
-                    if cif_path and cif_path.exists():
-                        msg_parts.append(f"Best CIF: {cif_path}")
-                    msg_parts.append(f"Duration: {usage_info.get('duration_seconds', 0):.2f}s")
-                    result.message = " ".join(msg_parts)
-                elif output_tarball:
-                    result.message = (
-                        f"Chai-1 prediction completed. "
-                        f"{num_samples} samples, best score: {best_score:.4f}. "
-                        f"Output available ({output_size} bytes, {len(output_files_list)} files). "
-                        f"Duration: {usage_info.get('duration_seconds', 0):.2f}s"
-                    )
-                else:
-                    result.message = (
-                        f"Chai-1 prediction completed but no output files found. "
-                        f"Duration: {usage_info.get('duration_seconds', 0):.2f}s"
-                    )
+            warnings = list(saved.warnings)
+            if folder_note:
+                warnings.append(folder_note)
 
-                result.data = {
-                    "output_file": (
-                        str(output_path) if output_path and output_path.exists() else None
-                    ),
-                    "cif_file": str(cif_path) if cif_path and cif_path.exists() else None,
-                    "output_folder": str(final_folder) if final_folder else None,
-                    "output_prefix": file_prefix,
-                    "output_file_size": output_size,
-                    "output_files": output_files_list,
-                    "output_tarball_available": bool(output_tarball),
-                    "num_samples": num_samples,
-                    "best_sample_idx": best_idx,
-                    "best_aggregate_score": best_score,
-                    "scores": scores,
-                    "fasta_input_length": modal_result.get("fasta_input_length", 0),
-                    "processing_time_seconds": modal_result.get("processing_time_seconds", 0),
-                    "modal_metadata": modal_result.get("modal_metadata", {}),
-                    "job_id": cloud_result.get("job_id"),
-                    "usage": {
-                        "duration_seconds": usage_info.get("duration_seconds", 0),
-                        "cost_usd": usage_info.get("cost_usd", 0),
-                    },
-                    "status": "completed",
-                    "credential_mode": "bocoflow",
+            best_idx = modal_result.get("best_sample_idx", 0)
+            files = {}
+            try:
+                chosen = _main_files(sc.members(saved.source), final_folder, file_prefix, best_idx)
+                written = sc.extract(saved.source, {m: dest for m, dest in chosen.values()})
+                files = {
+                    role: str(dest) for role, (member, dest) in chosen.items() if member in written
                 }
-                result.metadata["cloud_job_id"] = cloud_result.get("job_id")
+            except (tarfile.TarError, EOFError, OSError) as exc:
+                warnings.append(f"The best structure could not be taken out of the result: {exc}")
 
-            elif response.status_code == 401:
-                result.success = False
-                result.message = "Authentication failed. Please sign in again."
+            for warning in warnings:
+                stream_log(warning, node_id=self.node_id, level="warning")
 
-            elif response.status_code == 402:
-                result.success = False
-                result.message = "Insufficient credits. Please purchase more credits."
-
-            elif response.status_code == 503:
+            if "structure" not in files:
+                # A prediction without a structure is not a result, whatever the reply said.
                 result.success = False
                 result.message = (
-                    "Modal cloud service temporarily unavailable. "
-                    "The H100 GPU may be scaling up. Please try again in a few minutes."
+                    "Chai-1 finished, but the result holds no structure"
+                    + (f" (job {job_id})" if job_id else "")
+                    + f". What came back was saved to {saved.tarball}."
                 )
+                return result.to_json()
 
+            num_samples = modal_result.get("num_samples", 0)
+            best_score = modal_result.get("best_aggregate_score", 0.0) or 0.0
+            scores = modal_result.get("scores", [])
+            tarball = saved.tarball
+            structure = files.get("structure")
+            duration = usage_info.get("duration_seconds", 0) or 0
+
+            parts = [
+                "Chai-1 structure prediction completed.",
+                f"{num_samples} samples generated.",
+                f"Best score: {best_score:.4f} (sample {best_idx}).",
+            ]
+            if structure:
+                parts.append(f"Best CIF: {structure}.")
+            if saved.complete:
+                parts.append(f"Full result saved to {tarball} ({saved.tarball_bytes} bytes).")
             else:
-                error_detail = ""
-                try:
-                    error_detail = response.json().get("detail", response.text)
-                except Exception:
-                    error_detail = response.text
-                result.success = False
-                result.message = f"API error ({response.status_code}): {error_detail}"
+                parts.append(f"Main files saved to {tarball} ({saved.tarball_bytes} bytes).")
+            if saved.downloaded and saved.server_copy_deleted:
+                parts.append("The copy held by Salpa Compute was deleted.")
+            parts.append(f"Duration: {duration:.2f}s")
+            if warnings:
+                parts.append(f"Note: {warnings[0]}")
+
+            result.success = True
+            result.message = " ".join(parts)
+            result.data = {
+                "output_file": str(tarball) if tarball else None,
+                "cif_file": structure,
+                "output_folder": str(final_folder),
+                "output_prefix": file_prefix,
+                "output_file_size": saved.tarball_bytes,
+                "output_files": saved.files,
+                "output_tarball_available": bool(tarball),
+                "num_samples": num_samples,
+                "best_sample_idx": best_idx,
+                "best_aggregate_score": best_score,
+                "scores": scores,
+                "fasta_input_length": modal_result.get("fasta_input_length", 0),
+                "processing_time_seconds": modal_result.get("processing_time_seconds", 0),
+                "modal_metadata": modal_result.get("modal_metadata", {}),
+                "job_id": job_id,
+                "usage": {
+                    "duration_seconds": usage_info.get("duration_seconds", 0),
+                    "cost_usd": usage_info.get("cost_usd", 0),
+                },
+                "status": "completed",
+                "credential_mode": "bocoflow",
+                "structure_file": structure,
+                "scores_file": files.get("scores"),
+                "archive_complete": saved.complete,
+                "archive_sha256": saved.sha256,
+                "delivery": saved.content,
+                "warnings": warnings,
+            }
+            if tarball:
+                result.files["output"]["archive"] = self.format_output_path(str(tarball))
+            for role, path in files.items():
+                result.files["output"][role] = self.format_output_path(path)
+            stream_log("Chai-1 result saved.", node_id=self.node_id, progress=100)
 
         except requests.Timeout:
             result.success = False
-            result.message = (
-                "Request timed out. Chai-1 predictions can take several minutes. "
-                "Please try again or use a smaller complex."
+            result.message = "No answer from Salpa Compute in time. " + (
+                deadline.warning
+                or "Chai-1 predictions can take several minutes; try again, or use a smaller complex."
             )
 
         except requests.RequestException as e:

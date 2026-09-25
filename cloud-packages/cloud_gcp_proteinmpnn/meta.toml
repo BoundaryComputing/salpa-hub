@@ -1,9 +1,9 @@
 # Cloud GCP ProteinMPNN — protein sequence design from backbone structure.
-# This is a client stub that calls the BoCoFlow API Gateway → GCP Cloud Run (CPU).
+# This is a client stub that calls the Salpa Compute gateway → GCP Cloud Run (CPU).
 
 [package]
 name = "cloud-gcp-proteinmpnn"
-version = "1.0.3"
+version = "1.0.4"
 description = "Protein sequence design from backbone structure using ProteinMPNN (GCP Cloud)"
 author = "BoundaryComputing"
 license = "MIT"
@@ -33,6 +33,9 @@ category = "Protein Design"
 tooltip = "Design amino acid sequences from backbone structure using ProteinMPNN (GCP Cloud Run, CPU)"
 
 [node.features]
+# The timeout a new node starts with (seconds): the gateway's 5-minute limit for ProteinMPNN and a few minutes more.
+# A node already saved in a workflow keeps the timeout it was saved with.
+default_timeout = 600
 supports_resume = false
 requires_gpu = false
 parallel_capable = false

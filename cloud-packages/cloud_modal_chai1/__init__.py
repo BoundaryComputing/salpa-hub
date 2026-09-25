@@ -1,4 +1,4 @@
-"""Cloud Modal Chai-1 - Mode B (BoCoFlow Credits)"""
+"""Cloud Modal Chai-1 - a Salpa Compute node"""
 
 from .node import CloudModalChai1
 
