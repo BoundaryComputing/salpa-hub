@@ -62,7 +62,7 @@ except ImportError:
 
 #: Sent with every request, so the gateway records which version of this node called it.
 PACKAGE_NAME = "cloud-modal-diffdock"
-PACKAGE_VERSION = "1.0.3"
+PACKAGE_VERSION = "1.0.5"
 SERVICE = "modal-diffdock"
 #: The timeout a run needs: DiffDock's 15-minute limit, a cold start, and the download.
 RECOMMENDED_TIMEOUT = 1500
@@ -308,15 +308,17 @@ class CloudModalDiffdock(Node):
             )
 
             # DiffDock: warm ~40s, cold start ~590s (ESM-2 model loading)
-            response = post_with_progress(
-                url=sc.execute_url(SERVICE),
-                json=payload,
-                headers=headers,
-                timeout=deadline.post_timeout,
-                node_id=self.node_id,
-                service_name="DiffDock",
-                cold_start_hint="cold starts take up to 10 min",
-            )
+            # Stop in the app cancels this run on Salpa Compute.
+            with sc.cancellable(payload["client_request_id"], deadline.post_timeout):
+                response = post_with_progress(
+                    url=sc.execute_url(SERVICE),
+                    json=payload,
+                    headers=headers,
+                    timeout=deadline.post_timeout,
+                    node_id=self.node_id,
+                    service_name="DiffDock",
+                    cold_start_hint="cold starts take up to 10 min",
+                )
 
             if response.status_code != 200:
                 result.success = False
@@ -460,11 +462,17 @@ class CloudModalDiffdock(Node):
                 result.files["output"][f"pose_{index + 1}"] = self.format_output_path(path)
 
         except requests.Timeout:
+            # The node gives up; the run need not go on without it.
+            stopped = sc.cancel_run(payload["client_request_id"])
             result.success = False
-            result.message = "No answer from Salpa Compute in time. " + (
-                deadline.warning
-                or "DiffDock cold starts take ~10 min (ESM-2 model loading); warm calls take "
-                "~40s. Try again: the container may now be warm."
+            result.message = (
+                "No answer from Salpa Compute in time"
+                + ("; the run there was cancelled. " if stopped else ". ")
+                + (
+                    deadline.warning
+                    or "DiffDock cold starts take ~10 min (ESM-2 model loading); warm calls take "
+                    "~40s. Try again: the container may now be warm."
+                )
             )
 
         except requests.RequestException as e:

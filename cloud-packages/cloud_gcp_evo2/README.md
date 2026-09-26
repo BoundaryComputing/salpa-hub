@@ -32,3 +32,14 @@ earlier keeps the timeout it was saved with: raise it under **Advanced Options >
 may need.
 
 A failed run is reported as a failure with its reason, never as an empty success.
+
+## Stopping a run
+
+Pressing Stop in Salpa also stops the run on Salpa Compute (Salpa 0.8.3 and later): the GPU work
+ends within about half a minute. So does a run the node gives up on when its timeout passes. The
+GPU time the run used until then counts toward your monthly GPU hour, and a run whose result you
+did not receive is never charged. The same holds for a run that fails because of its input, such
+as one that runs out of GPU memory; a failure on our side counts nothing.
+
+You can have two GPU runs in progress at a time. A third is refused until one of them finishes or
+is stopped.

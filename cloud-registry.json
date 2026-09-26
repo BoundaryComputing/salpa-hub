@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-09-25T18:58:38.691038+00:00",
+  "generated_at": "2026-09-26T06:25:54.361965+00:00",
   "source_name": "Salpa Compute",
   "packages": [
     {
       "name": "cloud-gcp-evo2",
-      "version": "1.0.4",
+      "version": "1.0.6",
       "description": "DNA sequence scoring, embeddings, and generation using Evo2 on GCP (L4 GPU)",
       "display_name": "Evo2 DNA Model (GCP)",
       "category": "Genomics",
@@ -27,7 +27,7 @@
     },
     {
       "name": "cloud-gcp-proteinmpnn",
-      "version": "1.0.4",
+      "version": "1.0.6",
       "description": "Protein sequence design from backbone structure using ProteinMPNN (GCP Cloud)",
       "display_name": "ProteinMPNN Design (GCP)",
       "category": "Protein Design",
@@ -48,7 +48,7 @@
     },
     {
       "name": "cloud-modal-boltz2",
-      "version": "1.0.5",
+      "version": "1.0.7",
       "description": "Protein structure prediction using Boltz-2 on Modal H100 GPU",
       "display_name": "Boltz-2 Prediction (Modal)",
       "category": "cloud",
@@ -67,7 +67,7 @@
     },
     {
       "name": "cloud-modal-chai1",
-      "version": "1.0.5",
+      "version": "1.0.7",
       "description": "Multi-modal structure prediction using Chai-1 on Modal H100 GPU",
       "display_name": "Chai-1 Prediction (Modal)",
       "category": "cloud",
@@ -88,7 +88,7 @@
     },
     {
       "name": "cloud-modal-diffdock",
-      "version": "1.0.3",
+      "version": "1.0.5",
       "description": "Blind protein-ligand docking using DiffDock on Modal A10G GPU",
       "display_name": "DiffDock Docking (Modal)",
       "category": "cloud",

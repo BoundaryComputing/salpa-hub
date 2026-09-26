@@ -51,7 +51,7 @@ except ImportError:
 
 #: Sent with every request, so the gateway records which version of this node called it.
 PACKAGE_NAME = "cloud-gcp-evo2"
-PACKAGE_VERSION = "1.0.4"
+PACKAGE_VERSION = "1.0.6"
 SERVICE = "evo2"
 #: The timeout a run needs: the gateway's 15-minute limit for Evo2 and a few minutes more.
 RECOMMENDED_TIMEOUT = 1200
@@ -160,6 +160,7 @@ class CloudGcpEvo2(Node):
             progress=0,
         )
         deadline = None
+        client_request_id = sc.new_client_request_id()
 
         try:
             result = NodeResult()
@@ -236,7 +237,7 @@ class CloudGcpEvo2(Node):
                     "temperature": temperature,
                     "top_k": top_k,
                 },
-                "client_request_id": sc.new_client_request_id(),
+                "client_request_id": client_request_id,
             }
 
             headers = {
@@ -251,15 +252,17 @@ class CloudGcpEvo2(Node):
             )
 
             # -- Call the gateway --
-            response = post_with_progress(
-                url=sc.execute_url(SERVICE),
-                json=payload,
-                headers=headers,
-                timeout=deadline.post_timeout,
-                node_id=self.node_id,
-                service_name="Evo2",
-                cold_start_hint="cold starts take 2-5 min",
-            )
+            # Stop in the app cancels this run on Salpa Compute.
+            with sc.cancellable(client_request_id, deadline.post_timeout):
+                response = post_with_progress(
+                    url=sc.execute_url(SERVICE),
+                    json=payload,
+                    headers=headers,
+                    timeout=deadline.post_timeout,
+                    node_id=self.node_id,
+                    service_name="Evo2",
+                    cold_start_hint="cold starts take 2-5 min",
+                )
 
             # -- Handle response --
             if response.status_code != 200:
@@ -367,9 +370,12 @@ class CloudGcpEvo2(Node):
         except NodeException:
             raise
         except requests.Timeout:
+            # The node gives up; the run need not go on without it.
+            stopped = sc.cancel_run(client_request_id)
             raise NodeException(
                 "cloud-gcp-evo2",
-                "No answer from Salpa Compute in time. "
+                "No answer from Salpa Compute in time"
+                + ("; the run there was cancelled. " if stopped else ". ")
                 + (
                     (deadline.warning if deadline else None)
                     or "Cold starts may take ~2-5 min. Please try again."

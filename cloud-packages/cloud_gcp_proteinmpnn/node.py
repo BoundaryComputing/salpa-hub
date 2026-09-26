@@ -46,7 +46,7 @@ except ImportError:
 
 #: Sent with every request, so the gateway records which version of this node called it.
 PACKAGE_NAME = "cloud-gcp-proteinmpnn"
-PACKAGE_VERSION = "1.0.4"
+PACKAGE_VERSION = "1.0.6"
 SERVICE = "proteinmpnn"
 #: The timeout a run needs: the gateway's 5-minute limit for ProteinMPNN and a few minutes more.
 RECOMMENDED_TIMEOUT = 600
@@ -149,6 +149,7 @@ class CloudGcpProteinmpnn(Node):
             progress=0,
         )
         deadline = None
+        client_request_id = sc.new_client_request_id()
 
         try:
             result = NodeResult()
@@ -216,7 +217,7 @@ class CloudGcpProteinmpnn(Node):
                     "package": PACKAGE_NAME,
                     "package_version": PACKAGE_VERSION,
                 },
-                "client_request_id": sc.new_client_request_id(),
+                "client_request_id": client_request_id,
                 "predecessor_data": {},
                 "options": {
                     "pdb_content": pdb_content,
@@ -247,18 +248,20 @@ class CloudGcpProteinmpnn(Node):
             # `requests` stays imported — the except clauses below still catch
             # requests.Timeout / requests.RequestException, which post_with_progress
             # re-raises from its worker thread.
-            response = post_with_progress(
-                url=sc.execute_url(SERVICE),
-                json=payload,
-                headers=headers,
-                timeout=deadline.post_timeout,
-                node_id=self.node_id,
-                service_name="ProteinMPNN",
-                # No minutes figure here on purpose: this is the CPU service with a ~7 MB
-                # model and 1-30 s inference, so evo2's "2-5 min" would be wrong, and
-                # nothing in the repo measures what it actually is. Say the true thing.
-                cold_start_hint="the first call may need to start the service",
-            )
+            # Stop in the app cancels this run on Salpa Compute.
+            with sc.cancellable(client_request_id, deadline.post_timeout):
+                response = post_with_progress(
+                    url=sc.execute_url(SERVICE),
+                    json=payload,
+                    headers=headers,
+                    timeout=deadline.post_timeout,
+                    node_id=self.node_id,
+                    service_name="ProteinMPNN",
+                    # No minutes figure here on purpose: this is the CPU service with a ~7 MB
+                    # model and 1-30 s inference, so evo2's "2-5 min" would be wrong, and
+                    # nothing in the repo measures what it actually is. Say the true thing.
+                    cold_start_hint="the first call may need to start the service",
+                )
 
             # ── Handle response ──────────────────────────────────────────
             if response.status_code == 200:
@@ -372,9 +375,12 @@ class CloudGcpProteinmpnn(Node):
         except NodeException:
             raise
         except requests.Timeout:
+            # The node gives up; the run need not go on without it.
+            stopped = sc.cancel_run(client_request_id)
             raise NodeException(
                 "cloud-gcp-proteinmpnn",
-                "No answer from Salpa Compute in time. "
+                "No answer from Salpa Compute in time"
+                + ("; the run there was cancelled. " if stopped else ". ")
                 + (
                     (deadline.warning if deadline else None)
                     or "The service may be scaling up — please retry."

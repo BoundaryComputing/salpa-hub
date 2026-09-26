@@ -36,7 +36,7 @@ from pathlib import Path
 
 import requests
 
-HELPER_VERSION = 1
+HELPER_VERSION = 3
 
 DEFAULT_API_URL = "https://compute.salpa.app"
 API_URL_ENV = "BOCOFLOW_CLOUD_API_URL"
@@ -327,7 +327,8 @@ def http_error_message(response, label):
     if status == 404:
         return detail or f"Salpa Compute at {api_base()} does not offer {label}."
     if status == 429:
-        return "Salpa Compute is busy. Try again in a minute."
+        # The gateway says why: most often two GPU runs are already in progress.
+        return detail or "Salpa Compute is busy. Try again in a minute."
     if status == 503:
         return (
             f"{label} is temporarily unavailable on Salpa Compute; its GPU may be starting. "
@@ -846,3 +847,81 @@ def save_result(cloud_result, folder, prefix, auth_token, node_id=None, deadline
         return saved
 
     raise ResultError(f"Salpa Compute returned no result files (job {job_id or 'unknown'}).")
+
+
+# ---------------------------------------------------------------------------
+# Stopping a run
+# ---------------------------------------------------------------------------
+
+CANCEL_TIMEOUT = (5, 10)
+#: How long the record for Stop outlives the node's own wait.
+CANCEL_RECORD_MARGIN_SECONDS = 120
+
+
+def cancel_url():
+    return f"{api_base()}/api/cloud/jobs/cancel"
+
+
+class _Cancellable:
+    """Records, for the app's Stop, which Salpa Compute run this node is waiting on.
+
+    Stop kills a node outright, so the node cannot cancel its run itself. The app's
+    server reads this record and sends the cancel, then stops the node. It needs a Salpa
+    that knows how (bocoflow_core.stop_flag.register_cloud_request); with an older one
+    this does nothing, and a stopped run goes on to its end as before.
+    """
+
+    def __init__(self, client_request_id, seconds):
+        self.client_request_id = client_request_id
+        self.seconds = seconds
+        self.registered = False
+
+    def __enter__(self):
+        try:
+            from bocoflow_core.stop_flag import register_cloud_request
+        except ImportError:
+            return self
+        try:
+            self.registered = bool(
+                register_cloud_request(
+                    self.client_request_id,
+                    api_base(),
+                    int(self.seconds) + CANCEL_RECORD_MARGIN_SECONDS,
+                )
+            )
+        except Exception:
+            self.registered = False
+        return self
+
+    def __exit__(self, *exc):
+        if self.registered:
+            try:
+                from bocoflow_core.stop_flag import clear_cloud_request
+
+                clear_cloud_request()
+            except Exception:
+                pass
+        return False
+
+
+def cancellable(client_request_id, seconds):
+    """``with cancellable(request_id, wait_seconds): <send the request>``."""
+    return _Cancellable(client_request_id, seconds)
+
+
+def cancel_run(client_request_id):
+    """Ask Salpa Compute to stop a run this node stopped waiting for. Best effort.
+
+    Returns whether Salpa Compute accepted the cancel. The request id is the credential,
+    so no sign-in token is needed.
+    """
+    try:
+        response = requests.post(
+            cancel_url(),
+            json={"client_request_id": client_request_id},
+            timeout=CANCEL_TIMEOUT,
+        )
+        response.close()
+        return response.status_code == 202
+    except requests.RequestException:
+        return False

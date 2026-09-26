@@ -23,3 +23,9 @@ A run takes seconds. A new node starts with a timeout of 600 seconds. The node w
 timeout is shorter than that.
 
 A failed run is reported as a failure with its reason, never as an empty success.
+
+## Stopping a run
+
+Pressing Stop in Salpa tells Salpa Compute you no longer want the result (Salpa 0.8.3 and later),
+and so does a run the node gives up on when its timeout passes. The time the run used counts
+toward your monthly quota, and a run whose result you did not receive is never charged.

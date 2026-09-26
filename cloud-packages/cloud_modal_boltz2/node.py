@@ -47,7 +47,7 @@ except ImportError:
 
 #: Sent with every request, so the gateway records which version of this node called it.
 PACKAGE_NAME = "cloud-modal-boltz2"
-PACKAGE_VERSION = "1.0.5"
+PACKAGE_VERSION = "1.0.7"
 SERVICE = "boltz2"
 #: The timeout a run needs: Boltz-2's 30-minute limit, a cold start, and the download.
 RECOMMENDED_TIMEOUT = 2400
@@ -285,15 +285,17 @@ class CloudModalBoltz2(Node):
                 node_id=self.node_id,
                 progress=10,
             )
-            response = post_with_progress(
-                url=url,
-                json=payload,
-                headers=headers,
-                timeout=deadline.post_timeout,
-                node_id=self.node_id,
-                service_name="Boltz-2",
-                cold_start_hint="cold starts take 2-3 min",
-            )
+            # Stop in the app cancels this run on Salpa Compute.
+            with sc.cancellable(payload["client_request_id"], deadline.post_timeout):
+                response = post_with_progress(
+                    url=url,
+                    json=payload,
+                    headers=headers,
+                    timeout=deadline.post_timeout,
+                    node_id=self.node_id,
+                    service_name="Boltz-2",
+                    cold_start_hint="cold starts take 2-3 min",
+                )
 
             if response.status_code != 200:
                 result.success = False
@@ -422,10 +424,16 @@ class CloudModalBoltz2(Node):
             stream_log("Boltz-2 result saved.", node_id=self.node_id, progress=100)
 
         except requests.Timeout:
+            # The node gives up; the run need not go on without it.
+            stopped = sc.cancel_run(payload["client_request_id"])
             result.success = False
-            result.message = "No answer from Salpa Compute in time. " + (
-                deadline.warning
-                or "Boltz-2 predictions can take up to 30 minutes; try again, or use a shorter sequence."
+            result.message = (
+                "No answer from Salpa Compute in time"
+                + ("; the run there was cancelled. " if stopped else ". ")
+                + (
+                    deadline.warning
+                    or "Boltz-2 predictions can take up to 30 minutes; try again, or use a shorter sequence."
+                )
             )
 
         except requests.RequestException as e:
