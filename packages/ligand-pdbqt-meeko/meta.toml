@@ -8,7 +8,7 @@
 # overwrite). The DIRECTORY uses underscores. Keep this line comment-free — some
 # tooling parses it literally.
 name = "ligand-pdbqt-meeko"
-version = "0.1.0"
+version = "0.1.1"
 description = "Prepare docking-ready PDBQT ligands from an SDF with Meeko (AutoDock Vina / AutoDock4)"
 author = "Boundary Computing"
 license = "LGPL-2.1-only"          # REQUIRED — a node with no license is skipped at

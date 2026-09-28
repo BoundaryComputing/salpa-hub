@@ -49,6 +49,12 @@ skipped silently.
 **Local (PIXI_SUBPROCESS)** — CPU only. `meeko` (pure Python) and `rdkit` from conda-forge;
 both build for every platform this package declares.
 
+**Platforms: linux-64 and osx-64, with Python 3.12** (since 0.1.1). The Salpa app imports its
+compiled core into this environment, and that core is built for Python 3.12 only. On Apple
+Silicon and Windows, Meeko pulls a prody build that needs Python older than 3.12, so 0.1.0 got
+Python 3.11 there and could not run in the app. Apple Silicon now runs the osx-64 build through
+Rosetta 2, and Windows the linux-64 build through WSL2.
+
 ## Status
 
 Built with the `salpa-node` skill and verified on 2026-09-05:

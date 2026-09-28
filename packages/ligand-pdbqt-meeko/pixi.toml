@@ -4,18 +4,23 @@
 
 [workspace]
 name = "ligand-pdbqt-meeko"
-version = "0.1.0"
+version = "0.1.1"
 description = "Prepare docking-ready PDBQT ligands from an SDF with Meeko (AutoDock Vina / AutoDock4)"
 channels = ["conda-forge"]
 # Declare ONLY platforms your deps actually build for (pixi solves ALL of them).
 # Many bioconda / specialized packages lack win-64 (and sometimes osx-arm64).
 # `salpa add <package>` narrows this for you and records why — you rarely edit it by hand.
-# salpa add: linux-aarch64 added — every dependency has a build there (salpa platforms).
-platforms = ["linux-64", "linux-aarch64", "osx-64", "osx-arm64", "win-64"]
+# salpa add: linux-aarch64 removed — the solve finds no python that numpy and prody can use there.
+# salpa add: osx-arm64 removed — the solve finds no gcc_linux-64 and python that prody can use there.
+# salpa add: win-64 removed — the solve finds no gcc_linux-64 and python that prody can use there.
+platforms = ["linux-64", "osx-64"]
 
 [dependencies]
-# Core Python requirement
-python = ">=3.10,<3.13"
+# Python 3.12 exactly: the Salpa app imports its compiled core into this environment, and
+# that core is built for 3.12 only. On osx-arm64, win-64 and linux-aarch64 Meeko pulls the
+# noarch prody 2.5.0, which needs Python <3.12, so those platforms cannot solve; the app runs
+# this package there through Rosetta 2 (osx-64) and WSL2 (linux-64) instead.
+python = "3.12.*"
 
 # Redis client for real-time log streaming from subprocess to UI.
 # Keeps stream_log() calls in your node appearing in the UI immediately.

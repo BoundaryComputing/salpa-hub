@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-09-25T14:11:27.360525+00:00",
+  "generated_at": "2026-09-28T20:44:25.787571+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
@@ -68,7 +68,7 @@
     },
     {
       "name": "ligand-pdbqt-meeko",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "description": "Prepare docking-ready PDBQT ligands from an SDF with Meeko (AutoDock Vina / AutoDock4)",
       "display_name": "Ligand PDBQT (Meeko)",
       "category": "Docking",
