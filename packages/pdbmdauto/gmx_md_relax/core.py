@@ -18,6 +18,7 @@ Restraints use GROMACS `freezegrps` mechanism (not posres .itp files).
 
 import os
 import re
+import signal
 import subprocess
 from dataclasses import dataclass
 
@@ -60,6 +61,60 @@ def _run(argv, cwd=None, timeout=3600, stdin_text=None):
     return r.returncode, (r.stdout or "") + "\n" + (r.stderr or "")
 
 
+# Below this many atoms mdrun runs as one rank, on OpenMP threads, instead of splitting the
+# system into domains. On a 10-core Mac GROMACS split 1AKI in vacuum (1,960 atoms) into 10
+# domains, a 1 x 10 x 1 grid with empty cells, and such runs failed now and then with a
+# domain decomposition error, which one rank cannot raise: "atoms moved too far between two
+# domain decomposition steps" at mm1 (2 of 7 runs of the template, 2026-09-23), and signal 6
+# at nvt_fixOriBackbone (1AKI, 1 of 12 runs, 2026-09-30). One rank was also faster there:
+# 7 s against 10 s for 1AKI's step, 13-14 s against 18 s for 6LU7's (4,730 atoms). Every
+# locked GROMACS build is thread-MPI (`nompi`), where `-ntmpi` is valid. A solvated system
+# (25,000 atoms and more in the template) keeps GROMACS's own choice.
+SINGLE_RANK_BELOW_ATOMS = 20000
+
+
+def _atom_count(gro_file):
+    """The atom count a .gro file declares on its second line, or None."""
+    try:
+        with open(gro_file) as f:
+            f.readline()
+            return int(f.readline().split()[0])
+    except (OSError, ValueError, IndexError):
+        return None
+
+
+def _rank_args(gro_file):
+    """["-ntmpi", "1"] for a system small enough to run as one rank, else []."""
+    n = _atom_count(gro_file)
+    return ["-ntmpi", "1"] if n is not None and n < SINGLE_RANK_BELOW_ATOMS else []
+
+
+def _signal(rc):
+    """", killed by signal 6 (SIGABRT)" for a process a signal ended, else "".
+
+    It follows "(rc=N)", which stays as it was: Salpa's pipeline test recognises a step that
+    blew up by "mdrun(<step>) failed (rc=N)".
+    """
+    if rc >= 0:
+        return ""
+    try:
+        name = signal.Signals(-rc).name
+    except ValueError:
+        name = "an unknown signal"
+    return f", killed by signal {-rc} ({name})"
+
+
+def _output_tail(out, limit=2000):
+    """The end of a GROMACS run's output, where it says what went wrong.
+
+    GROMACS opens with a banner of some 500 characters and closes with its error ("Fatal
+    error: ..."). The node's message used to keep the first 500 characters of the log, so it
+    showed the banner and never the error (found on 1AKI, 2026-09-30).
+    """
+    out = out.strip()
+    return out if len(out) <= limit else "[...]\n" + out[-limit:]
+
+
 def _extract_max_force(log_path):
     """Extract final 'Maximum force' from GROMACS log."""
     max_force = 0.0
@@ -100,12 +155,12 @@ def _run_grompp_mdrun(
 
     rc, out = _run(cmd, cwd=output_dir)
     if rc != 0:
-        return False, "", f"grompp({run_label}) failed (rc={rc}):\n{out}"
+        return False, "", f"grompp({run_label}) failed (rc={rc}){_signal(rc)}:\n{_output_tail(out)}"
 
-    cmd = ["gmx", "mdrun", "-v", "-deffnm", run_label]
+    cmd = ["gmx", "mdrun", "-v", "-deffnm", run_label, *_rank_args(gro_file)]
     rc, out = _run(cmd, cwd=output_dir, timeout=timeout)
     if rc != 0:
-        return False, "", f"mdrun({run_label}) failed (rc={rc}):\n{out}"
+        return False, "", f"mdrun({run_label}) failed (rc={rc}){_signal(rc)}:\n{_output_tail(out)}"
 
     output_gro = os.path.join(output_dir, f"{run_label}.gro")
     if os.path.exists(output_gro):

@@ -191,6 +191,36 @@ class GenAli(Node):
                 reference_seqs=reference_seqs,
             )
 
+            # A longer chain holding a residue this preparation cannot build is not a ligand,
+            # and leaving it out would change the system, so the step stops and says why.
+            cannot_build = processing_result["cannot_build_chains"]
+            if cannot_build:
+                raise NodeException(
+                    "gen_ali",
+                    "This preparation cannot build " + "; ".join(
+                        f"chain {c} ({u['length']} residues): "
+                        + ", ".join(f"{name} at {pos}" for pos, name in u["residues"])
+                        for c, u in sorted(cannot_build.items())
+                    ) + ". Neither a standard amino acid nor a modified residue the file "
+                    "declares (MODRES), these cannot be rebuilt, and the chain is too long to "
+                    "be a ligand. Prepare a PDB file with those residues replaced or the chain "
+                    "removed, and give it to step 1 with Input Mode 'local_file'.",
+                )
+
+            # A short one is a ligand in all but name (6LU7's N3 inhibitor, chain C): it is
+            # set aside, as ligands are, and said so.
+            set_aside = processing_result["set_aside_chains"]
+            for chain_id, u in sorted(set_aside.items()):
+                stream_log(
+                    f"Chain {chain_id} ({u['length']} residues) is set aside as a ligand: its "
+                    f"deposited sequence holds "
+                    + ", ".join(name for _, name in u["residues"])
+                    + ", which this preparation cannot build. Ligands are removed, and so is "
+                    f"this chain; the simulated system does not contain it.",
+                    level="warning",
+                    node_id=self.node_id,
+                )
+
             chain_results = processing_result["chain_results"]
             seq_agree_all = processing_result["seq_agree_all"]
             mismatched = processing_result["mismatched_chains"]
@@ -246,6 +276,10 @@ class GenAli(Node):
                 "pdb_chain_list": sorted(chain_results.keys()),
                 "chain_info": chain_info,  # Preserved from predecessor
                 "chain_alignment_results": chain_alignment_results,
+                "set_aside_chains": {
+                    c: {"length": u["length"], "residues": [name for _, name in u["residues"]]}
+                    for c, u in set_aside.items()
+                },
                 # True, False, or None when nothing was compared.
                 "seq_agree_pdb_fasta": seq_agree_all,
                 "sequence_check": {
@@ -278,6 +312,11 @@ class GenAli(Node):
                 check_summary = (
                     "Sequences not checked: no RCSB sequence to compare against "
                     "(saved only when the structure is fetched by PDB ID)."
+                )
+
+            if set_aside:
+                check_summary += (
+                    f" Set aside as ligands: chain(s) {', '.join(sorted(set_aside))}."
                 )
 
             result.success = True

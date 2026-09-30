@@ -4,6 +4,49 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 versions are the `[package].version` in `package.toml`, which is what the Marketplace's Updates tab
 compares against.
 
+## [1.2.7] — 2026-09-30
+
+Fixes from running the procedure for your own protein inside Salpa on nine common entries (4Z8J,
+1UBQ, 1AKI, 1L2Y, 1HSG, 3I2V, 9AYN, 6LU7, 4HHB). Six ran green and right. 3I2V failed at step 5,
+6LU7 ran green with a wrong result, and 1AKI's relaxation failed once in twelve runs without
+saying why. The environment is unchanged, so nothing is rebuilt.
+
+### Fixed
+- **A selenomethionine structure is modelled.** Merge PDB Chains now keeps a modified residue
+  the file's MODRES records declare, written as its standard parent (selenomethionine as
+  methionine, its selenium as methionine's sulfur; atoms the parent lacks are dropped). 1.2.5
+  taught Generate Alignment to rebuild such a residue but left this step dropping it, so the two
+  disagreed wherever one occurred, and Fix Missing Residues stopped: on 3I2V, "Alignment-structure
+  mismatch at pos 113 in chain A, alignment is 'M' structure residue is 'A'". A new package test
+  checks that the alignment's structure track and the template agree, residue for residue.
+- **A short chain of residues the preparation cannot build is set aside as a ligand.** 6LU7's
+  N3 inhibitor is chain C, six residues, three of them non-standard with no MODRES record. 1.2.6
+  dropped those three and kept the other three as a free Ala-Val-Leu tripeptide, which was
+  solvated and simulated beside the protease, with every step green. Generate Alignment now judges
+  each chain's deposited sequence (SEQRES): a chain of 30 residues or fewer that holds a residue
+  it cannot build is set aside, with a warning, and Merge PDB Chains leaves it out of the
+  template. A longer such chain stops the step, naming the chain and the residues. Standard
+  residues, MODRES-declared ones and terminal caps (ACE, FOR, NH2, NME) are built or left out as
+  before; a bound ligand, which carries a chain letter but is not in the sequence, is not judged,
+  and neither are DNA and RNA chains.
+- **A failed relaxation step says why.** GMX MD Relaxation raised with the first 500 characters
+  of its log, which is GROMACS's banner, so a failure never showed GROMACS's error, which it
+  prints last. It now raises with each step's result and the end of the failed step's output,
+  sends the same to the log panel, and names a signal that ended the process ("killed by signal
+  6 (SIGABRT)").
+
+### Changed
+- **A small system's relaxation runs as one rank.** Below 20,000 atoms, GMX MD Relaxation runs
+  `mdrun` with `-ntmpi 1`, on OpenMP threads, instead of letting GROMACS split the system into
+  domains. On a 10-core Mac GROMACS split 1AKI in vacuum (1,960 atoms) into ten domains, and such
+  runs failed now and then with a domain decomposition error, which one rank cannot raise: once in
+  twelve runs of 1AKI at `nvt_fixOriBackbone`, and twice in seven runs of the reference template
+  at `mm1` in an earlier test. One rank was also faster there: 7 s against 10 s for 1AKI's step,
+  13 s against 18 s for 6LU7's (4,730 atoms). A solvated system keeps GROMACS's own choice.
+- **The walkthrough's counts are given as a range.** The box follows the protein after a
+  relaxation that does not repeat exactly: six runs of the reference template gave 25,866 to
+  27,724 atoms in a 6.41 to 6.56 nm cube, where the walkthrough gave one run's 26,202 and 6.45.
+
 ## [1.2.6] — 2026-09-30
 
 Node fixes, one of which changes what the restrained relaxation holds still. The environment is

@@ -104,6 +104,60 @@ def read_modres(pdb_path: str) -> dict:
     return modres
 
 
+# Groups a terminus may carry that this preparation leaves out, keeping the chain: an acetyl or
+# formyl on the N-terminus, an amide or N-methyl amide on the C-terminus.
+_TERMINAL_CAPS = {"ACE", "FOR", "NH2", "NME"}
+
+# A chain this short whose deposited sequence holds a residue this preparation cannot build is a
+# ligand in all but name, and is set aside like one; a longer one stops the step. 6LU7's N3
+# inhibitor is chain C, six residues, three of them non-standard, and 1.2.6 kept the other three
+# as a free tripeptide beside the protease (found 2026-09-30).
+PEPTIDE_LIGAND_MAX_RESIDUES = 30
+
+
+def read_seqres(pdb_path: str) -> dict:
+    """Each chain's deposited sequence, from the file's SEQRES records, as residue names."""
+    seqres = {}
+    with open(pdb_path, "r", errors="replace") as f:
+        for line in f:
+            if line.startswith("SEQRES"):
+                seqres.setdefault(line[11:12], []).extend(line[19:70].split())
+    return seqres
+
+
+def unbuildable_residues(pdb_path: str) -> dict:
+    """Per chain, the deposited residues this preparation cannot build, by 1-based position.
+
+    It builds the standard amino acids, and a modified residue the file's MODRES records
+    declare, as its parent. A cap at either terminus is left out and the chain kept. Anything
+    else in a chain's SEQRES cannot be built: a residue there is part of the polymer, unlike a
+    bound ligand, which carries a chain letter but is not in the sequence. Nucleic-acid chains
+    are not judged here; they are set aside before modelling in any case.
+
+    Returns:
+        dict of chain_id -> {"length": n, "residues": [(position, name), ...]}, only for the
+        chains that hold such a residue.
+    """
+    declared = {}
+    for (chain, _resid), (modified, _parent) in read_modres(pdb_path).items():
+        declared.setdefault(chain, set()).add(modified)
+    out = {}
+    for chain, names in read_seqres(pdb_path).items():
+        if not any(n in protein_letters_3to1 for n in names) and any(
+            n in _NUCLEOTIDE_MAP for n in names
+        ):
+            continue
+        cannot = [
+            (i + 1, n) for i, n in enumerate(names)
+            if n not in protein_letters_3to1
+            and n not in declared.get(chain, set())
+            and not (n in _TERMINAL_CAPS and i in (0, len(names) - 1))
+        ]
+        if cannot:
+            out[chain] = {"length": len(names), "residues": cannot}
+    return out
+
+
 def extract_present_residues(pdb_path: str, case_name: str = "structure") -> dict:
     """Extract residues present in a PDB structure, per chain.
 
@@ -602,6 +656,9 @@ def process_all_chains(
               differs, None if no chain had a reference to compare against
             - mismatched_chains: sorted chain ids whose sequence differs
             - not_compared_chains: sorted chain ids with no reference
+            - set_aside_chains: short chains holding a residue this preparation cannot
+              build (unbuildable_residues), left out as ligands
+            - cannot_build_chains: longer such chains, also left out; the node refuses them
     """
     # Extract present residues from PDB
     present_by_chain = extract_present_residues(pdb_path, case_name)
@@ -630,10 +687,18 @@ def process_all_chains(
     if reference_seqs:
         fasta_seqs.update(reference_seqs)
 
+    # A chain holding a residue this preparation cannot build is set aside when it is a short
+    # peptide (a ligand in all but name) and refused when it is longer; the caller decides what
+    # to do with a refusal. Either way it gets no alignment, so no later step models it.
+    unbuildable = unbuildable_residues(pdb_path)
+    set_aside = {c: u for c, u in unbuildable.items()
+                 if u["length"] <= PEPTIDE_LIGAND_MAX_RESIDUES}
+    cannot_build = {c: u for c, u in unbuildable.items() if c not in set_aside}
+
     # Process each chain
     chain_results = {}
     for chain_id in chain_ids:
-        if chain_id not in present_by_chain:
+        if chain_id not in present_by_chain or chain_id in unbuildable:
             continue
 
         result = process_chain(
@@ -655,4 +720,6 @@ def process_all_chains(
         "seq_agree_all": seq_agree_all,
         "mismatched_chains": sorted(c for c, agree in compared.items() if not agree),
         "not_compared_chains": sorted(c for c in chain_results if c not in compared),
+        "set_aside_chains": set_aside,
+        "cannot_build_chains": cannot_build,
     }

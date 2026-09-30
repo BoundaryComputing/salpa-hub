@@ -100,7 +100,8 @@ worth a look:
 
 - `Merge/fixed.pdb` — the completed protein. Open it in any structure viewer and find the ends of
   the chains: the orange residues in the walkthrough's first figure are the rebuilt ones.
-- `gmx/ion.gro` — the protein in its box of water and ions, 26,202 atoms.
+- `gmx/ion.gro` — the protein in its box of water and ions, about 26,000 atoms (the count
+  varies from run to run; see the walkthrough).
 - `gmx/md.gro` with `gmx/md.trr` — the final coordinates and the eleven frames of the test run.
 
 ## Reading the results
@@ -145,8 +146,9 @@ The same workflow prepares another protein. Do this for each one:
 5. **Press Run.** The water box sizes itself to your protein, with 1 nm of water on every side, so
    nothing else needs changing.
 
-Afterwards, check the same things as in the example. All eleven steps should be green. Step 5
-says how many residues it rebuilt, and `Merge/rebuilt_residues.json` lists them. Open
+Afterwards, check the same things as in the example. All eleven steps should be green. Step 2
+names any chain it set aside as a ligand (see *Honest limits*). Step 5 says how many residues it
+rebuilt, and `Merge/rebuilt_residues.json` lists them. Open
 `Merge/fixed.pdb` to look at the rebuilt parts before you trust them.
 
 **What you have.** The prepared system is in `gmx/`: `em.gro` is the minimised system in water,
@@ -169,6 +171,11 @@ waters are removed, and DNA or RNA chains are set aside.
   against and should be read with that in mind.
 - Ligands, cofactors, metals and crystal waters are removed at step 4. A system that needs them
   needs a different preparation.
+- A chain of 30 residues or fewer that holds a residue this preparation cannot build (neither a
+  standard amino acid nor a modified one the file declares) is treated as a ligand and removed at
+  step 2, which says so. A peptide-like inhibitor deposited as its own chain, such as 6LU7's, is
+  the usual case. A longer chain holding such a residue stops step 2: prepare a PDB file without
+  it and give that to step 1 as a local file.
 - Two picoseconds of dynamics is a smoke test. Real sampling takes nanoseconds to microseconds.
 - The force field is an approximation, and protonation is a prediction made once, at the start.
 - The *Model Terminal Extensions* switch on Fix Missing Residues has no effect in this version; the

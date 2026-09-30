@@ -98,8 +98,9 @@ domain in complex with the C-terminal PDZ-binding motif of the parathyroid hormo
 0.95 Å — at pH 7. The entry has two chains (the PDZ domain, 101 residues in sequence, and an
 8-residue peptide) and six residues absent from the coordinates: Gly33–Gly37 of the domain and
 Gln586 of the peptide, all at N-termini. The workflow rebuilds them, protonates the complex, and
-delivers a solvated system of 26,202 atoms (8,170 waters, 25 Na⁺ and 24 Cl⁻, net charge zero) in a
-6.45 nm cube, with a 2 ps production trajectory.
+delivers a solvated system of about 26,000 atoms in a cube of about 6.5 nm (the reference run:
+26,202 atoms, 8,170 waters, 25 Na⁺ and 24 Cl⁻, net charge zero, a 6.45 nm cube), with a 2 ps
+production trajectory. The counts vary a few percent from run to run.
 
 The workflow requires no manual configuration: the structure is retrieved from the RCSB PDB at run
 time (network access is required for this example), and the only input at load is a working

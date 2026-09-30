@@ -143,8 +143,9 @@ cold laptop, 222 s on the same laptop once hot.
 side, so the protein stays 2 nm from its periodic images however it turns. Then `solvate` with
 SPC216 and `genion -neutral -conc 0.15 -pname NA -nname CL`. Reference run: a 6.45 nm cube and
 8,170 waters; the complex carried a charge of −1, so 25 Na⁺ and 24 Cl⁻ bring it to zero at 0.15 M;
-**26,202 atoms** in total. The box follows the protein's diameter, which moves a little with the
-rebuilt residues, so these counts vary slightly from run to run.
+**26,202 atoms** in total. The box follows the protein's diameter after the relaxation before it,
+which is molecular dynamics and does not repeat exactly, so these counts vary from run to run:
+six runs on one Mac gave 25,866 to 27,724 atoms in a 6.41 to 6.56 nm cube.
 
 ![The solvated system: protein cartoon, water as points, Na⁺ blue and Cl⁻ green, the box outlined. This figure is from 1.2.5's reference run, whose box was a fixed 5 nm cube](figures/pdbmdauto-pipeline-box.jpg)
 

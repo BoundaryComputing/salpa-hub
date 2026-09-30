@@ -7,6 +7,11 @@ Bio.PDB module.
 
 For DNA/RNA chains, atoms are written as HETATM records (MODELLER/ProMod3
 convention for non-protein chains in multi-chain homology modeling).
+
+A modified residue that the file's MODRES records declare (selenomethionine, MSE, above
+all) is kept, written as its standard parent, because Generate Alignment rebuilds it as
+that parent and ProMod3 requires the alignment and this structure to agree residue for
+residue. Every other HETATM residue (ligands, ions, waters) is left out.
 """
 
 import json
@@ -35,18 +40,89 @@ class MergeResult:
 # BioPython chain selector
 # ---------------------------------------------------------------------------
 
+# The heavy atoms of each standard amino acid, by PDB atom name. A declared modified
+# residue keeps the atoms its parent also has; the rest (a phosphate, a methyl, ...) go.
+_AA_HEAVY_ATOMS = {
+    "ALA": {"N", "CA", "C", "O", "CB"},
+    "ARG": {"N", "CA", "C", "O", "CB", "CG", "CD", "NE", "CZ", "NH1", "NH2"},
+    "ASN": {"N", "CA", "C", "O", "CB", "CG", "OD1", "ND2"},
+    "ASP": {"N", "CA", "C", "O", "CB", "CG", "OD1", "OD2"},
+    "CYS": {"N", "CA", "C", "O", "CB", "SG"},
+    "GLN": {"N", "CA", "C", "O", "CB", "CG", "CD", "OE1", "NE2"},
+    "GLU": {"N", "CA", "C", "O", "CB", "CG", "CD", "OE1", "OE2"},
+    "GLY": {"N", "CA", "C", "O"},
+    "HIS": {"N", "CA", "C", "O", "CB", "CG", "ND1", "CD2", "CE1", "NE2"},
+    "ILE": {"N", "CA", "C", "O", "CB", "CG1", "CG2", "CD1"},
+    "LEU": {"N", "CA", "C", "O", "CB", "CG", "CD1", "CD2"},
+    "LYS": {"N", "CA", "C", "O", "CB", "CG", "CD", "CE", "NZ"},
+    "MET": {"N", "CA", "C", "O", "CB", "CG", "SD", "CE"},
+    "PHE": {"N", "CA", "C", "O", "CB", "CG", "CD1", "CD2", "CE1", "CE2", "CZ"},
+    "PRO": {"N", "CA", "C", "O", "CB", "CG", "CD"},
+    "SER": {"N", "CA", "C", "O", "CB", "OG"},
+    "THR": {"N", "CA", "C", "O", "CB", "OG1", "CG2"},
+    "TRP": {"N", "CA", "C", "O", "CB", "CG", "CD1", "CD2", "NE1", "CE2", "CE3",
+            "CZ2", "CZ3", "CH2"},
+    "TYR": {"N", "CA", "C", "O", "CB", "CG", "CD1", "CD2", "CE1", "CE2", "CZ", "OH"},
+    "VAL": {"N", "CA", "C", "O", "CB", "CG1", "CG2"},
+}
+
+# Atoms renamed on the way to the parent: (modified residue, atom) -> (name, element).
+_RENAMED_ATOMS = {("MSE", "SE"): ("SD", "S")}
+
+
+def read_modres(pdb_path: str) -> dict:
+    """The modified residues a PDB file's MODRES records declare, with their standard parents.
+
+    The same reading as Generate Alignment's (gen_ali/core.py), which rebuilds these residues
+    as their parents; the two must agree.
+
+    Returns:
+        dict of (chain_id, resid) -> (modified name, standard parent name),
+        e.g. ("A", 113) -> ("MSE", "MET").
+    """
+    modres = {}
+    with open(pdb_path, "r", errors="replace") as f:
+        for line in f:
+            if not line.startswith("MODRES"):
+                continue
+            try:
+                resid = int(line[18:22])
+            except ValueError:
+                continue
+            modres[(line[16:17], resid)] = (line[12:15].strip(), line[24:27].strip())
+    return modres
+
+
+def _kept_as_parent(modres: dict, chain_id: str, resid: int, resname: str):
+    """The standard parent a declared modified residue is written as, or None."""
+    declared = modres.get((chain_id, resid))
+    if not declared or declared[0] != resname or declared[1] not in _AA_HEAVY_ATOMS:
+        return None
+    return declared[1]
+
+
 class ChainSelector(Select):
     """Select specific chains from a PDB structure."""
 
-    def __init__(self, chain_ids: list, dna_chains: set = None):
+    def __init__(self, chain_ids: list, dna_chains: set = None, modres: dict = None):
         self.chain_ids = set(chain_ids)
         self.dna_chains = dna_chains or set()
+        self.modres = modres or {}
 
     def accept_chain(self, chain):
         return chain.id in self.chain_ids
 
     def accept_residue(self, residue):
-        # Skip water and other hetero residues (ligands, ions, modified residues).
+        # A modified residue the file's MODRES records declare stays: Generate Alignment
+        # rebuilds it as its parent, and merge_chains() writes it as that parent. Left out,
+        # the structure was one residue short of the alignment wherever one occurred, and
+        # ProMod3 stopped with "Alignment-structure mismatch" (3I2V chain A, MSE 113).
+        hetflag, resid, _icode = residue.id
+        if hetflag.startswith("H_") and _kept_as_parent(
+            self.modres, residue.get_parent().id, resid, residue.get_resname()
+        ):
+            return True
+        # Skip water and other hetero residues (ligands, ions, undeclared modified residues).
         #
         # BioPython hetflag conventions (residue.id[0]):
         #   ' '   — standard amino acid or nucleotide (from PDB ATOM record)
@@ -143,11 +219,62 @@ def merge_chains(
     else:
         io = PDBIO()
 
+    modres = read_modres(pdb_path)
     io.set_structure(structure)
-    selector = ChainSelector(selected_chains, dna_chains)
+    selector = ChainSelector(selected_chains, dna_chains, modres)
     io.save(output_path, selector)
+    if modres:
+        write_modified_as_parents(output_path, modres)
 
     return output_path
+
+
+def _atom_name_field(name: str, element: str) -> str:
+    """A PDB atom-name field (columns 13-16): a one-letter element's name starts in 14."""
+    if len(name) < 4 and len(element) == 1:
+        return f" {name:<3}"
+    return f"{name:<4}"
+
+
+def write_modified_as_parents(pdb_path: str, modres: dict) -> int:
+    """Rewrite, in place, each declared modified residue as its standard parent.
+
+    Its HETATM records become ATOM records under the parent's name. Atoms the parent also
+    has are kept, renamed where the parent calls them otherwise (selenomethionine's SE is
+    methionine's SD, a sulfur); the rest, and any hydrogens, are dropped. Returns the number
+    of atom records rewritten.
+    """
+    with open(pdb_path, "r") as f:
+        lines = f.readlines()
+    out, rewritten = [], 0
+    for line in lines:
+        if not line.startswith("HETATM"):
+            out.append(line)
+            continue
+        try:
+            resid = int(line[22:26])
+        except ValueError:
+            out.append(line)
+            continue
+        resname = line[17:20].strip()
+        parent = _kept_as_parent(modres, line[21:22], resid, resname)
+        if parent is None:
+            out.append(line)
+            continue
+        name = line[12:16].strip()
+        element = line[76:78].strip() if len(line) >= 78 else ""
+        name, element = _RENAMED_ATOMS.get((resname, name), (name, element))
+        if name not in _AA_HEAVY_ATOMS[parent] and name != "OXT":
+            continue
+        body = line.rstrip("\n").ljust(80)
+        out.append(
+            "ATOM  " + body[6:12] + _atom_name_field(name, element) + body[16:17]
+            + f"{parent:>3}" + body[20:76] + f"{element:>2}" + body[78:].rstrip() + "\n"
+        )
+        rewritten += 1
+    with open(pdb_path, "w") as f:
+        f.writelines(out)
+    return rewritten
 
 
 def write_chain_metadata(
@@ -206,7 +333,12 @@ def process_merge(
             available.append(chain.id)
         break
 
-    # Select chains
+    # Select chains. "all" means every chain the alignment covers when the alignment step said
+    # which those are: a chain it set aside (a short peptide of residues it cannot build, such
+    # as 6LU7's inhibitor, chain C) has no alignment, and merged here it would reach ProMod3's
+    # template anyway, as 1.2.6's free tripeptide did.
+    if chain_types and selected_chains_str.strip().lower() == "all":
+        available = [c for c in available if c in chain_types]
     selected = select_chains(available, selected_chains_str)
 
     # Filter chain_types to selected chains only

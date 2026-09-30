@@ -210,9 +210,17 @@ class GmxMdRelax(Node):
 
             if not relax_result.success:
                 log_message(f"Relaxation log:\n{relax_result.log}")
+                # For a subprocess node the UI shows what stream_log() sends and the error
+                # raised below; log_message() reaches only the log file.
+                stream_log(
+                    f"Relaxation failed:\n{relax_result.log}",
+                    level="error", node_id=self.node_id,
+                )
+                # The whole log: one line per step that ran, then the failed step with the
+                # end of GROMACS's output, which is where its error is (core._output_tail).
                 raise NodeException(
                     "gmx_md_relax",
-                    f"Relaxation failed:\n{relax_result.log[:500]}",
+                    f"Relaxation failed:\n{relax_result.log}",
                 )
 
             stream_log(
