@@ -13,14 +13,20 @@ its own energy minimization anyway.
 ProMod3 replaces MODELLER — Apache 2.0 license, no registration required.
 """
 
+import json
 import os
 import sys
 from dataclasses import dataclass, field
+
+# Beside fixed.pdb: which model residues ProMod3 rebuilt, chain by chain. Original Atom
+# Groups reads it, because the model's numbers are not the deposited ones.
+REBUILT_MAP_NAME = "rebuilt_residues.json"
 
 
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class FixResiduesResult:
@@ -29,14 +35,18 @@ class FixResiduesResult:
     output_pdb: str
     num_chains_processed: int = 0
     total_residues_added: int = 0
-    chain_details: dict = field(default_factory=dict)  # chain_id -> {before, after, added}
+    chain_details: dict = field(
+        default_factory=dict
+    )  # chain_id -> {before, after, added}
     promod3_log: str = ""
     success: bool = False
+    rebuilt_map: str = ""
 
 
 # ---------------------------------------------------------------------------
 # Alignment format conversion
 # ---------------------------------------------------------------------------
+
 
 def ali_to_fasta(
     ali_path: str,
@@ -75,8 +85,97 @@ def ali_to_fasta(
 
 
 # ---------------------------------------------------------------------------
+# The record of rebuilt residues
+# ---------------------------------------------------------------------------
+
+
+def rebuilt_positions(fasta_path: str) -> list:
+    """Target positions (1-based) where the template has no residue.
+
+    ProMod3 numbers the model by position in the target sequence, so these are the
+    numbers the rebuilt residues carry in fixed.pdb. A column where the target has a
+    gap is not a target position and shifts nothing.
+    """
+    sequences, current = [], None
+    with open(fasta_path) as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith(">"):
+                current = []
+                sequences.append(current)
+            elif current is not None:
+                current.append(line)
+    if len(sequences) < 2:
+        raise ValueError(
+            f"{os.path.basename(fasta_path)} holds fewer than two sequences"
+        )
+    target, template = "".join(sequences[0]), "".join(sequences[1])
+    if len(target) != len(template):
+        raise ValueError(
+            f"{os.path.basename(fasta_path)}: the two rows differ in length"
+        )
+    position, rebuilt = 0, []
+    for t, m in zip(target, template):
+        if t == "-":
+            continue
+        position += 1
+        if m == "-":
+            rebuilt.append(position)
+    return rebuilt
+
+
+def model_residue_numbers(pdb_path: str) -> list:
+    """[(chain, [residue numbers in order])], chains in the order the file lists them."""
+    order, numbers = [], {}
+    with open(pdb_path) as f:
+        for line in f:
+            if not line.startswith(("ATOM", "HETATM")):
+                continue
+            chain, resid = line[21], int(line[22:26])
+            if chain not in numbers:
+                order.append(chain)
+                numbers[chain] = []
+            if not numbers[chain] or numbers[chain][-1] != resid:
+                numbers[chain].append(resid)
+    return [(chain, numbers[chain]) for chain in order]
+
+
+def write_rebuilt_map(fixed_pdb: str, fasta_by_chain: dict, out_path: str) -> str:
+    """Write which residues of fixed.pdb ProMod3 rebuilt, chain by chain in file order.
+
+    A rebuilt residue is one at a target position the template lacked AND present in
+    the model: with terminal modelling off, a missing tag is absent, not rebuilt.
+    """
+    chains = []
+    for chain, residues in model_residue_numbers(fixed_pdb):
+        fasta = fasta_by_chain.get(chain)
+        gaps = set(rebuilt_positions(fasta)) if fasta else set()
+        chains.append(
+            {
+                "chain": chain,
+                "residues": residues,
+                "rebuilt": [n for n in residues if n in gaps],
+            }
+        )
+    record = {
+        "numbering": "model",
+        "note": (
+            "Residue numbers as in fixed.pdb, where ProMod3 numbers every chain from 1 "
+            "by position in the target sequence. 'rebuilt' lists the residues ProMod3 "
+            "built because the template had no coordinates for them."
+        ),
+        "chains": chains,
+    }
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(record, f, indent=2)
+        f.write("\n")
+    return out_path
+
+
+# ---------------------------------------------------------------------------
 # ProMod3 Python API pipeline
 # ---------------------------------------------------------------------------
+
 
 def fix_chain_residues(
     pdb_path: str,
@@ -96,7 +195,7 @@ def fix_chain_residues(
         dict with keys: model (ost Entity), residues_before, residues_after, gaps_filled
     """
     from ost import io, mol, seq
-    from promod3 import modelling, loop
+    from promod3 import loop, modelling
 
     # Load template, restrict to this chain
     tpl = io.LoadPDB(pdb_path, restrict_chains=chain_id)
@@ -151,6 +250,7 @@ def fix_chain_residues(
 # High-level processing
 # ---------------------------------------------------------------------------
 
+
 def process_fix_residues(
     pdb_path: str,
     ali_dir: str,
@@ -190,20 +290,23 @@ def process_fix_residues(
     # Process each protein chain
     chain_models = []
     chain_details = {}
-    alignment_files = []
+    alignment_files = {}
+    failed_chains = []
     total_added = 0
     log_lines = []
 
     for chain_id in sorted(chains_to_model):
         ali_path = os.path.join(ali_dir, chain_id, "homology.ali")
         if not os.path.exists(ali_path):
-            log_lines.append(f"Chain {chain_id}: no .ali file, skipping")
+            log_lines.append(f"Chain {chain_id}: FAILED — no alignment at {ali_path}")
+            chain_details[chain_id] = {"error": "no alignment"}
+            failed_chains.append(chain_id)
             continue
 
         # Convert .ali to ProMod3 FASTA
         fasta_path = os.path.join(merge_dir, f"alignment_{chain_id}.fasta")
         ali_to_fasta(ali_path, fasta_path, chain_id=chain_id, pdb_stem=pdb_stem)
-        alignment_files.append(fasta_path)
+        alignment_files[chain_id] = fasta_path
 
         # Fix residues for this chain
         try:
@@ -225,9 +328,27 @@ def process_fix_residues(
         except Exception as e:
             log_lines.append(f"Chain {chain_id}: FAILED — {e}")
             chain_details[chain_id] = {"error": str(e)}
+            failed_chains.append(chain_id)
 
     # Combine chain models into a single PDB
     output_pdb = os.path.join(merge_dir, "fixed.pdb")
+
+    # A protein chain left out here would be missing from every later step, which
+    # then runs on a different system from the one deposited. Up to 1.2.5 the step
+    # still reported success; now nothing is written and the step fails.
+    if failed_chains:
+        log_lines.append(
+            f"\nfixed.pdb not written: chain(s) {', '.join(failed_chains)} could not be "
+            f"modelled, and a structure without them is not the deposited system."
+        )
+        return FixResiduesResult(
+            output_pdb=output_pdb,
+            num_chains_processed=len(chain_models),
+            total_residues_added=total_added,
+            chain_details=chain_details,
+            promod3_log="\n".join(log_lines),
+            success=False,
+        )
 
     if chain_models:
         from ost import io, mol
@@ -259,9 +380,14 @@ def process_fix_residues(
             os.remove(cpdb)
 
         log_lines.append(f"\nCombined output: {output_pdb}")
+        rebuilt_map = write_rebuilt_map(
+            output_pdb, alignment_files, os.path.join(merge_dir, REBUILT_MAP_NAME)
+        )
+        log_lines.append(f"Rebuilt residues recorded in {rebuilt_map}")
         success = True
     else:
         log_lines.append("\nNo chains were successfully processed")
+        rebuilt_map = ""
         success = False
 
     return FixResiduesResult(
@@ -271,4 +397,5 @@ def process_fix_residues(
         chain_details=chain_details,
         promod3_log="\n".join(log_lines),
         success=success,
+        rebuilt_map=rebuilt_map,
     )

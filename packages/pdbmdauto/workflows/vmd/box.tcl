@@ -27,13 +27,14 @@ mol representation VDW 1.0 20.0
 mol color ColorID 7
 mol selection {resname CL}
 mol addrep top
-# The periodic box, drawn by hand from the .gro box vector (5.0 nm cube = 50 A) — the pbc
-# plugin is not loaded in -dispdev text mode, so `pbc box` cannot be relied on here.
-set L 50.0
+# The periodic box, drawn by hand from the .gro box vector, which VMD reads into the unit
+# cell (in A) — the pbc plugin is not loaded in -dispdev text mode, so `pbc box` cannot be
+# relied on here. Since 1.2.6 the box is sized from the protein, so its edges are read, not set.
+lassign [molinfo top get {a b c}] La Lb Lc
 graphics top color black
 foreach e {{0 0 0 1 0 0} {0 0 0 0 1 0} {0 0 0 0 0 1} {1 0 0 1 1 0} {1 0 0 1 0 1} {0 1 0 1 1 0} {0 1 0 0 1 1} {0 0 1 1 0 1} {0 0 1 0 1 1} {1 1 0 1 1 1} {1 0 1 1 1 1} {0 1 1 1 1 1}} {
   lassign $e ax ay az bx by bz
-  graphics top line [list [expr {$ax*$L}] [expr {$ay*$L}] [expr {$az*$L}]] [list [expr {$bx*$L}] [expr {$by*$L}] [expr {$bz*$L}]] width 2
+  graphics top line [list [expr {$ax*$La}] [expr {$ay*$Lb}] [expr {$az*$Lc}]] [list [expr {$bx*$La}] [expr {$by*$Lb}] [expr {$bz*$Lc}]] width 2
 }
 display resetview
 rotate x by -65

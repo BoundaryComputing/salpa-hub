@@ -1610,7 +1610,8 @@
                 "run_label": "md",
                 "force_field": "amber99sb",
                 "water_model": "tip3p",
-                "box_size": "5 5 5",
+                "box_size": "auto",
+                "box_padding": 1.0,
                 "ion_conc": 0.15,
                 "input_top_file": "",
                 "input_gro_file": "",
@@ -1657,8 +1658,14 @@
                 "box_size": {
                   "type": "string",
                   "label": "Box Size (nm)",
-                  "value": "5 5 5",
-                  "docstring": "Box dimensions 'X Y Z'. Use '0 0 0' for auto triclinic."
+                  "value": "auto",
+                  "docstring": "'auto': a cube sized from the protein's diameter plus Box Padding on every side, safe as the protein rotates. Or three lengths 'X Y Z' in nm."
+                },
+                "box_padding": {
+                  "type": "float",
+                  "label": "Box Padding (nm)",
+                  "value": 1.0,
+                  "docstring": "Distance from the protein to each face of the 'auto' box. 1.0 nm keeps its periodic images 2 nm apart, twice the 1.0 nm cutoffs of the shipped .mdp files."
                 },
                 "ion_conc": {
                   "type": "float",
@@ -1707,7 +1714,8 @@
                 "run_label": "md",
                 "force_field": "amber99sb",
                 "water_model": "tip3p",
-                "box_size": "5 5 5",
+                "box_size": "auto",
+                "box_padding": 1.0,
                 "ion_conc": 0.15,
                 "input_top_file": "",
                 "input_gro_file": "",
@@ -1720,7 +1728,8 @@
               "run_label": "md",
               "force_field": "amber99sb",
               "water_model": "tip3p",
-              "box_size": "5 5 5",
+              "box_size": "auto",
+              "box_padding": 1.0,
               "ion_conc": 0.15,
               "input_top_file": "",
               "input_gro_file": "",
@@ -2479,7 +2488,8 @@
           "run_label": "md",
           "force_field": "amber99sb",
           "water_model": "tip3p",
-          "box_size": "5 5 5",
+          "box_size": "auto",
+          "box_padding": 1.0,
           "ion_conc": 0.15,
           "input_top_file": "",
           "input_gro_file": "",

@@ -1,6 +1,6 @@
 """No node in this package may hand a command to a shell.
 
-Regression guard for bocoflow#104, which broke the packaged macOS app for three
+Regression guard for the shell-quoting bug that broke the packaged macOS app for three
 releases.
 
 THE INVARIANT CHANGED, AND GOT STRONGER
@@ -88,7 +88,7 @@ def test_nothing_runs_through_a_shell():
         + "\n\nBuild the command as an argv list instead and drop shell=True.\n"
         "A shell flattens the arguments and re-splits them by guessing where\n"
         "the boundaries were; every packaged macOS install has a space in its\n"
-        "node path, so it guesses wrong (bocoflow#104). If you needed the shell\n"
+        "node path, so it guesses wrong. If you needed the shell\n"
         "for `echo X | cmd`, pass input='X\\n' instead -- that pipe only ever\n"
         "answered an interactive prompt."
     )

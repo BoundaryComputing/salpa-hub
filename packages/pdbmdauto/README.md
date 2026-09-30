@@ -59,7 +59,8 @@ simulated system.
 structure are distinguished from reconstructed atoms by two index groups (heavy atoms and backbone
 atoms of the resolved residues). The reconstructed regions are relaxed under position restraints on
 the experimental atoms (two short NVT runs at 300 K, then two conjugate-gradient minimizations),
-the system is placed in a 5 nm cubic box, solvated, neutralized and brought to 0.15 M NaCl, and
+the system is placed in a cubic box with at least 1.0 nm between the protein and each face,
+solvated, neutralized and brought to 0.15 M NaCl, and
 minimized once more in water.
 
 **4. Production simulation.** A short production MD run is performed locally (GROMACS `mdrun`,
@@ -97,13 +98,14 @@ domain in complex with the C-terminal PDZ-binding motif of the parathyroid hormo
 0.95 Å — at pH 7. The entry has two chains (the PDZ domain, 101 residues in sequence, and an
 8-residue peptide) and six residues absent from the coordinates: Gly33–Gly37 of the domain and
 Gln586 of the peptide, all at N-termini. The workflow rebuilds them, protonates the complex, and
-delivers a solvated system of 12,193 atoms (3,509 waters, 12 Na⁺ and 11 Cl⁻, net charge zero) in a
-5 nm cube, with a 2 ps production trajectory.
+delivers a solvated system of 26,202 atoms (8,170 waters, 25 Na⁺ and 24 Cl⁻, net charge zero) in a
+6.45 nm cube, with a 2 ps production trajectory.
 
 The workflow requires no manual configuration: the structure is retrieved from the RCSB PDB at run
 time (network access is required for this example), and the only input at load is a working
-directory. To prepare a different target, set the PDB identifier (or a local file) and the pH on
-the first node and execute. Its walkthrough, `workflows/pdbmdauto-pipeline.md`, describes every
+directory. To prepare a different target, start a fresh workflow from the template in a new
+folder, set the PDB identifier (or a local file) on the first node and, if needed, the pH on the
+sixth (pKa + GROMACS EM), and execute; the tutorial's *Your own protein* section walks through it. Its walkthrough, `workflows/pdbmdauto-pipeline.md`, describes every
 step's inputs, outputs and parameters, with figures from a reference run.
 
 ### Measured run times
@@ -116,7 +118,10 @@ step's inputs, outputs and parameters, with figures from a reference run.
 | Windows 11, WSL2 (virtual machine) | first install | ≈ 20 min |
 
 The spread on the Intel laptop is thermal: its GROMACS stages ran 2.5× slower on a back-to-back run
-than on a cold machine. The restrained relaxation (step 8) is the dominant cost.
+than on a cold machine. The restrained relaxation (step 8) is the dominant cost. These times were
+measured on 1.2.0, whose box was a fixed 5 nm cube; 1.2.6's box, sized from the protein, holds about
+twice the atoms, which lengthens the last two steps (on the same laptop, run outside the app, the
+2 ps production ran at 29 ns/day).
 
 ## Outputs and interpretation
 

@@ -443,6 +443,42 @@ class TestRunMdSimulation:
         assert "grompp failed" in result.message
 
     @patch("subprocess.run")
+    def test_success_records_the_trajectories_mdrun_wrote(
+        self, mock_run, temp_simulation_dir
+    ):
+        """The shipped md.mdp writes a TRR only (nstxout); an mdp with nstxout-compressed
+        writes an XTC as well. The result names whichever exist."""
+        work = Path(temp_simulation_dir)
+
+        def side_effect(*args, **kwargs):
+            if "grompp" in args[0]:
+                (work / "md.tpr").touch()
+            else:
+                for name in ("md.gro", "md.trr", "md.edr", "md.log"):
+                    (work / name).touch()
+            return MagicMock(returncode=0, stdout="", stderr="")
+
+        mock_run.side_effect = side_effect
+        kwargs = dict(
+            top_file="topol.top",
+            gro_file="conf.gro",
+            mdp_file="md.mdp",
+            working_dir=temp_simulation_dir,
+        )
+
+        result = run_md_simulation(**kwargs)
+        assert result.success is True
+        assert result.trr_file == str(work / "md.trr")
+        assert result.xtc_file is None
+
+        (work / "md.xtc").touch()
+        result = run_md_simulation(**kwargs)
+        assert (result.xtc_file, result.trr_file) == (
+            str(work / "md.xtc"),
+            str(work / "md.trr"),
+        )
+
+    @patch("subprocess.run")
     def test_mdrun_failure(self, mock_run, temp_simulation_dir):
         """Test handling of mdrun failure."""
 

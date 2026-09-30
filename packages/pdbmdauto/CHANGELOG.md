@@ -4,6 +4,49 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 versions are the `[package].version` in `package.toml`, which is what the Marketplace's Updates tab
 compares against.
 
+## [1.2.6] — 2026-09-30
+
+Node fixes, one of which changes what the restrained relaxation holds still. The environment is
+unchanged, so nothing is rebuilt. Start a fresh workflow from the template, in a new folder: an
+older case folder still holds the index groups 1.2.5 built.
+
+### Fixed
+- **Original Atom Groups hold the crystal residues and leave out the rebuilt ones.** Step 8
+  freezes these two groups while the rebuilt parts relax. ProMod3 numbers its model from 1, while
+  the missing-residue lists keep the deposited numbers, and a `.gro` has no chain IDs. The step
+  matched the two by number alone, so on 4Z8J it left out five crystal residues (model A33–A37)
+  and froze all six rebuilt ones. On an entry whose missing residues have high deposited numbers,
+  nothing rebuilt relaxed at all. Fix Missing Residues now writes `Merge/rebuilt_residues.json`,
+  the rebuilt residues in the model's own numbering, chain by chain. Original Atom Groups reads it
+  and checks that each chain's residues match before it writes anything; a structure that does
+  not match stops the step instead of producing wrong groups. On the reference run the groups are
+  now OriHeavy 780 and OriBackBone 410 atoms, where 1.2.5 gave 776 and 414. GMX Index Groups
+  (`gen_gmx_ndx`), which carries the same code, is fixed the same way.
+- **Fix Missing Residues fails when it cannot model a protein chain.** A chain ProMod3 failed on,
+  or one with no alignment, was left out of `fixed.pdb` while the step reported success, so every
+  later step ran on a system missing that chain. The step now fails, names the chain and the
+  reason, and writes no `fixed.pdb`. DNA and RNA chains are unaffected: they are still set aside,
+  with the warning, before modelling.
+- **A local PDB file works.** In `local_file` mode the PDB FASTA Parser read the file where it
+  was, and every later step looks for the structure in the case folder, so Generate Alignment
+  stopped at "No PDB file found". The file is now copied into the case folder (as `<name>.pdb`),
+  as a downloaded entry is.
+
+### Changed
+- **The simulation box is sized from the protein.** Solvate & Ionize's Box Size now defaults to
+  `auto`: a cube sized from the protein's diameter plus Box Padding (new, default 1.0 nm) on every
+  side, so the protein stays at least 2 nm from its periodic images however it turns, twice the
+  1.0 nm cutoffs of the shipped `.mdp` files. The template used a fixed 5 nm cube, which left the
+  reference protein (4Z8J, about 4.4 nm across) 0.56 nm from its box, and less once it rotated,
+  and did not fit a larger protein at all. Three lengths `X Y Z` still give an explicit box, and
+  `0 0 0` now means `auto`. A larger box holds more water, so a run takes longer.
+- **GROMACS MD Run (Local) declares the trajectory it writes.** The shipped `md.mdp` writes its
+  frames to a full-precision `md.trr` (`nstxout`), and the node declared only an XTC, which that
+  mdp never writes. So a run's trajectory was declared by no one, and Salpa's View tab could not
+  play it. The node now declares `md.trr` as the run's `trajectory`. An mdp that also writes a
+  compressed XTC (`nstxout-compressed`) still has the XTC as its `trajectory`, and its TRR is
+  declared beside it as `trajectory_trr`. What the simulation computes is unchanged.
+
 ## [1.2.5] — 2026-09-25
 
 One node fix. The environment is unchanged, so nothing is rebuilt.
@@ -120,8 +163,7 @@ Documentation and metadata. No node code changed.
   the README and every node's `[node.platforms]` block said otherwise — "Docker/WSL2 support
   coming soon", "Apple Silicon under Rosetta" — long after both had stopped being true.
 - **`linux-aarch64` declared.** Every dependency has an ARM Linux build and the solve is
-  identical to `linux-64`; the platform list was hand-maintained and wrong in this direction
-  (bocoflow#105).
+  identical to `linux-64`; the platform list was hand-maintained and wrong in this direction.
 - **`openstructure` declared.** `fix_residues_promod3` imports it directly; until now that import
   was satisfied only transitively through `promod3`.
 - README: thirteen nodes (not fourteen — `pdb_tools_clean` left in 1.0.x); the deleted "PDB Clean"
@@ -148,7 +190,7 @@ bumps of unchanged versions.
 
 ## [1.1.2] — 2026-09-01
 - Pin `openmm >=8.3.1,<8.6`: openmm 8.6.0 removed a symbol promod3's compiled extension links
-  against, so every environment solved after 2026-08-19 died at Fix Missing Residues (bocoflow#130).
+  against, so every environment solved after 2026-08-19 died at Fix Missing Residues.
 
 ## [1.1.1] — 2026-08-31
 - Test fixture builds its awkward paths instead of hardcoding a home directory.
@@ -159,7 +201,7 @@ bumps of unchanged versions.
   guards the invariant).
 
 ## [1.0.6] – [1.0.8] — 2026-08-31
-- Quote every path that reaches a shell (bocoflow#104: the pipeline died at Solvate & Ionize on a
+- Quote every path that reaches a shell (the pipeline died at Solvate & Ionize on a
   packaged macOS install, whose path contains a space); the guard was interpreter-dependent and
   hid six more sites in `gmx_md_relax`; its own explanation corrected.
 
@@ -169,8 +211,8 @@ bumps of unchanged versions.
 
 ## [1.0.1] — 2026-07-21
 - `pdb-tools` and `mdanalysis` restored to the shared environment (pdb2pqr needs them at run
-  time; trimming them broke the node, bocoflow#64). `pdb_tools_clean` removed on 2026-07-28
-  (bocoflow#73); the package has thirteen nodes since.
+  time; trimming them broke the node). `pdb_tools_clean` removed on 2026-07-28; the package has
+  thirteen nodes since.
 
 ## [1.0.0] — 2026-03-31
 - First release: fourteen nodes replacing `gromacs-suite` + `pdb-toolkit`, and the

@@ -5,7 +5,9 @@ Generates custom GROMACS index groups (OriHeavy, OriBackBone) that distinguish
 original crystallographic residues from homology-modeled residues.
 
 Runs BEFORE solvation — reads vacuum pdb2gmx.gro from pka_gmx_em.
-The missing_residues CSVs come from the case folder (created by pdb_fasta_biopython).
+Which residues were rebuilt comes from Fix Missing Residues' rebuilt_residues.json
+(Merge/, beside fixed.pdb). The missing_residues CSVs in the case folder are used
+only for a PDB in the deposited numbering that has no record.
 
 Input: Vacuum structure (.gro) + missing residues CSVs (from case folder)
 Output: NDX file with OriHeavy and OriBackBone groups (in gmx/ folder)
@@ -21,16 +23,17 @@ from bocoflow_core.parameters import (
 )
 
 try:
-    from .core import generate_ori_ndx
+    from .core import generate_ori_ndx, locate_rebuilt_map
 except ImportError:
     # Stage 2. node_runner puts the node's directory on sys.path and imports
     # node.py as a TOP-LEVEL module, so there is no package for `.core` to be
     # relative to. Without this the next stage ran instead and every symbol
     # below was None by the time execute() called it.
     try:
-        from core import generate_ori_ndx
+        from core import generate_ori_ndx, locate_rebuilt_map
     except ImportError:
-        generate_ori_ndx = None
+        generate_ori_ndx = locate_rebuilt_map = None
+
 
 class GenGmxNdx(Node):
     """
@@ -45,12 +48,20 @@ class GenGmxNdx(Node):
 
     OPTIONS = {
         "case_name": StringParameter(
-            "Case Name", default="",
+            "Case Name",
+            default="",
             docstring="Leave empty to use predecessor data.",
         ),
         "input_structure": FileParameterEdit(
-            "Structure File (.gro/.pdb)", default="",
+            "Structure File (.gro/.pdb)",
+            default="",
             docstring="Vacuum structure from pka_gmx_em. Leave empty: auto-discovers pdb2gmx.gro.",
+        ),
+        "rebuilt_residues": FileParameterEdit(
+            "Rebuilt Residues (.json)",
+            default="",
+            docstring="Fix Missing Residues' rebuilt_residues.json. Leave empty: found in the "
+            "case folder's Merge/.",
         ),
     }
 
@@ -64,15 +75,21 @@ class GenGmxNdx(Node):
             result = NodeResult()
             stream_log("Generating index groups", node_id=self.node_id, progress=0)
 
-            input_data = predecessor_data[0] if predecessor_data and predecessor_data[0] else {}
-            case_name = flow_vars["case_name"].get_value() or input_data.get("case_name", "protein")
+            input_data = (
+                predecessor_data[0] if predecessor_data and predecessor_data[0] else {}
+            )
+            case_name = flow_vars["case_name"].get_value() or input_data.get(
+                "case_name", "protein"
+            )
 
             # gmx/ folder from predecessor (pka_gmx_em)
             working_path = input_data.get("working_path", "")
             gmx_dir = self.resolve_path(working_path) if working_path else ""
 
             # Structure file: auto-discover from predecessor output_gro or scan gmx/
-            structure = self.resolve_path(flow_vars["input_structure"].get_value()) or ""
+            structure = (
+                self.resolve_path(flow_vars["input_structure"].get_value()) or ""
+            )
 
             if not structure and input_data.get("output_gro"):
                 structure = self.resolve_path(input_data["output_gro"])
@@ -88,35 +105,73 @@ class GenGmxNdx(Node):
                 raise NodeException("gen_gmx_ndx", "Structure file required.")
 
             # Missing residues CSVs are in the CASE folder (parent of gmx/)
-            case_dir = os.path.dirname(gmx_dir) if gmx_dir else os.path.dirname(structure)
+            case_dir = (
+                os.path.dirname(gmx_dir) if gmx_dir else os.path.dirname(structure)
+            )
 
             # NDX output goes in gmx/ folder
             ndx_path = os.path.join(gmx_dir or os.path.dirname(structure), "index.ndx")
 
-            stream_log("Building OriHeavy/OriBackBone groups", node_id=self.node_id, progress=30)
+            # Which residues ProMod3 rebuilt: its model is numbered from 1, so the
+            # deposited numbers in the CSVs cannot place them.
+            explicit_map = flow_vars["rebuilt_residues"].get_value()
+            rebuilt_map = locate_rebuilt_map(
+                self.resolve_path(explicit_map) if explicit_map else "", case_dir
+            )
+            if explicit_map and not rebuilt_map:
+                raise NodeException(
+                    "gen_gmx_ndx", f"Rebuilt Residues file not found: {explicit_map}"
+                )
+            stream_log(
+                (
+                    f"Rebuilt residues from {rebuilt_map}"
+                    if rebuilt_map
+                    else "No rebuilt_residues.json: missing residues from the CSVs"
+                ),
+                node_id=self.node_id,
+                progress=20,
+            )
+
+            stream_log(
+                "Building OriHeavy/OriBackBone groups",
+                node_id=self.node_id,
+                progress=30,
+            )
 
             ndx_result = generate_ori_ndx(
                 structure_path=structure,
                 ndx_path=ndx_path,
                 missing_csv_dir=case_dir,
                 chain_ids=input_data.get("pdb_chain_list"),
+                rebuilt_map_path=rebuilt_map,
             )
 
             if not ndx_result.success:
-                raise NodeException("gen_gmx_ndx", f"Index generation failed: {ndx_result.log}")
+                raise NodeException(
+                    "gen_gmx_ndx", f"Index generation failed: {ndx_result.log}"
+                )
 
             stream_log("Index groups created", node_id=self.node_id, progress=90)
 
             # Pass through predecessor data + add NDX
-            result.data.update({
-                "case_name": case_name,
-                "working_path": self.format_output_path(gmx_dir or os.path.dirname(structure)),
-                "output_gro": input_data.get("output_gro", self.format_output_path(structure)),
-                "output_top": input_data.get("output_top", ""),
-                "output_ndx": self.format_output_path(ndx_result.output_ndx),
-                "n_ori_heavy": ndx_result.n_ori_heavy,
-                "n_ori_backbone": ndx_result.n_ori_backbone,
-            })
+            result.data.update(
+                {
+                    "case_name": case_name,
+                    "working_path": self.format_output_path(
+                        gmx_dir or os.path.dirname(structure)
+                    ),
+                    "output_gro": input_data.get(
+                        "output_gro", self.format_output_path(structure)
+                    ),
+                    "output_top": input_data.get("output_top", ""),
+                    "output_ndx": self.format_output_path(ndx_result.output_ndx),
+                    "n_ori_heavy": ndx_result.n_ori_heavy,
+                    "n_ori_backbone": ndx_result.n_ori_backbone,
+                    "rebuilt_residues": (
+                        self.format_output_path(rebuilt_map) if rebuilt_map else ""
+                    ),
+                }
+            )
             result.success = True
             result.message = f"OriHeavy: {ndx_result.n_ori_heavy}, OriBackBone: {ndx_result.n_ori_backbone}"
             stream_log(result.message, node_id=self.node_id, progress=100)

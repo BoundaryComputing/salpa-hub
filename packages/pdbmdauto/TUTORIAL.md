@@ -72,7 +72,7 @@ that decided.
 | 6 | pKa + GROMACS EM | Decides charges for pH 7, adds hydrogens, writes the force-field topology, minimises in vacuum | PROPKA, PDB2PQR, GROMACS | The electrostatics of your simulation are decided here |
 | 7 | Original Atom Groups | Marks which atoms came from the experiment | GROMACS | So the next step can hold them still |
 | 8 | GMX MD Relaxation — in vacuum, restrained | Lets the rebuilt residues settle while the crystal's atoms are held | GROMACS | The built pieces adopt sensible positions without moving what was measured |
-| 9 | GMX Solvate & Ionize | Puts everything in a 5 nm box of water with 0.15 M NaCl, neutral | GROMACS | Proteins live in salt water, not vacuum |
+| 9 | GMX Solvate & Ionize | Puts everything in a box of water with 0.15 M NaCl, neutral, at least 1 nm from the protein on every side | GROMACS | Proteins live in salt water, not vacuum |
 | 10 | GMX MD Relaxation — in water | Minimises the whole box | GROMACS | Water settles onto the protein before it moves |
 | 11 | GROMACS MD Run (Local) | Runs 2 ps of molecular dynamics | GROMACS | Proves the prepared system runs; the trajectory is the starting point for real work |
 
@@ -90,7 +90,8 @@ them missing from the crystal.
    template.
 
 Watch the eleven steps go green in order. On a 2019 Intel laptop the whole thing took three to
-five and a half minutes across three runs; on an Apple Silicon Mac Mini, about two. The first
+five and a half minutes across three runs; on an Apple Silicon Mac Mini, about two. (Measured on
+the previous version, whose water box was smaller; expect the last two steps to take a little longer.) The first
 time, the app also downloads and builds the tools (3.1 GB, about three and a half minutes on a
 Mac with a fast connection, about twenty on Windows, where it sets up a Linux environment for you).
 
@@ -99,7 +100,7 @@ worth a look:
 
 - `Merge/fixed.pdb` — the completed protein. Open it in any structure viewer and find the ends of
   the chains: the orange residues in the walkthrough's first figure are the rebuilt ones.
-- `gmx/ion.gro` — the protein in its box of water and ions, 12,193 atoms.
+- `gmx/ion.gro` — the protein in its box of water and ions, 26,202 atoms.
 - `gmx/md.gro` with `gmx/md.trr` — the final coordinates and the eleven frames of the test run.
 
 ## Reading the results
@@ -112,7 +113,7 @@ What "good" looks like:
   steps. In water (step 10) the energy drops by a large amount as the water settles onto the
   protein, and is still gently descending when the 500-step limit stops it — that is expected for
   this demonstration; a production study would let it run longer.
-- The system is neutral: the topology lists 12 sodium and 11 chloride ions, which cancel the
+- The system is neutral: the topology lists 25 sodium and 24 chloride ions, which cancel the
   protein's charge of −1 at pH 7 and add 0.15 M salt.
 - The MD run finishes: `gmx/md.log` ends with a *Performance* line and *Finished mdrun*.
 
@@ -121,10 +122,46 @@ When something looks wrong:
 | You see | Likely cause | What to do |
 |---|---|---|
 | Step 1 fails immediately | No network — 4Z8J could not be fetched | Connect, or point *Input mode* at a local file |
-| Step 5 fails | ProMod3 or OpenMM problem in the environment | Check the Log Center; reinstalling the package rebuilds the environment |
+| Step 5 fails and names a chain | ProMod3 could not model that chain, so the run stops rather than go on without it | Check the Log Center for the reason; a chain that cannot be modelled needs a different preparation |
+| Step 5 fails with no chain named | ProMod3 or OpenMM problem in the environment | Check the Log Center; reinstalling the package rebuilds the environment |
 | A step stops at Solvate & Ionize | A working directory the tools could not use | Choose a plain, empty folder and rerun |
 | The first run is very slow | It is building the environment, or the first run on Windows | Wait; the second run is minutes |
-| Numbers differ from the walkthrough's | Normal: rebuilt residues and MD velocities vary between runs | The counts (residues, atoms, ions) should not |
+| A GROMACS step (a relaxation or the MD run) fails with a warning about LINCS or atoms moving too far | The system started from a strained spot; it happens now and then | Run the workflow again; it usually passes |
+| Numbers differ from the walkthrough's | Normal: rebuilt residues and MD velocities vary between runs, and the box follows the protein | The number of rebuilt residues should not; atom and ion counts vary slightly with the box |
+
+## Your own protein
+
+The same workflow prepares another protein. Do this for each one:
+
+1. **Install pdbmdauto** from the Marketplace, if you have not yet. The template stays greyed out
+   until the package is installed.
+2. **Start a fresh workflow from the template, in a new, empty folder.** A folder that already holds
+   a run keeps that run's files, and some steps pick up what they find there.
+3. **Choose the structure on the first step, PDB FASTA Parser.** Type the entry's code in *PDB ID*,
+   or set *Input mode* to *local file* and pick a `.pdb` file. Leave the case name as it is
+   (`e2e_4z8j`): it only names the results folder, and every step uses the same one.
+4. **Set the pH on the sixth step, pKa + GROMACS EM**, if it matters for your protein. The template
+   uses 7.
+5. **Press Run.** The water box sizes itself to your protein, with 1 nm of water on every side, so
+   nothing else needs changing.
+
+Afterwards, check the same things as in the example. All eleven steps should be green. Step 5
+says how many residues it rebuilt, and `Merge/rebuilt_residues.json` lists them. Open
+`Merge/fixed.pdb` to look at the rebuilt parts before you trust them.
+
+**What you have.** The prepared system is in `gmx/`: `em.gro` is the minimised system in water,
+`topol.top` with its `.itp` files is the topology, and `index.ndx` holds the groups. The two
+picoseconds of MD at the end only show that the system runs.
+
+**A longer run.** A study equilibrates the minimised system first (a short run at constant
+temperature, then one at constant pressure) and then runs for nanoseconds or more. This package
+ships no production settings for that; you bring your own `.mdp` files. On a cluster with GROMACS,
+those files from `gmx/` and your `.mdp` files are all a run needs. The package's *GROMACS MD Run*
+node can also submit to a SLURM cluster over SSH, using an HPC profile you set up under
+*Settings → HPC Profiles* (with an SSH key).
+
+What this preparation cannot do is listed next: in particular, ligands, cofactors, metals and
+waters are removed, and DNA or RNA chains are set aside.
 
 ## Honest limits
 
@@ -144,5 +181,5 @@ When something looks wrong:
 - The tools, each with its own documentation: [GROMACS](https://www.gromacs.org),
   [ProMod3 / SWISS-MODEL](https://swissmodel.expasy.org), [PDB2PQR and PROPKA](https://www.poissonboltzmann.org),
   [Biopython](https://biopython.org). The README lists the papers to cite.
-- To prepare your own protein: change the PDB id and the pH on the first node, or switch *Input
-  mode* to a local file. Everything else stays the same.
+- To prepare your own protein, see *Your own protein* above: a fresh workflow in a new folder,
+  the PDB id (or a local file) on the first step, and the pH, if it matters to you, on the sixth.

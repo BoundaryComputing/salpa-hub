@@ -1,6 +1,6 @@
 """Paths reach GROMACS as whole argv elements, never as text a shell re-splits.
 
-Regression test for bocoflow#104.
+Regression test for the packaged macOS app, whose node paths contain a space.
 
 WHAT WENT WRONG
 

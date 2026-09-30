@@ -10,10 +10,10 @@ energy-relaxed system with a short test trajectory — every intermediate on dis
 | Unresolved residues | **six**, all N-terminal: A Gly33–Gly37 (`GSHGG`, a tag remnant) and B Gln586 |
 | pH | 7 |
 | Force field | amber99sb, TIP3P water |
-| Box | 5.0 nm cube |
-| Ions | 0.15 M NaCl, neutralised — 12 Na⁺, 11 Cl⁻ |
+| Box | 6.45 nm cube: the protein's diameter plus 1.0 nm on every side |
+| Ions | 0.15 M NaCl, neutralised — 25 Na⁺, 24 Cl⁻ |
 | Production | 2 ps (1000 × 2 fs) at 300 K |
-| Runtime | 3–5½ min on an Intel laptop (three runs), ≈ 2 min on an Apple Silicon Mac Mini; the first install adds 3½ min on a Mac, ≈ 20 min on Windows through WSL2 |
+| Runtime | 3–5½ min on an Intel laptop (three runs), ≈ 2 min on an Apple Silicon Mac Mini, measured on 1.2.0, whose box was a smaller 5 nm cube; the first install adds 3½ min on a Mac, ≈ 20 min on Windows through WSL2 |
 
 ## Before you run
 
@@ -110,8 +110,12 @@ one **converged to Fmax < 1000 in 15 steps** at −1.26 × 10⁴ kJ/mol.
 | writes | `gmx/index.ndx` with two extra groups, `OriHeavy` and `OriBackBone` |
 
 Marks which atoms came from the experiment, so the next step can hold them still while the rebuilt
-ones move. Reference run: **OriHeavy 776 atoms, OriBackBone 414** — the 103 resolved residues × 4
-backbone atoms + 2 terminal oxygens, exactly the six rebuilt residues excluded.
+ones move. Which residues were rebuilt comes from `Merge/rebuilt_residues.json`, written by step 5
+in the model's own numbering. Reference run: **OriHeavy 780 atoms, OriBackBone 410**. That is the
+103 resolved residues: 101 × 4 backbone atoms, plus 3 for each of the two C-termini, whose oxygens
+(OC1, OC2) are not backbone atoms. Exactly the six rebuilt residues are left out.
+(Up to 1.2.5 this step matched deposited residue numbers against the renumbered model and got
+776 and 414 with the wrong residues.)
 
 ### 8 · GMX MD Relaxation (restrained) — GROMACS, protocol `full_4step`
 
@@ -132,14 +136,17 @@ cold laptop, 222 s on the same laptop once hot.
 | | |
 |---|---|
 | takes | `gmx/mm2.gro`, `gmx/pdb2gmx.top`, `demo_data/ions.mdp` (shipped with the node) |
-| writes | `gmx/box.gro` (rewritten as a 5 nm cube), `gmx/solv.gro`, `gmx/ion.tpr`, `gmx/ion.gro`, `gmx/topol.top` |
-| set here | box size, salt concentration, ion names |
+| writes | `gmx/box.gro` (rewritten as the padded cube), `gmx/solv.gro`, `gmx/ion.tpr`, `gmx/ion.gro`, `gmx/topol.top` |
+| set here | box size (`auto`) and padding, salt concentration, ion names |
 
-`editconf -box 5 5 5`, `solvate` with SPC216, then `genion -neutral -conc 0.15 -pname NA -nname CL`.
-Reference run: 3,509 waters; the complex carried a charge of −1, so 12 Na⁺ and 11 Cl⁻ bring it to
-zero at 0.15 M; **12,193 atoms** in total.
+`editconf -bt cubic -d 1.0 -c`: a cube sized from the protein's diameter plus 1.0 nm on every
+side, so the protein stays 2 nm from its periodic images however it turns. Then `solvate` with
+SPC216 and `genion -neutral -conc 0.15 -pname NA -nname CL`. Reference run: a 6.45 nm cube and
+8,170 waters; the complex carried a charge of −1, so 25 Na⁺ and 24 Cl⁻ bring it to zero at 0.15 M;
+**26,202 atoms** in total. The box follows the protein's diameter, which moves a little with the
+rebuilt residues, so these counts vary slightly from run to run.
 
-![The solvated system: protein cartoon, water as points, Na⁺ blue and Cl⁻ green, the 5 nm box outlined](figures/pdbmdauto-pipeline-box.jpg)
+![The solvated system: protein cartoon, water as points, Na⁺ blue and Cl⁻ green, the box outlined. This figure is from 1.2.5's reference run, whose box was a fixed 5 nm cube](figures/pdbmdauto-pipeline-box.jpg)
 
 ### 10 · GMX MD Relaxation (solvated) — GROMACS, protocol `em_only`
 
@@ -149,12 +156,12 @@ zero at 0.15 M; **12,193 atoms** in total.
 | writes | `gmx/em.tpr`, `gmx/em.gro`, `gmx/em.log`, `gmx/em.edr` |
 
 One steepest-descent minimisation of the whole box, 500 steps, tolerance 500. Reference run: it
-**stops at the step limit** with Fmax ≈ 2.9 × 10³ kJ mol⁻¹ nm⁻¹ and a potential energy of
-−1.84 × 10⁵ kJ/mol — the water has relaxed onto the protein (compare the curve below) but the
+**stops at the step limit** with Fmax ≈ 7.5 × 10³ kJ mol⁻¹ nm⁻¹ (on a glutamate's carboxylate;
+the largest remaining force changes from run to run) and a potential energy of −4.09 × 10⁵ kJ/mol — the water has relaxed onto the protein (compare the curve below) but the
 tolerance is not met. For the demonstration that is enough; for a production study raise
 `nsteps` in `em.mdp` until it converges.
 
-![Potential energy during the two minimisations: the in-vacuo one converges in 15 steps; the solvated one falls by 1.6 × 10⁵ kJ/mol and is still descending at step 500](figures/pdbmdauto-pipeline-energy.jpg)
+![Potential energy during the two minimisations: the in-vacuo one converges in 15 steps; the solvated one falls by 2.4 × 10⁵ kJ/mol and is still descending at step 500](figures/pdbmdauto-pipeline-energy.jpg)
 
 ### 11 · GROMACS MD Run (Local) — GROMACS
 
@@ -180,20 +187,22 @@ grep -E 'converged|Potential Energy|Maximum force' gmx/em_hbonds.log gmx/em.log
 
 ## Expected result
 
-From the reference run (Intel MacBook Pro, Salpa 0.3.1, pdbmdauto 1.2.0, 2026-09-03):
+From the reference run (Intel MacBook Pro, pdbmdauto 1.2.6, its eleven nodes run in order outside the app, 2026-09-30):
 
 ```
 rebuilt residues     A 33-37 (GSHGG) + B 586 (Gln)  →  fixed.pdb chain A 1-101, chain B 1-8
-index groups         OriHeavy 776   OriBackBone 414   Protein 1643 (with H)
+index groups         OriHeavy 780   OriBackBone 410   Protein 1643 (with H)
 vacuum EM (step 6)   converged Fmax < 1000 in 15 steps   E = -1.26e4 kJ/mol
-solvated system      12193 atoms   3509 SOL   12 NA   11 CL   charge -1 → 0   box 5.0 nm
-solvated EM (step 10) 500 steps, not converged   E = -1.84e5 kJ/mol   Fmax = 2.9e3
-production           1000 × 2 fs = 2 ps   11 frames in md.trr   9-32 ns/day
+solvated system      26202 atoms   8170 SOL   25 NA   24 CL   charge -1 → 0   box 6.45 nm
+solvated EM (step 10) 500 steps, not converged   E = -4.09e5 kJ/mol   Fmax = 7.5e3
+production           1000 × 2 fs = 2 ps   11 frames in md.trr   29 ns/day
 ```
 
 What varies between runs: the rebuilt residues' exact coordinates (ProMod3 samples), the MD
-velocities (random seed), and the last digits of the energies. What must not vary: six residues
-rebuilt, 12,193 atoms, a neutral system, eleven nodes green.
+velocities (random seed), the last digits of the energies, and slightly the box edge and the
+number of waters, which follow the protein's diameter. What must not vary: six residues rebuilt,
+a neutral system at 0.15 M with at least 1 nm of water between the protein and each face, eleven
+nodes green.
 
 ## Runtime
 

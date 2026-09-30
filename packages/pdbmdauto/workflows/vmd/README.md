@@ -29,8 +29,10 @@ Two things worth knowing:
 - **ProMod3 renumbers from 1.** `Merge/merge.pdb` keeps 4Z8J's numbering (chain A 38–133, chain B
   587–593); `Merge/fixed.pdb` comes back as A 1–101 and B 1–8. The six rebuilt residues — the
   entry's REMARK 465 records A 33–37 and B 586 — are therefore `chain A and resid 1 to 5` and
-  `chain B and resid 1` in `fixed.tcl`. Downstream, `ori_ndx_builder` still excludes exactly those
-  six: its OriBackBone group is 414 atoms = 103 resolved residues × 4 backbone atoms + 2 OXT.
+  `chain B and resid 1` in `fixed.tcl`. Downstream, Original Atom Groups excludes exactly those
+  six, reading them from `Merge/rebuilt_residues.json`: its OriBackBone group is 410 atoms, the 103
+  resolved residues × 4 backbone atoms less one for each of the two C-termini (OC1 and OC2 are not
+  backbone atoms).
 - **Render at the size you want.** `display resize` before `render` gives a sharp image;
   upscaling a small render afterwards makes a larger file that is no sharper.
 

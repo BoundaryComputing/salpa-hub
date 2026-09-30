@@ -10,6 +10,7 @@ Features: chain splitting, HETATM handling, missing residues analysis.
 """
 
 import os
+import shutil
 from datetime import datetime
 
 from bocoflow_core.logger import log_message
@@ -53,6 +54,7 @@ except ImportError:
         extract_missing_residues = extract_sequences = fetch_fasta_from_rcsb = None
         fetch_pdb_from_rcsb = parse_pdb_structure = write_fasta_files = None
         write_missing_residues_csv = None
+
 
 class PdbFastaBiopython(Node):
     """
@@ -186,9 +188,19 @@ class PdbFastaBiopython(Node):
                     log_message(f"Warning: Could not fetch RCSB FASTA: {e}")
 
             elif input_mode == "local_file":
-                pdb_path = self.resolve_path(pdb_file)
-                if not pdb_path or not os.path.exists(pdb_path):
-                    raise NodeException("parameter", f"PDB file not found: {pdb_path}")
+                source = self.resolve_path(pdb_file)
+                if not source or not os.path.exists(source):
+                    raise NodeException("parameter", f"PDB file not found: {source}")
+                # Every later step looks for the structure in the case folder,
+                # where pdb_id mode saves its download. A local file left where it
+                # was stopped Generate Alignment at "No PDB file found".
+                stem = os.path.splitext(os.path.basename(source))[0]
+                pdb_path = os.path.join(output_dir, f"{stem}.pdb")
+                if not (
+                    os.path.exists(pdb_path) and os.path.samefile(source, pdb_path)
+                ):
+                    shutil.copyfile(source, pdb_path)
+                    log_message(f"Copied {source} into the case folder")
             else:
                 raise NodeException(
                     "parameter",
@@ -232,9 +244,9 @@ class PdbFastaBiopython(Node):
                 if missing:
                     missing_csv_files = write_missing_residues_csv(missing, output_dir)
                     for chain_id, csv_path in missing_csv_files.items():
-                        result.files["output"][
-                            f"missing_residues_{chain_id}"
-                        ] = self.format_output_path(csv_path)
+                        result.files["output"][f"missing_residues_{chain_id}"] = (
+                            self.format_output_path(csv_path)
+                        )
                         log_message(
                             f"Wrote missing residues for chain {chain_id}: {csv_path}"
                         )
@@ -256,6 +268,7 @@ class PdbFastaBiopython(Node):
                     "case_name": case_name,
                     "input_mode": input_mode,
                     "working_path": self.format_output_path(output_dir),
+                    "pdb_file": self.format_output_path(pdb_path),
                     "num_chains": len(chains),
                     "chain_info": chain_info,
                 }

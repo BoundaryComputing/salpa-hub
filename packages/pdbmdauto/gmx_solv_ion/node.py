@@ -33,6 +33,7 @@ except ImportError:
     except ImportError:
         process_solv_ion = None
 
+
 class GmxSolvIon(Node):
     """
     GROMACS solvation and ionization.
@@ -46,15 +47,54 @@ class GmxSolvIon(Node):
     """
 
     OPTIONS = {
-        "case_name": StringParameter("Case Name", default="", docstring="Leave empty to use predecessor data."),
-        "run_label": StringParameter("Run Label", default="md", docstring="Simulation label."),
-        "force_field": SelectParameter("Force Field", options=["amber99sb", "charmm27", "oplsaa", "gromos53a6"], default="amber99sb", docstring="Force field for pdb2gmx."),
-        "water_model": SelectParameter("Water Model", options=["tip3p", "spc", "spce", "tip4p"], default="tip3p", docstring="Water model for pdb2gmx."),
-        "box_size": StringParameter("Box Size (nm)", default="5 5 5", docstring="Box dimensions 'X Y Z'. Use '0 0 0' for auto triclinic."),
-        "ion_conc": FloatParameter("Ion Concentration (mol/L)", default=0.15, docstring="Na+/Cl- concentration. Set 0 to skip."),
-        "input_top_file": FileParameterEdit("Topology File (.top)", default="", docstring="Topology from pka_gmx_em. Leave empty: auto-discovers gmx_em/pdb2gmx.top."),
-        "input_gro_file": FileParameterEdit("Structure File (.gro)", default="", docstring="Structure from pka_gmx_em. Leave empty: auto-discovers gmx_em/pdb2gmx.gro."),
-        "input_mdp_file": FileParameterEdit("Parameters File (.mdp)", default="node:demo_data/ions.mdp", docstring="MDP for genion preprocessing."),
+        "case_name": StringParameter(
+            "Case Name", default="", docstring="Leave empty to use predecessor data."
+        ),
+        "run_label": StringParameter(
+            "Run Label", default="md", docstring="Simulation label."
+        ),
+        "force_field": SelectParameter(
+            "Force Field",
+            options=["amber99sb", "charmm27", "oplsaa", "gromos53a6"],
+            default="amber99sb",
+            docstring="Force field for pdb2gmx.",
+        ),
+        "water_model": SelectParameter(
+            "Water Model",
+            options=["tip3p", "spc", "spce", "tip4p"],
+            default="tip3p",
+            docstring="Water model for pdb2gmx.",
+        ),
+        "box_size": StringParameter(
+            "Box Size (nm)",
+            default="auto",
+            docstring="'auto': a cube sized from the protein's diameter plus Box Padding on every side, safe as the protein rotates. Or three lengths 'X Y Z' in nm.",
+        ),
+        "box_padding": FloatParameter(
+            "Box Padding (nm)",
+            default=1.0,
+            docstring="Distance from the protein to each face of the 'auto' box. 1.0 nm keeps its periodic images 2 nm apart, twice the 1.0 nm cutoffs of the shipped .mdp files.",
+        ),
+        "ion_conc": FloatParameter(
+            "Ion Concentration (mol/L)",
+            default=0.15,
+            docstring="Na+/Cl- concentration. Set 0 to skip.",
+        ),
+        "input_top_file": FileParameterEdit(
+            "Topology File (.top)",
+            default="",
+            docstring="Topology from pka_gmx_em. Leave empty: auto-discovers gmx_em/pdb2gmx.top.",
+        ),
+        "input_gro_file": FileParameterEdit(
+            "Structure File (.gro)",
+            default="",
+            docstring="Structure from pka_gmx_em. Leave empty: auto-discovers gmx_em/pdb2gmx.gro.",
+        ),
+        "input_mdp_file": FileParameterEdit(
+            "Parameters File (.mdp)",
+            default="node:demo_data/ions.mdp",
+            docstring="MDP for genion preprocessing.",
+        ),
     }
 
     def execute(self, predecessor_data, flow_vars):
@@ -65,10 +105,16 @@ class GmxSolvIon(Node):
 
         try:
             result = NodeResult()
-            stream_log("Starting solvation & ionization", node_id=self.node_id, progress=0)
+            stream_log(
+                "Starting solvation & ionization", node_id=self.node_id, progress=0
+            )
 
-            input_data = predecessor_data[0] if predecessor_data and predecessor_data[0] else {}
-            case_name = flow_vars["case_name"].get_value() or input_data.get("case_name", "protein")
+            input_data = (
+                predecessor_data[0] if predecessor_data and predecessor_data[0] else {}
+            )
+            case_name = flow_vars["case_name"].get_value() or input_data.get(
+                "case_name", "protein"
+            )
 
             working_path = input_data.get("working_path", "")
             case_dir = self.resolve_path(working_path) if working_path else ""
@@ -85,7 +131,10 @@ class GmxSolvIon(Node):
                 top = self.resolve_path(input_data["output_top"])
 
             if not gro or not top:
-                raise NodeException("gmx_solv_ion", "GRO and TOP files required. Connect to pka_gmx_em or provide explicit paths.")
+                raise NodeException(
+                    "gmx_solv_ion",
+                    "GRO and TOP files required. Connect to pka_gmx_em or provide explicit paths.",
+                )
 
             # Use the same gmx/ folder as pka_gmx_em (all GROMACS ops in one dir)
             output_dir = case_dir if case_dir else os.path.dirname(gro)
@@ -98,7 +147,10 @@ class GmxSolvIon(Node):
                     mdp = default_mdp
                     log_message(f"Using bundled default MDP: {mdp}")
                 else:
-                    raise NodeException("gmx_solv_ion", "No MDP file provided and no bundled default found.")
+                    raise NodeException(
+                        "gmx_solv_ion",
+                        "No MDP file provided and no bundled default found.",
+                    )
 
             # Ensure output dir exists
             os.makedirs(output_dir, exist_ok=True)
@@ -112,40 +164,57 @@ class GmxSolvIon(Node):
             # Only generate if NDX doesn't exist at all (standalone mode without gen_gmx_ndx)
             if not os.path.exists(ndx):
                 # "q" accepts make_ndx's default groups. stdin, not a shell
-                # pipe, so a spaced path stays one argument (bocoflow#104).
+                # pipe, so a spaced path stays one argument.
                 subprocess.run(
                     ["gmx", "make_ndx", "-f", gro, "-o", ndx],
-                    input="q\n", capture_output=True, text=True,
-                    cwd=output_dir, timeout=30,
+                    input="q\n",
+                    capture_output=True,
+                    text=True,
+                    cwd=output_dir,
+                    timeout=30,
                 )
 
             if not all([gro, top, mdp]):
-                raise NodeException("gmx_solv_ion", "GRO, TOP, and MDP files are required.")
+                raise NodeException(
+                    "gmx_solv_ion", "GRO, TOP, and MDP files are required."
+                )
 
-            stream_log("Running GROMACS solvation pipeline", node_id=self.node_id, progress=30)
+            stream_log(
+                "Running GROMACS solvation pipeline", node_id=self.node_id, progress=30
+            )
 
             solv_result = process_solv_ion(
-                gro_file=gro, top_file=top, mdp_file=mdp, ndx_file=ndx,
-                output_dir=output_dir, case_name=case_name,
+                gro_file=gro,
+                top_file=top,
+                mdp_file=mdp,
+                ndx_file=ndx,
+                output_dir=output_dir,
+                case_name=case_name,
                 run_label=flow_vars["run_label"].get_value() or "md",
-                box_size=flow_vars["box_size"].get_value() or "5 5 5",
+                box_size=flow_vars["box_size"].get_value() or "auto",
+                box_padding=flow_vars["box_padding"].get_value(),
                 ion_conc=flow_vars["ion_conc"].get_value(),
             )
 
             if not solv_result.success:
                 log_message(f"GROMACS log:\n{solv_result.log}")
-                raise NodeException("gmx_solv_ion", f"Solvation/ionization failed: {solv_result.log[-1200:]}")
+                raise NodeException(
+                    "gmx_solv_ion",
+                    f"Solvation/ionization failed: {solv_result.log[-1200:]}",
+                )
 
             stream_log("Solvation complete", node_id=self.node_id, progress=90)
 
-            result.data.update({
-                "case_name": case_name,
-                "working_path": self.format_output_path(output_dir),
-                "output_gro": self.format_output_path(solv_result.output_gro),
-                "output_top": self.format_output_path(solv_result.output_top),
-                "output_ndx": self.format_output_path(solv_result.output_ndx),
-                "run_label": flow_vars["run_label"].get_value(),
-            })
+            result.data.update(
+                {
+                    "case_name": case_name,
+                    "working_path": self.format_output_path(output_dir),
+                    "output_gro": self.format_output_path(solv_result.output_gro),
+                    "output_top": self.format_output_path(solv_result.output_top),
+                    "output_ndx": self.format_output_path(solv_result.output_ndx),
+                    "run_label": flow_vars["run_label"].get_value(),
+                }
+            )
             result.success = True
             result.message = "Solvation and ionization complete"
             stream_log(result.message, node_id=self.node_id, progress=100)

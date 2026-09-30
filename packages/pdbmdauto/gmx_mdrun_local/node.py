@@ -311,12 +311,19 @@ class GmxMdRunLocal(Node):
                 stream_log(
                     f"Output: {Path(sim_result.gro_file).name}", node_id=self.node_id
                 )
-            if sim_result.xtc_file:
-                output_files["trajectory"] = self.format_output_path(
-                    sim_result.xtc_file
+            # The trajectory: the compressed XTC when the mdp writes one, else the
+            # full-precision TRR, which is all the shipped md.mdp writes (nstxout). A run
+            # that writes both declares the TRR as well, so both can be viewed.
+            trajectory = sim_result.xtc_file or sim_result.trr_file
+            if trajectory:
+                output_files["trajectory"] = self.format_output_path(trajectory)
+                stream_log(f"Output: {Path(trajectory).name}", node_id=self.node_id)
+            if sim_result.xtc_file and sim_result.trr_file:
+                output_files["trajectory_trr"] = self.format_output_path(
+                    sim_result.trr_file
                 )
                 stream_log(
-                    f"Output: {Path(sim_result.xtc_file).name}", node_id=self.node_id
+                    f"Output: {Path(sim_result.trr_file).name}", node_id=self.node_id
                 )
             if sim_result.edr_file:
                 output_files["energy"] = self.format_output_path(sim_result.edr_file)

@@ -70,7 +70,7 @@ def _run_gmx(argv, cwd=None, stdin_text=None) -> tuple:
     guess wrong: the packaged macOS app installs nodes under
     `~/Library/Application Support/...`, so `-f <mdp>` silently became two
     arguments and GROMACS reported only `fopen() returned error code 2`, nine
-    steps into an eleven-step pipeline (bocoflow#104).
+    steps into an eleven-step pipeline.
 
     Quoting every path fixes that round-trip. Not making the round-trip removes
     it: argv elements are passed to execve as-is, so a space, a quote, a `$` or
@@ -101,6 +101,35 @@ def _purge_temp_files(directory: str):
                 os.remove(os.path.join(directory, f))
 
 
+def editconf_box_args(box_size: str, box_padding: float) -> list:
+    """The editconf arguments that define the simulation box.
+
+    "auto" (also "" or "0 0 0"): a cube sized from the protein's diameter plus
+    `box_padding` nm on every side. editconf uses the diameter for a cubic box,
+    so the protein stays at least 2 x padding from its periodic images however it
+    rotates. Three positive lengths in nm give an explicit box. The system is
+    centred in either case. Raises ValueError for anything else.
+    """
+    text = (box_size or "").strip()
+    try:
+        lengths = [float(x) for x in text.split()] if text.lower() != "auto" else []
+    except ValueError:
+        raise ValueError(
+            f"Box Size must be 'auto' or three lengths in nm, not {box_size!r}"
+        )
+    if not lengths or (len(lengths) == 3 and all(x == 0 for x in lengths)):
+        if not box_padding or box_padding <= 0:
+            raise ValueError(
+                f"Box Padding must be a positive length in nm, not {box_padding!r}"
+            )
+        return ["-bt", "cubic", "-d", str(float(box_padding)), "-c"]
+    if len(lengths) != 3 or any(x <= 0 for x in lengths):
+        raise ValueError(
+            f"Box Size must be 'auto' or three lengths in nm, not {box_size!r}"
+        )
+    return ["-box", *(str(x) for x in lengths), "-c"]
+
+
 def process_solv_ion(
     gro_file: str,
     top_file: str,
@@ -109,9 +138,10 @@ def process_solv_ion(
     output_dir: str,
     case_name: str,
     run_label: str = "md",
-    box_size: str = "20 20 20",
+    box_size: str = "auto",
     ion_conc: float = 0.15,
     scale_fill: float = 0.57,
+    box_padding: float = 1.0,
 ) -> SolvIonResult:
     """Run GROMACS solvation and ionization pipeline.
 
@@ -123,9 +153,10 @@ def process_solv_ion(
         output_dir: Working directory.
         case_name: Case identifier.
         run_label: Simulation label.
-        box_size: Box dimensions "X Y Z" in nm ("0 0 0" for triclinic auto).
+        box_size: "auto" for a cube padded around the protein, or "X Y Z" in nm.
         ion_conc: Ion concentration in mol/L (0 to skip).
         scale_fill: Van der Waals scale factor for solvation density.
+        box_padding: Protein-to-face distance in nm for the "auto" box.
 
     Returns:
         SolvIonResult with output file paths.
@@ -142,15 +173,13 @@ def process_solv_ion(
         shutil.copy2(top_file, work_top)
 
     # Step 1: editconf — define box
-    box = [float(x) for x in box_size.split()]
+    try:
+        box_args = editconf_box_args(box_size, box_padding)
+    except ValueError as e:
+        result.log = str(e)
+        return result
     box_gro = os.path.join(output_dir, "box.gro")
-
-    if box[0] > 0:
-        cmd = ["gmx", "editconf", "-f", gro_file, "-o", box_gro,
-               "-box", str(box[0]), str(box[1]), str(box[2])]
-    else:
-        cmd = ["gmx", "editconf", "-f", gro_file, "-o", box_gro,
-               "-bt", "triclinic", "-d", "2.0"]
+    cmd = ["gmx", "editconf", "-f", gro_file, "-o", box_gro, *box_args]
 
     rc, out = _run_gmx(cmd, cwd=output_dir)
     log_lines.append(f"editconf: rc={rc}")
@@ -158,11 +187,29 @@ def process_solv_ion(
         result.log = "\n".join(log_lines) + "\n" + out
         return result
     result.box_gro = box_gro
+    try:
+        with open(box_gro) as f:
+            vectors = f.read().splitlines()[-1].split()[:3]
+        log_lines.append(f"box: {' x '.join(vectors)} nm ({' '.join(box_args[:-1])})")
+    except (OSError, IndexError):
+        pass
 
     # Step 2: solvate — add water
     solv_gro = os.path.join(output_dir, "solv.gro")
-    cmd = ["gmx", "solvate", "-cp", box_gro, "-cs", "spc216.gro",
-           "-p", work_top, "-o", solv_gro, "-scale", str(scale_fill)]
+    cmd = [
+        "gmx",
+        "solvate",
+        "-cp",
+        box_gro,
+        "-cs",
+        "spc216.gro",
+        "-p",
+        work_top,
+        "-o",
+        solv_gro,
+        "-scale",
+        str(scale_fill),
+    ]
     rc, out = _run_gmx(cmd, cwd=output_dir)
     log_lines.append(f"solvate: rc={rc}")
     if rc != 0:
@@ -172,8 +219,20 @@ def process_solv_ion(
 
     # Step 3: grompp — preprocess for genion
     ion_tpr = os.path.join(output_dir, "ion.tpr")
-    cmd = ["gmx", "grompp", "-f", mdp_file, "-c", solv_gro,
-           "-p", work_top, "-o", ion_tpr, "-maxwarn", "10"]
+    cmd = [
+        "gmx",
+        "grompp",
+        "-f",
+        mdp_file,
+        "-c",
+        solv_gro,
+        "-p",
+        work_top,
+        "-o",
+        ion_tpr,
+        "-maxwarn",
+        "10",
+    ]
     rc, out = _run_gmx(cmd, cwd=output_dir)
     log_lines.append(f"grompp: rc={rc}")
     if rc != 0:
@@ -184,9 +243,23 @@ def process_solv_ion(
     ion_gro = os.path.join(output_dir, "ion.gro")
     if ion_conc > 0:
         # "SOL" answers genion's "which group to replace with ions?" prompt.
-        cmd = ["gmx", "genion", "-s", ion_tpr, "-p", work_top, "-o", ion_gro,
-               "-neutral", "-nname", "CL", "-pname", "NA",
-               "-conc", str(ion_conc)]
+        cmd = [
+            "gmx",
+            "genion",
+            "-s",
+            ion_tpr,
+            "-p",
+            work_top,
+            "-o",
+            ion_gro,
+            "-neutral",
+            "-nname",
+            "CL",
+            "-pname",
+            "NA",
+            "-conc",
+            str(ion_conc),
+        ]
         rc, out = _run_gmx(cmd, cwd=output_dir, stdin_text="SOL\n")
         log_lines.append(f"genion: rc={rc}")
         if rc != 0:

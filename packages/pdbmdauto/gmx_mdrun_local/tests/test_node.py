@@ -249,6 +249,7 @@ class TestExecuteParameterExtraction:
                     tpr_file=None,
                     gro_file=None,
                     xtc_file=None,
+                    trr_file=None,
                     edr_file=None,
                     log_file=None,
                 ),
@@ -278,6 +279,7 @@ class TestExecuteParameterExtraction:
                     tpr_file=None,
                     gro_file=None,
                     xtc_file=None,
+                    trr_file=None,
                     edr_file=None,
                     log_file=None,
                 ),
@@ -404,6 +406,7 @@ class TestExecuteResultFormatting:
                     tpr_file="/work/production.tpr",
                     gro_file="/work/production.gro",
                     xtc_file=None,
+                    trr_file=None,
                     edr_file=None,
                     log_file="/work/production.log",
                 ),
@@ -433,6 +436,7 @@ class TestExecuteResultFormatting:
                     tpr_file="/work/production.tpr",
                     gro_file="/work/production.gro",
                     xtc_file=None,
+                    trr_file=None,
                     edr_file=None,
                     log_file=None,
                 ),
@@ -465,6 +469,7 @@ class TestExecuteResultFormatting:
                     tpr_file=None,
                     gro_file=None,
                     xtc_file=None,
+                    trr_file=None,
                     edr_file=None,
                     log_file=None,
                 ),
@@ -526,6 +531,7 @@ class TestPredecessorDataHandling:
                     tpr_file=None,
                     gro_file=None,
                     xtc_file=None,
+                    trr_file=None,
                     edr_file=None,
                     log_file=None,
                 ),
@@ -558,6 +564,7 @@ class TestPredecessorDataHandling:
                     tpr_file=None,
                     gro_file=None,
                     xtc_file=None,
+                    trr_file=None,
                     edr_file=None,
                     log_file=None,
                 ),
@@ -618,6 +625,7 @@ class TestCoreIntegration:
                     tpr_file=None,
                     gro_file=None,
                     xtc_file=None,
+                    trr_file=None,
                     edr_file=None,
                     log_file=None,
                 ),
@@ -641,3 +649,67 @@ class TestCoreIntegration:
             assert call_kwargs["num_threads"] == 2
             assert call_kwargs["max_warnings"] == 3
             assert call_kwargs["verbose"] is False
+
+
+# =============================================================================
+# Test: the trajectory the node declares (pdbmdauto 1.2.6)
+# =============================================================================
+
+
+class TestTrajectoryDeclared:
+    """The View tab plays what the run declares, so the node must declare what mdrun wrote."""
+
+    @pytest.fixture
+    def mock_flow_vars(self):
+        def make_var(value):
+            mock = MagicMock()
+            mock.get_value.return_value = value
+            return mock
+
+        return {
+            "case_name": make_var("test_case"),
+            "run_label": make_var("md"),
+            "input_top_file": make_var("/work/topol.top"),
+            "input_gro_file": make_var("/work/conf.gro"),
+            "input_mdp_file": make_var("/work/md.mdp"),
+            "input_ndx_file": make_var(None),
+            "output_folder": make_var(""),
+            "num_threads": make_var(1),
+            "max_warnings": make_var(0),
+            "verbose": make_var(False),
+            "force_to_run": make_var(False),
+        }
+
+    def _declared(self, mock_flow_vars, xtc, trr):
+        simulated = core.SimulationResult(
+            success=True,
+            message="done",
+            tpr_file="/work/md.tpr",
+            gro_file="/work/md.gro",
+            xtc_file=xtc,
+            trr_file=trr,
+        )
+        with (
+            patch.object(node_module, "check_gromacs_available", return_value=True),
+            patch.object(node_module, "run_md_simulation", return_value=simulated),
+            patch.object(GmxMdRunLocal, "resolve_path", side_effect=lambda x: x),
+        ):
+            node = GmxMdRunLocal(create_mock_node_info())
+            node.format_output_path = lambda x: f"abs:{x}"
+            return json.loads(node.execute([], mock_flow_vars))["data"]["output_files"]
+
+    def test_the_trr_the_shipped_mdp_writes_is_the_trajectory(self, mock_flow_vars):
+        declared = self._declared(mock_flow_vars, xtc=None, trr="/work/md.trr")
+        assert declared["trajectory"] == "abs:/work/md.trr"
+        assert "trajectory_trr" not in declared
+
+    def test_an_xtc_is_preferred_and_the_trr_declared_beside_it(self, mock_flow_vars):
+        declared = self._declared(
+            mock_flow_vars, xtc="/work/md.xtc", trr="/work/md.trr"
+        )
+        assert declared["trajectory"] == "abs:/work/md.xtc"
+        assert declared["trajectory_trr"] == "abs:/work/md.trr"
+
+    def test_no_trajectory_is_declared_when_none_was_written(self, mock_flow_vars):
+        declared = self._declared(mock_flow_vars, xtc=None, trr=None)
+        assert "trajectory" not in declared and "trajectory_trr" not in declared

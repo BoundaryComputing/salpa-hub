@@ -228,6 +228,12 @@ class FixResiduesPromod3(Node):
             result.files["output"]["fixed_pdb"] = self.format_output_path(
                 fix_result.output_pdb
             )
+            # Which of fixed.pdb's residues ProMod3 rebuilt, in the model's own
+            # numbering: Original Atom Groups reads it.
+            if fix_result.rebuilt_map:
+                result.files["output"]["rebuilt_residues"] = self.format_output_path(
+                    fix_result.rebuilt_map
+                )
 
             result.data.update(
                 {
@@ -240,6 +246,11 @@ class FixResiduesPromod3(Node):
                     "num_chains_modeled": fix_result.num_chains_processed,
                     "total_residues_added": fix_result.total_residues_added,
                     "chain_details": fix_result.chain_details,
+                    "rebuilt_residues": (
+                        self.format_output_path(fix_result.rebuilt_map)
+                        if fix_result.rebuilt_map
+                        else ""
+                    ),
                 }
             )
 

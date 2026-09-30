@@ -48,7 +48,7 @@ def _run(argv, cwd=None, timeout=3600, stdin_text=None):
     NO SHELL. Arguments are passed to execve as-is, so a space, quote or `$` in
     a path is simply part of the argument. Building one string and letting a
     shell re-split it is what broke the pipeline on packaged macOS, where every
-    node lives under `~/Library/Application Support/...` (bocoflow#104).
+    node lives under `~/Library/Application Support/...`.
 
     `stdin_text` replaces the `echo q | gmx make_ndx` idiom: the pipe only ever
     answered an interactive prompt, and stdin does that without a shell.

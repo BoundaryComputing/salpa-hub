@@ -76,7 +76,10 @@ class SimulationResult:
         message: Human-readable status message
         tpr_file: Path to generated TPR file (if created)
         gro_file: Path to output structure file (if created)
-        xtc_file: Path to trajectory file (if created)
+        xtc_file: Path to the compressed trajectory (XTC), if the mdp writes one
+            (nstxout-compressed)
+        trr_file: Path to the full-precision trajectory (TRR), if the mdp writes one
+            (nstxout; the shipped md.mdp writes only this)
         edr_file: Path to energy file (if created)
         log_file: Path to log file (if created)
         grompp_returncode: Return code from grompp command
@@ -90,6 +93,7 @@ class SimulationResult:
     tpr_file: Optional[str] = None
     gro_file: Optional[str] = None
     xtc_file: Optional[str] = None
+    trr_file: Optional[str] = None
     edr_file: Optional[str] = None
     log_file: Optional[str] = None
     grompp_returncode: int = 0
@@ -301,6 +305,7 @@ def run_md_simulation(
     tpr_file = os.path.join(working_dir, f"{run_label}.tpr")
     out_gro = os.path.join(working_dir, f"{run_label}.gro")
     out_xtc = os.path.join(working_dir, f"{run_label}.xtc")
+    out_trr = os.path.join(working_dir, f"{run_label}.trr")
     out_edr = os.path.join(working_dir, f"{run_label}.edr")
     out_log = os.path.join(working_dir, f"{run_label}.log")
 
@@ -373,6 +378,7 @@ def run_md_simulation(
         tpr_file=tpr_file if os.path.exists(tpr_file) else None,
         gro_file=out_gro if os.path.exists(out_gro) else None,
         xtc_file=out_xtc if os.path.exists(out_xtc) else None,
+        trr_file=out_trr if os.path.exists(out_trr) else None,
         edr_file=out_edr if os.path.exists(out_edr) else None,
         log_file=out_log if os.path.exists(out_log) else None,
         grompp_returncode=grompp_result.returncode,

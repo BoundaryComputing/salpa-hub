@@ -365,3 +365,62 @@ class TestPdbIdMode:
         )
         with pytest.raises(Exception):
             node.execute([], flow_vars)
+
+
+# ---------------------------------------------------------------------------
+# Tests: a local file reaches the case folder
+# ---------------------------------------------------------------------------
+
+
+class TestLocalFileInTheCaseFolder:
+    """Every later step looks for the structure in the case folder. In pdb_id mode the
+    node saves the download there; in local_file mode it used the file where it was, so
+    Generate Alignment stopped with "No PDB file found" on the next step."""
+
+    def test_a_local_file_is_copied_into_the_case_folder(self, node, output_dir):
+        flow_vars = make_flow_vars(
+            input_mode="local_file",
+            pdb_file=str(DEMO_PDB),
+            case_name="mine",
+            output_dir=output_dir,
+        )
+        result = json.loads(node.execute([], flow_vars))
+
+        copied = Path(output_dir) / "mine" / DEMO_PDB.name
+        assert result["success"] is True
+        assert copied.read_bytes() == DEMO_PDB.read_bytes()
+        assert result["data"]["pdb_file"].endswith(f"mine/{DEMO_PDB.name}")
+
+    def test_a_file_already_in_the_case_folder_is_used_in_place(self, node, output_dir):
+        case = Path(output_dir) / "mine"
+        case.mkdir()
+        inside = case / DEMO_PDB.name
+        inside.write_bytes(DEMO_PDB.read_bytes())
+        flow_vars = make_flow_vars(
+            input_mode="local_file",
+            pdb_file=str(inside),
+            case_name="mine",
+            output_dir=output_dir,
+        )
+        result = json.loads(node.execute([], flow_vars))
+
+        assert result["success"] is True
+        assert inside.read_bytes() == DEMO_PDB.read_bytes()
+        assert sorted(p.name for p in case.glob("*.pdb")) == [DEMO_PDB.name]
+
+    def test_a_file_without_the_pdb_extension_arrives_as_pdb(self, node, output_dir):
+        # Generate Alignment looks for *.pdb; the wwPDB also distributes .ent files.
+        source = Path(output_dir) / "pdb3lz0.ent"
+        source.write_bytes(DEMO_PDB.read_bytes())
+        flow_vars = make_flow_vars(
+            input_mode="local_file",
+            pdb_file=str(source),
+            case_name="mine",
+            output_dir=output_dir,
+        )
+        result = json.loads(node.execute([], flow_vars))
+
+        assert result["success"] is True
+        assert (
+            Path(output_dir) / "mine" / "pdb3lz0.pdb"
+        ).read_bytes() == DEMO_PDB.read_bytes()
