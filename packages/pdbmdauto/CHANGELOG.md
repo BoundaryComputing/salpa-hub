@@ -4,6 +4,17 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 versions are the `[package].version` in `package.toml`, which is what the Marketplace's Updates tab
 compares against.
 
+## [1.2.8] — 2026-10-02
+
+Documentation only: no node and no environment changes, so nothing is rebuilt.
+
+### Changed
+- **The tutorial and the walkthrough show each step's result inside Salpa.** From Salpa 0.9 a
+  node's View tab draws the structures its run wrote. The tutorial's worked example and its
+  procedure for your own protein now open Fix Missing Residues, GMX Solvate & Ionize and GROMACS
+  MD Run there, and the walkthrough's *Looking at the result* says which file each step opens
+  on, before the VMD commands for use outside the app.
+
 ## [1.2.7] — 2026-09-30
 
 Fixes from running the procedure for your own protein inside Salpa on nine common entries (4Z8J,

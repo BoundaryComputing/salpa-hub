@@ -179,6 +179,23 @@ tolerance is not met. For the demonstration that is enough; for a production stu
 
 ## Looking at the result
 
+In Salpa (0.9 or later), each step's **View** tab draws the structures it wrote. Select the node
+and open **View** in the panel on the right, or right-click the node and choose **View**; **View in
+window** keeps the view open beside the workflow. A step opens on its main structure, and its
+**Files** menu lists the rest:
+
+| Step | Opens on |
+|---|---|
+| 4 · Merge PDB Chains | `Merge/merge.pdb` |
+| 5 · Fix Missing Residues | `Merge/fixed.pdb` |
+| 6 · pKa + GROMACS EM | `gmx/em_hbonds.gro`; `gmx/protonated.pdb` and `gmx/propka.pqr` are under *Named in results* in **Files** |
+| 8 · GMX MD Relaxation (restrained) | `gmx/mm2.gro` |
+| 9 · GMX Solvate & Ionize | `gmx/ion.gro` |
+| 10 · GMX MD Relaxation (solvated) | `gmx/em.gro` |
+| 11 · GROMACS MD Run (Local) | `gmx/md.gro`; tick `md.trr` in **Files** and press **Play** (▶) for the eleven frames |
+
+Outside the app, the same files:
+
 ```bash
 vmd Merge/fixed.pdb                      # the completed model — colour by chain, find the termini
 vmd gmx/md.gro gmx/md.trr                # the trajectory, 11 frames

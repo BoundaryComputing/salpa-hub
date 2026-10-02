@@ -95,14 +95,19 @@ the previous version, whose water box was smaller; expect the last two steps to 
 time, the app also downloads and builds the tools (3.1 GB, about three and a half minutes on a
 Mac with a fast connection, about twenty on Windows, where it sets up a Linux environment for you).
 
-Afterwards, open the working directory and go to `pdbmdauto-e2e-full/e2e_4z8j/`. Three files are
-worth a look:
+Afterwards, three results are worth a look, and Salpa draws each one (version 0.9 or later). Click
+the step on the canvas and open the **View** tab in the panel on the right, or right-click the step
+and choose **View**. The tab opens on the step's structure by itself.
 
-- `Merge/fixed.pdb` — the completed protein. Open it in any structure viewer and find the ends of
-  the chains: the orange residues in the walkthrough's first figure are the rebuilt ones.
-- `gmx/ion.gro` — the protein in its box of water and ions, about 26,000 atoms (the count
-  varies from run to run; see the walkthrough).
-- `gmx/md.gro` with `gmx/md.trr` — the final coordinates and the eleven frames of the test run.
+- **Fix Missing Residues** shows `Merge/fixed.pdb`, the completed protein. Find the ends of the
+  chains: the orange residues in the walkthrough's first figure are the rebuilt ones.
+- **GMX Solvate & Ionize** shows `gmx/ion.gro`, the protein in its box of water and ions, about
+  26,000 atoms (the count varies from run to run; see the walkthrough).
+- **GROMACS MD Run (Local)** shows `gmx/md.gro`, the final coordinates. Open **Files**, tick
+  `md.trr` and press **Play** (▶) to watch the eleven frames of the test run.
+
+The files are also in the working directory, under `pdbmdauto-e2e-full/e2e_4z8j/`, for any other
+structure viewer.
 
 ## Reading the results
 
@@ -148,8 +153,8 @@ The same workflow prepares another protein. Do this for each one:
 
 Afterwards, check the same things as in the example. All eleven steps should be green. Step 2
 names any chain it set aside as a ligand (see *Honest limits*). Step 5 says how many residues it
-rebuilt, and `Merge/rebuilt_residues.json` lists them. Open
-`Merge/fixed.pdb` to look at the rebuilt parts before you trust them.
+rebuilt, and `Merge/rebuilt_residues.json` lists them. Look at the rebuilt parts before you trust
+them: Fix Missing Residues' **View** tab draws `Merge/fixed.pdb`.
 
 **What you have.** The prepared system is in `gmx/`: `em.gro` is the minimised system in water,
 `topol.top` with its `.itp` files is the topology, and `index.ndx` holds the groups. The two
