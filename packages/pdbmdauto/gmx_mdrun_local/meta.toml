@@ -3,7 +3,7 @@
 
 [package]
 name = "gmx-mdrun-local"
-version = "1.0.1"
+version = "1.0.2"
 description = "Simple GROMACS MD simulation node for local execution - ideal for demos, tutorials, and testing"
 author = "BoundaryComputing"
 license = "MIT"

@@ -6,7 +6,7 @@ Pipeline:
 2. gmx solvate — add SPC216 water molecules
 3. gmx grompp — preprocess for genion
 4. gmx genion — add Na+/Cl- ions to neutralize
-5. gmx make_ndx — generate/update index groups
+5. gmx make_ndx — regenerate the index, keeping the groups the given index added
 """
 
 import glob
@@ -31,32 +31,41 @@ class SolvIonResult:
     log: str = ""
 
 
-def _extract_custom_groups(ndx_path: str) -> str:
-    """Extract OriHeavy and OriBackBone groups from an NDX file as text.
+def _read_groups(ndx_path: str) -> list:
+    """The groups of an index file, in order, as (name, text) pairs.
 
-    Returns the group text (including headers) to be appended after regeneration,
-    or empty string if no custom groups found.
+    Each text is the group's header line and its atom lines, as written; an index that does not
+    exist has no groups.
     """
     if not os.path.exists(ndx_path):
-        return ""
-    result_lines = []
-    capturing = False
+        return []
+    groups = []
     with open(ndx_path) as f:
         for line in f:
-            if line.strip() in ("[ OriHeavy ]", "[ OriBackBone ]"):
-                capturing = True
-                result_lines.append(line)
-                continue
-            if line.startswith("[") and capturing:
-                # New group that's not ours — check if it's the other custom group
-                if line.strip() in ("[ OriHeavy ]", "[ OriBackBone ]"):
-                    result_lines.append(line)
-                    continue
-                capturing = False
-                continue
-            if capturing:
-                result_lines.append(line)
-    return "".join(result_lines) if result_lines else ""
+            header = re.match(r"\s*\[\s*(.+?)\s*\]\s*$", line)
+            if header:
+                groups.append([header.group(1), line])
+            elif groups:
+                groups[-1][1] += line
+    return [(name, text) for name, text in groups]
+
+
+def _group_names(ndx_path: str) -> list:
+    """The names of an index file's groups, in order."""
+    return [name for name, _ in _read_groups(ndx_path)]
+
+
+def _carried_groups(old_groups: list, regenerated_names) -> str:
+    """The groups of the given index that the regenerated defaults do not make again, as text.
+
+    make_ndx's defaults for the solvated structure name the water and the ions as well as the
+    solute, so what the given index added to its own defaults is what is left: OriHeavy and
+    OriBackBone from Original Atom Groups, and a group made for the solute upstream, such as a
+    protein-ligand complex's Protein_LIG. Solvate and genion add atoms only after the solute's,
+    so these groups keep their atom numbers. Up to 1.2.8 only OriHeavy and OriBackBone were kept.
+    """
+    made_again = set(regenerated_names)
+    return "".join(text for name, text in old_groups if name not in made_again)
 
 
 def _run_gmx(argv, cwd=None, stdin_text=None) -> tuple:
@@ -270,17 +279,22 @@ def process_solv_ion(
         log_lines.append("genion: skipped (ion_conc=0)")
     result.ion_gro = ion_gro
 
-    # Regenerate NDX for the solvated structure (adds Water, SOL, Ion, non-Protein groups)
-    # but PRESERVE OriHeavy/OriBackBone from gen_gmx_ndx
+    # Regenerate the index for the solvated structure (adds Water, SOL, Ion, Water_and_ions
+    # and non-Protein), then keep every group the given index added to make_ndx's defaults:
+    # OriHeavy and OriBackBone from Original Atom Groups, and any group made upstream for the
+    # solute, such as a complex's Protein_LIG. Read before make_ndx overwrites the file.
     out_ndx = ndx_file
-    ori_groups = _extract_custom_groups(ndx_file)  # save OriHeavy/OriBackBone
+    given = _read_groups(ndx_file)
     # "q" quits make_ndx's interactive group editor, accepting the defaults.
     cmd = ["gmx", "make_ndx", "-f", ion_gro, "-o", out_ndx]
     _run_gmx(cmd, cwd=output_dir, stdin_text="q\n")
-    if ori_groups:
+    regenerated = _group_names(out_ndx)
+    carried = _carried_groups(given, regenerated)
+    if carried:
         with open(out_ndx, "a") as f:
-            f.write(ori_groups)
-        log_lines.append("make_ndx: regenerated + preserved OriHeavy/OriBackBone")
+            f.write(carried)
+        kept = [name for name, _ in given if name not in set(regenerated)]
+        log_lines.append(f"make_ndx: regenerated + kept {', '.join(kept)}")
 
     # Clean up temp files
     _purge_temp_files(output_dir)

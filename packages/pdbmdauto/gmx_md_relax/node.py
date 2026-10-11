@@ -241,6 +241,10 @@ class GmxMdRelax(Node):
                 "max_force": relax_result.max_force,
                 "em_safe": relax_result.em_safe,
             })
+            # .mdp files an upstream step offers for later runs, keyed by run label: handed
+            # on unchanged for GROMACS MD Run (pdbmdauto 1.2.9)
+            if input_data.get("mdp_files"):
+                result.data["mdp_files"] = input_data["mdp_files"]
 
             result.success = True
             result.message = (

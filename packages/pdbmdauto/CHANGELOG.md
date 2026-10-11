@@ -4,6 +4,34 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 versions are the `[package].version` in `package.toml`, which is what the Marketplace's Updates tab
 compares against.
 
+## [1.2.9] — 2026-10-11
+
+Three changes so that a protein with a bound ligand, added to the protein by a step after
+Original Atom Groups, can be equilibrated and simulated with these steps. A protein on its own
+runs exactly as before. The environment is unchanged, so nothing is rebuilt.
+
+### Changed
+- **GMX Solvate & Ionize keeps every index group the given index added.** After genion it makes
+  the index again with make_ndx's default groups, which then name the water and the ions. Up to
+  1.2.8 it kept only OriHeavy and OriBackBone from the index it was given; it now keeps every
+  group those defaults do not make again, in the order given. For a protein that is still
+  exactly OriHeavy and OriBackBone. For a protein with its ligand it is also the group of both
+  (`Protein_LIG`), so a run can couple the two together against the water and ions
+  (`tc-grps = Protein_LIG Water_and_ions`). Water and ions are added after the solute, so such a
+  group keeps its atom numbers.
+- **GROMACS MD Run takes its .mdp from upstream when its own is left at the default.** A step
+  before it can offer `mdp_files`, a mapping from a run label to the .mdp written for that run,
+  and the run uses the entry for its own Run Label. A file you set always wins, and a label the
+  mapping does not name keeps the bundled `md.mdp`. GMX MD Relaxation and GMX Solvate & Ionize
+  pass the mapping on unchanged.
+
+### Added
+- **One GROMACS MD Run can follow another.** The node now hands on its final structure
+  (`output_gro`, with the velocities mdrun writes into it), the topology and index it used
+  (`output_top`, `output_ndx`), its folder (`working_path`) and the `mdp_files` mapping, so a
+  second run connected after it, such as production after an equilibration at constant
+  pressure, continues from where the first ended.
+
 ## [1.2.8] — 2026-10-02
 
 Documentation only: no node and no environment changes, so nothing is rebuilt.

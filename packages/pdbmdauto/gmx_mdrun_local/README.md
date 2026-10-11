@@ -55,7 +55,9 @@ pixi install
 2. Configure the input files:
    - **Topology File (.top)**: Your GROMACS topology file
    - **Structure File (.gro)**: Input structure/coordinates
-   - **Parameters File (.mdp)**: MD parameters
+   - **Parameters File (.mdp)**: MD parameters. Left at its default, the run takes the .mdp an
+     upstream step offers for its Run Label, if one does (see *Taking the .mdp from upstream*);
+     otherwise the bundled `demo_data/md.mdp`
    - **Index File (.ndx)**: Optional index file
 3. Set execution options:
    - **Run Label**: Output file prefix (e.g., "nvt", "npt", "md")
@@ -86,6 +88,22 @@ if check_gromacs_available():
     else:
         print(f"Simulation failed: {result.message}")
 ```
+
+## Taking the .mdp from upstream, and one run after another
+
+A step before this one can offer `mdp_files` in its result: a mapping from a run label to the
+.mdp written for that run. When **Parameters File** is left at its default, the node uses the
+entry for its own **Run Label**. A file you set always wins, and a label the mapping does not
+name keeps the bundled default. GMX MD Relaxation and GMX Solvate & Ionize pass the mapping on
+unchanged, so it reaches this node from a step further up. A step that adds a ligand to the
+protein can offer one for `npt` (an equilibration at constant pressure) and one for `md` (the
+production run).
+
+The node hands on what a following run needs: its final structure as `output_gro` (mdrun
+writes the velocities into it), the topology and index it used as `output_top` and
+`output_ndx`, its folder as `working_path`, and the `mdp_files` mapping it was given. So a
+second MD Run connected after the first, with its own Run Label, continues from where the first
+ended.
 
 ## Output Files
 

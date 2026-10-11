@@ -1,6 +1,6 @@
 [package]
 name = "gmx-solv-ion"
-version = "1.0.1"
+version = "1.0.2"
 description = "GROMACS solvation and ionization — add water box and neutralize with ions"
 author = "BoundaryComputing"
 license = "MIT"

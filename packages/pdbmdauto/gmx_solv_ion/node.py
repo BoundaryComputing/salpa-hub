@@ -215,6 +215,10 @@ class GmxSolvIon(Node):
                     "run_label": flow_vars["run_label"].get_value(),
                 }
             )
+            # .mdp files an upstream step offers for later runs, keyed by run label: handed
+            # on unchanged for GROMACS MD Run (pdbmdauto 1.2.9)
+            if input_data.get("mdp_files"):
+                result.data["mdp_files"] = input_data["mdp_files"]
             result.success = True
             result.message = "Solvation and ionization complete"
             stream_log(result.message, node_id=self.node_id, progress=100)

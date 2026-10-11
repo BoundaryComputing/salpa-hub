@@ -97,7 +97,9 @@ class GmxMdRunLocal(Node):
         "input_mdp_file": FileParameterEdit(
             label="Parameters File (.mdp)",
             default="node:demo_data/md.mdp",
-            docstring="Production MD parameters (bundled: 1000 steps, 2 ps).",
+            docstring="MD parameters. Left at this default, the run uses the .mdp an upstream "
+            "step offers for its Run Label, if one does; otherwise the bundled file "
+            "(1000 steps, 2 ps).",
         ),
         "input_ndx_file": FileParameterEdit(
             label="Index File (.ndx)",
@@ -187,7 +189,22 @@ class GmxMdRunLocal(Node):
             # ================================================================
             top_file = self.resolve_path(flow_vars["input_top_file"].get_value()) or ""
             gro_file = self.resolve_path(flow_vars["input_gro_file"].get_value()) or ""
-            mdp_file = self.resolve_path(flow_vars["input_mdp_file"].get_value()) or ""
+
+            # The .mdp: the person's file when they set one. Left at its default, the file an
+            # upstream step offers for this run's label, when it offers one: `mdp_files` maps a
+            # run label to an .mdp (a step that adds a ligand can offer "npt" and "md").
+            # Otherwise the bundled default.
+            mdp_value = flow_vars["input_mdp_file"].get_value()
+            mdp_files = input_data.get("mdp_files")
+            offered = mdp_files.get(run_label) if isinstance(mdp_files, dict) else None
+            if offered and mdp_value in ("", None, self.OPTIONS["input_mdp_file"].default):
+                mdp_file = self.resolve_path(offered) or ""
+                stream_log(
+                    f"Parameters for run '{run_label}' from upstream: {Path(mdp_file).name}",
+                    node_id=self.node_id,
+                )
+            else:
+                mdp_file = self.resolve_path(mdp_value) or ""
 
             ndx_file = flow_vars["input_ndx_file"].get_value()
             ndx_file = self.resolve_path(ndx_file) if ndx_file else ""
@@ -338,13 +355,23 @@ class GmxMdRunLocal(Node):
 
             result.files["output"] = output_files
 
-            # Result data
+            # Result data. A following step, another MD Run among them, takes the final
+            # structure (mdrun writes the velocities into it), the topology and index this run
+            # used, and the .mdp mapping it was given (pdbmdauto 1.2.9).
             result.data = {
                 "case_name": case_name,
                 "run_label": run_label,
                 "output_files": output_files,
                 "threads_used": num_threads if num_threads > 0 else "auto",
+                "working_path": self.format_output_path(working_dir),
+                "output_top": self.format_output_path(top_file),
             }
+            if sim_result.gro_file:
+                result.data["output_gro"] = self.format_output_path(sim_result.gro_file)
+            if ndx_file:
+                result.data["output_ndx"] = self.format_output_path(ndx_file)
+            if isinstance(mdp_files, dict) and mdp_files:
+                result.data["mdp_files"] = mdp_files
 
             result.success = True
             result.message = sim_result.message
