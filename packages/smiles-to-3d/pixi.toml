@@ -4,7 +4,7 @@
 
 [workspace]
 name = "smiles-to-3d"
-version = "0.1.0"
+version = "0.1.1"
 description = "Generate 3D conformers from SMILES and write them as SDF (RDKit ETKDG + MMFF94)"
 channels = ["conda-forge"]
 # Declare ONLY platforms your deps actually build for (pixi solves ALL of them).
@@ -15,7 +15,7 @@ platforms = ["linux-64", "linux-aarch64", "osx-64", "osx-arm64", "win-64"]
 
 [dependencies]
 # Core Python requirement
-python = ">=3.10,<3.13"
+python = "3.12.*"   # the app's compiled core is built for 3.12 only (since 0.1.1)
 
 # Redis client for real-time log streaming from subprocess to UI.
 # Keeps stream_log() calls in your node appearing in the UI immediately.

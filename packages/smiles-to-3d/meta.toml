@@ -8,7 +8,7 @@
 # overwrite). The DIRECTORY uses underscores. Keep this line comment-free — some
 # tooling parses it literally.
 name = "smiles-to-3d"
-version = "0.1.0"
+version = "0.1.1"
 description = "Generate 3D conformers from SMILES and write them as SDF (RDKit ETKDG + MMFF94)"
 author = "Boundary Computing"
 license = "BSD-3-Clause"           # REQUIRED — a node with no license is skipped at

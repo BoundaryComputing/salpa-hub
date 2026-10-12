@@ -6,12 +6,15 @@
 # Per-package dev marker written by the installer / a dev source
 **/.installed_from.json
 
-# Pixi environments & lockfiles — installed per-package, regenerated on install,
-# and stripped at packaging. Use ** so NESTED multi-node packages are covered too,
-# e.g. packages/metalparm-vwf/<node>/.pixi/ and .../<node>/pixi.lock. The old
+# Pixi environments — built per package on install. Use ** so NESTED multi-node
+# packages are covered too, e.g. packages/metalparm-vwf/<node>/.pixi/. The old
 # one-level `packages/*/.pixi/` pattern missed these and let build caches slip in.
+#
+# A package's pixi.lock is NOT ignored since 2026-10-12: a package ships its lock
+# when its source tracks one, and the Salpa app builds the environment from it, so
+# an install gets the solve that was tested. smiles-to-3d and ligand-pdbqt-meeko
+# were the first.
 **/.pixi/
-**/pixi.lock
 
 # Test / coverage build caches
 **/.pytest_cache/

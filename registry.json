@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-10-11T14:18:32.082303+00:00",
+  "generated_at": "2026-10-12T21:38:17.790329+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
@@ -68,7 +68,7 @@
     },
     {
       "name": "ligand-pdbqt-meeko",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "description": "Prepare docking-ready PDBQT ligands from an SDF with Meeko (AutoDock Vina / AutoDock4)",
       "display_name": "Ligand PDBQT (Meeko)",
       "category": "Docking",
@@ -849,7 +849,7 @@
     },
     {
       "name": "smiles-to-3d",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "description": "Generate 3D conformers from SMILES and write them as SDF (RDKit ETKDG + MMFF94)",
       "display_name": "SMILES to 3D",
       "category": "Chemistry",

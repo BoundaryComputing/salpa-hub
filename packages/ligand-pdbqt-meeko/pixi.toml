@@ -4,7 +4,7 @@
 
 [workspace]
 name = "ligand-pdbqt-meeko"
-version = "0.1.1"
+version = "0.1.2"
 description = "Prepare docking-ready PDBQT ligands from an SDF with Meeko (AutoDock Vina / AutoDock4)"
 channels = ["conda-forge"]
 # Declare ONLY platforms your deps actually build for (pixi solves ALL of them).

@@ -55,6 +55,10 @@ Silicon and Windows, Meeko pulls a prody build that needs Python older than 3.12
 Python 3.11 there and could not run in the app. Apple Silicon now runs the osx-64 build through
 Rosetta 2, and Windows the linux-64 build through WSL2.
 
+**It ships its lock** (since 0.1.2). `pixi.lock` beside `pixi.toml` records the solve this
+version was tested with, for every platform above, and the Salpa app builds the environment from
+it, so an install gets those builds rather than whatever conda-forge holds on the day.
+
 ## Status
 
 Built with the `salpa-node` skill and verified on 2026-09-05:

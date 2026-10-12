@@ -43,6 +43,12 @@ silently: a docking run on three of four requested ligands is a wrong answer, no
 **Local (PIXI_SUBPROCESS)** — CPU only. One dependency, `rdkit` from conda-forge, which builds
 for every platform this package declares: linux-64, linux-aarch64, osx-64, osx-arm64, win-64.
 
+**It ships its lock** (since 0.1.1). `pixi.lock` beside `pixi.toml` records the solve this
+version was tested with, for every platform above, and the Salpa app builds the environment from
+it, so an install gets those builds rather than whatever conda-forge holds on the day. Python is
+pinned to 3.12, the only version the app's compiled core is built for; the lock gives 3.12 on all
+five platforms.
+
 ## Status
 
 Built with the `salpa-node` skill and verified on 2026-09-05:
