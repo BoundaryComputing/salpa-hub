@@ -6,7 +6,7 @@ A minimal water box simulation case for testing the GROMACS MD Run (Local) node.
 
 | File | Description |
 |------|-------------|
-| `water_box.gro` | Coordinates for 27 TIP3P water molecules in a 1.5nm cube |
+| `water_box.gro` | Coordinates for 510 TIP3P water molecules (1,530 atoms) in a 2.5 nm cube |
 | `topol.top` | Topology file using OPLS-AA force field |
 | `em.mdp` | Energy minimization parameters (steepest descent) |
 | `nvt.mdp` | NVT equilibration parameters (10 ps at 300K) |
@@ -49,8 +49,8 @@ gmx mdrun -deffnm nvt -v
 ## System Details
 
 - **Water model**: TIP3P (OPLS-AA force field)
-- **Box size**: 1.5 nm × 1.5 nm × 1.5 nm
-- **Number of molecules**: 27 water molecules (81 atoms)
+- **Box size**: 2.5 nm × 2.5 nm × 2.5 nm
+- **Number of molecules**: 510 water molecules (1,530 atoms)
 - **Periodic boundaries**: XYZ
 
 ## Notes

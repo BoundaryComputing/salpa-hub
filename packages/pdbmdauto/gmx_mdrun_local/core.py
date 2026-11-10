@@ -24,6 +24,32 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional
 
+# Below this many atoms mdrun runs as one rank, on OpenMP threads, instead of splitting the
+# system into domains: GMX MD Relaxation's rule (gmx_md_relax/core.py, pdbmdauto 1.2.7), for the
+# same cause. With Number of Threads at 0 (or at the core count) thread-MPI starts a rank on every
+# core, and on a 10-core Mac the bundled water box (1,530 atoms, a 2.5 nm cube) cannot be cut into
+# ten domains: "There is no domain decomposition for 10 ranks that is compatible with the given
+# box" (the Mac Mini, GROMACS 2026.3, 2026-11-10). One rank ran it in 3 s. Every locked GROMACS
+# build is thread-MPI, where `-ntmpi` is valid. A solvated protein (25,000 atoms and more in the
+# template) keeps GROMACS's own choice.
+SINGLE_RANK_BELOW_ATOMS = 20000
+
+
+def _atom_count(gro_file: str) -> Optional[int]:
+    """The atom count a .gro file declares on its second line, or None."""
+    try:
+        with open(gro_file) as f:
+            f.readline()
+            return int(f.readline().split()[0])
+    except (OSError, ValueError, IndexError):
+        return None
+
+
+def rank_args(gro_file: str) -> List[str]:
+    """["-ntmpi", "1"] for a system small enough to run as one rank, else []."""
+    n = _atom_count(gro_file)
+    return ["-ntmpi", "1"] if n is not None and n < SINGLE_RANK_BELOW_ATOMS else []
+
 
 @dataclass
 class GromppConfig:
@@ -343,11 +369,15 @@ def run_md_simulation(
             grompp_returncode=grompp_result.returncode,
         )
 
-    # Step 2: Run mdrun
+    # Step 2: Run mdrun, as one rank for a small system (SINGLE_RANK_BELOW_ATOMS)
+    gro_path = (
+        gro_file if os.path.isabs(gro_file) else os.path.join(working_dir, gro_file)
+    )
     mdrun_config = MdrunConfig(
         deffnm=run_label,
         num_threads=num_threads,
         verbose=verbose,
+        extra_args=rank_args(gro_path),
     )
 
     try:

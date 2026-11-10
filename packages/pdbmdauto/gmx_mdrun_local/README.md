@@ -18,7 +18,7 @@ This package includes ready-to-use demo data for testing:
 
 ```
 demo_data/water_box/
-├── water_box.gro    # 27 TIP3P water molecules in 1.5nm cube
+├── water_box.gro    # 510 TIP3P water molecules (1,530 atoms) in a 2.5 nm cube
 ├── topol.top        # Topology (OPLS-AA force field)
 ├── em.mdp           # Energy minimization parameters
 ├── nvt.mdp          # NVT equilibration (10ps at 300K)
@@ -61,7 +61,9 @@ pixi install
    - **Index File (.ndx)**: Optional index file
 3. Set execution options:
    - **Run Label**: Output file prefix (e.g., "nvt", "npt", "md")
-   - **Number of Threads**: OpenMP threads (0 = auto-detect)
+   - **Number of Threads**: threads for mdrun (0 = GROMACS chooses). A system under 20,000 atoms
+     runs as one rank on these threads (`-ntmpi 1`): on a 10-core Mac, GROMACS otherwise starts ten
+     ranks, and a box as small as the demo's cannot be cut into ten domains
    - **Max Warnings**: Maximum grompp warnings allowed
 4. Execute the node
 

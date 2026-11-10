@@ -4,6 +4,22 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 versions are the `[package].version` in `package.toml`, which is what the Marketplace's Updates tab
 compares against.
 
+## [1.2.10] — 2026-11-10
+
+GROMACS MD Run (Local) can run its own demo on a 10-core Mac. The environment is unchanged, so
+nothing is rebuilt.
+
+### Fixed
+- **GROMACS MD Run (Local) runs a system under 20,000 atoms as one rank**, on OpenMP threads, as
+  GMX MD Relaxation has since 1.2.7. With Number of Threads left at 0 (or set to the core count),
+  GROMACS started a rank on every core, and on a 10-core Mac the bundled water box could not be
+  cut into ten domains: mdrun stopped with "There is no domain decomposition for 10 ranks that is
+  compatible with the given box". One rank runs it in a few seconds. Number of Threads still sets
+  how many threads run; a larger system, such as the template's solvated protein, keeps GROMACS's
+  own choice.
+- The README and the water box's own README describe the bundled box as it is: 510 TIP3P waters
+  (1,530 atoms) in a 2.5 nm cube, not 27 waters in a 1.5 nm cube.
+
 ## [1.2.9] — 2026-10-11
 
 Three changes so that a protein with a bound ligand, added to the protein by a step after
