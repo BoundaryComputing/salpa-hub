@@ -4,6 +4,17 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 versions are the `[package].version` in `package.toml`, which is what the Marketplace's Updates tab
 compares against.
 
+## [1.2.11] — 2026-11-10
+
+Installing pdbmdauto from the Hub gets this version. Nothing a node does changes, and the environment is
+unchanged, so nothing is rebuilt.
+
+### Fixed
+- **No file in the package is empty.** The Hub could fail to send an empty file, and an app that met
+  that installed the copy it ships with instead, older, while saying the install had succeeded. Three
+  files were empty: `gmx_mdrun/__init__.py`, `gmx_mdrun/tests/__init__.py` and
+  `pdb_fasta_biopython/tests/__init__.py`. Each now holds one line.
+
 ## [1.2.10] — 2026-11-10
 
 GROMACS MD Run (Local) can run its own demo on a 10-core Mac. The environment is unchanged, so
