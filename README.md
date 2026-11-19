@@ -9,11 +9,12 @@ installable packages. Add it as a marketplace source in Salpa and install what y
 need. Heavy execution routes to **Salpa Compute** — never gated here.
 
 > **Status: prototypes.** `metaldock-vwf`, `metalparm-vwf` and `pdbmdauto` run end to
-> end and were tested on a few examples by a computational expert. They are not yet
-> validated against experimental data: read their results as hypotheses to test.
-> Version numbers count package releases, not validation. Flexible-binding,
-> covalent-inhibition and light-release workflows are planned and are not in the Hub
-> yet.
+> end. Each was tested on a few examples by a computational expert. Their full
+> functionality is not yet tested, and their accuracy is not yet validated against
+> experimental data. Read their results as hypotheses to test. Version numbers count
+> package releases, not validation. The advanced workflows (flexible binding,
+> covalent inhibition and light-triggered release) are internal prototypes, not yet
+> public.
 >
 > Packages are mirrored from their canonical dev repositories once they pass
 > end-to-end verification and ship experimentalist docs. This repo is the
