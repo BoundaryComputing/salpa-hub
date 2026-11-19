@@ -8,8 +8,15 @@ Salpa Hub is a public, additive distribution channel: a static repository of
 installable packages. Add it as a marketplace source in Salpa and install what you
 need. Heavy execution routes to **Salpa Compute** — never gated here.
 
-> **Status:** live. Packages are mirrored from their canonical dev repositories once
-> they pass end-to-end verification and ship experimentalist docs. This repo is the
+> **Status: prototypes.** `metaldock-vwf`, `metalparm-vwf` and `pdbmdauto` run end to
+> end and were tested on a few examples by a computational expert. They are not yet
+> validated against experimental data: read their results as hypotheses to test.
+> Version numbers count package releases, not validation. Flexible-binding,
+> covalent-inhibition and light-release workflows are planned and are not in the Hub
+> yet.
+>
+> Packages are mirrored from their canonical dev repositories once they pass
+> end-to-end verification and ship experimentalist docs. This repo is the
 > generated/published mirror — packages are never edited Hub-first.
 
 ## Packages
