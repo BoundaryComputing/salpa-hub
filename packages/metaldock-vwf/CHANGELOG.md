@@ -4,6 +4,57 @@ All notable changes to the `metaldock-vwf` package are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versioning is
 [SemVer](https://semver.org/).
 
+## [0.4.3] — 2026-11-20
+
+### Fixed
+
+- **A node run on its own reads its demo graphs, on any networkx.** networkx 3.6
+  moved a graph's bonds in its JSON from `"links"` to `"edges"`, and each version
+  looks only under its own key unless told which. Three demo graphs use `"links"`
+  and the ORCA reference uses `"edges"`. On networkx 3.6 and later, which a fresh
+  environment solves (3.7 today), QM Charges, Ligand PDBQT and AutoDock Run
+  failed with `KeyError: 'edges'` when run on their own demo data, as `salpa
+  smoke` and the tests do; from 2.8 to 3.5 the ORCA reference failed with
+  `KeyError: 'links'`. A full workflow was unaffected, because its nodes share one
+  environment and read what they wrote. Graphs are now read under whichever key
+  they hold and always written under `"links"`, on networkx 2.8.8 to 3.7 alike.
+
+- **`binding_energies` holds one energy per pose.** Results Analysis read every
+  "Estimated Free Energy of Binding" line of the docking log, and after its runs
+  the log repeats the best energy of each cluster. Asking for more poses than the
+  search ran counted those repeats as poses: a log of ten runs gave twelve
+  energies. Only the docked poses' own lines are read now, and every per-pose list
+  in `<case>_analysis.json` has one entry for each pose analysed, as
+  `best_pose_index` assumes.
+
+- **A pose that scores zero or above keeps its own energy.** AutoDock prints such
+  an energy with its sign, `+0.37`, and past 1000 kcal/mol in exponent form,
+  `+1.23e+03`. Results Analysis read only a minus sign and digits, so it skipped
+  the pose and gave every later pose the energy of the one after it.
+
+- **AutoDock Run takes an output folder named without a prefix.** Its grid and
+  docking steps run inside the output folder and were handed paths relative to
+  the folder above it, so a folder given as plain `docking` failed at the first
+  step with `docking/1jzi_re_ligand.pdbqt does't exist`. Such a folder now goes
+  where `rel:docking` would, in the run's working directory. Workflows in the app
+  name their folders with `rel:` and were not affected.
+
+- **`salpa smoke` can run Protein Prep, QM Charges and AutoDock Run on their demo
+  data.** smoke gives every folder parameter a node's `DEMO_CONFIG` leaves out its
+  own case directory, and these nodes take *MGLTools Dir*, *xtb Directory* and
+  *ORCA Directory* as the tool's location whenever they hold a value, so they
+  looked for MGLTools or xtb there. The demo configurations now leave them
+  empty, as a user does, and each node finds its tool in its own environment.
+  AutoDock Run's optional *AutoDock4 Parameter File* is left empty too: smoke
+  gives a file parameter the configuration leaves out the node's first demo
+  input, so it read the demo graph as its AutoDock4 parameters. Empty, it uses
+  the bundled `metal_dock.dat`.
+
+- **The templates estimate 3 minutes, not 5.** The estimate is the longest
+  measured run rounded up to the minute: three runs of each on an Intel Mac took
+  148–155 s (HSA) and 169–172 s (1JZI). The first run also builds the
+  environment, which the estimate does not count.
+
 ## [0.4.2] — 2026-09-24
 
 ### Fixed

@@ -55,8 +55,10 @@ def analyze_docking_results(
 
     Returns:
         Dict with keys, every per-pose list in the order AutoDock ran the poses,
-        which is not the order of their scores:
-        - ``binding_energies``: list of floats (kcal/mol).
+        which is not the order of their scores, and one entry for each pose
+        analysed: the first *num_poses* of *pose_xyz_paths*.
+        - ``binding_energies``: list of floats (kcal/mol); shorter only if the
+          log holds fewer docked poses.
         - ``binding_efficiencies``: list of floats (kcal/mol per heavy atom).
         - ``interacting_residues``: list of lists of (residue_name, residue_id) tuples.
         - ``best_pose_index``: 0-based index of the lowest binding energy, the
@@ -68,35 +70,33 @@ def analyze_docking_results(
     """
     if num_poses is None:
         num_poses = len(pose_xyz_paths)
+    poses = pose_xyz_paths[:num_poses]
 
-    # 1. Extract binding energies
-    energies = extract_binding_energies(dlg_path, num_poses)
+    # 1. Extract binding energies, one per pose analysed
+    energies = extract_binding_energies(dlg_path, len(poses))
     efficiencies = (
         [e / n_heavy_atoms for e in energies] if n_heavy_atoms > 0 else energies
     )
 
     # 2. Interacting residues
     residues_per_pose = []
-    for pose_path in pose_xyz_paths[:num_poses]:
+    for pose_path in poses:
         res = extract_interacting_residues(pose_path, protein_pdb, cutoff=cutoff)
         residues_per_pose.append(res)
 
-    # The energy pattern also matches the log's cluster summary, so choose only
-    # among energies that belong to a pose that was analysed.
-    scored = energies[: len(residues_per_pose)]
     result: dict = {
         "binding_energies": energies,
         "binding_efficiencies": efficiencies,
         "interacting_residues": residues_per_pose,
         "best_pose_index": (
-            min(range(len(scored)), key=scored.__getitem__) if scored else None
+            min(range(len(energies)), key=energies.__getitem__) if energies else None
         ),
     }
 
     # 3. RMSD (optional)
     if reference_xyz is not None:
         rmsds = []
-        for pose_path in pose_xyz_paths[:num_poses]:
+        for pose_path in poses:
             rmsd = calculate_rmsd(reference_xyz, pose_path)
             rmsds.append(rmsd)
         result["rmsd_values"] = rmsds
@@ -114,16 +114,29 @@ def analyze_docking_results(
 # ===================================================================
 
 
+# AutoDock writes each docked pose once per run, every line of it prefixed
+# "DOCKED: ", and AutoDock Run extracts the poses from those lines. The log then
+# summarises its clusters, repeating the energy of each cluster's best pose
+# without that prefix. Those lines are not poses: read as more, they gave a log
+# of ten runs twelve energies. The value is printed "%+7.2f", or "%+11.2e" past
+# 1000 kcal/mol, so a pose that scores above zero reads "+0.37"; a pattern that
+# missed it would hand every later pose its successor's energy.
+_DOCKED_ENERGY = re.compile(
+    r"^DOCKED: USER\s+Estimated Free Energy of Binding\s*=\s*"
+    r"([-+]?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)\s*kcal/mol",
+    re.MULTILINE,
+)
+
+
 def extract_binding_energies(dlg_path: Path, num_poses: int) -> list[float]:
-    """Extract estimated free energies of binding from the DLG file."""
+    """Estimated free energy of binding of each docked pose, in run order.
+
+    At most *num_poses*; the k-th is the energy of pose ``_{k}``.
+    """
     with open(dlg_path) as f:
         content = f.read()
 
-    matches = re.findall(
-        r"Estimated Free Energy of Binding\s*=\s*([-\d.]+)\s*kcal/mol",
-        content,
-    )
-    energies = [float(v) for v in matches]
+    energies = [float(v) for v in _DOCKED_ENERGY.findall(content)]
     return energies[:num_poses]
 
 

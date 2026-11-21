@@ -110,6 +110,10 @@ DEMO_CONFIG = {
     "output_dir": "protein",
     "ph": 7.0,
     "clean": True,
+    # Empty, as a user leaves it: the node then finds MGLTools in its own
+    # environment. Left out, salpa smoke fills a folder parameter with its case
+    # directory, and the node looks for prepare_receptor4.py there.
+    "mgltools_dir": "",
 }
 
 

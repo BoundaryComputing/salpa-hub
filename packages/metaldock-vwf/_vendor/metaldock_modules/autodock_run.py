@@ -86,6 +86,9 @@ def run_autodock(
         - ``pose_pdbqt_paths``: list of extracted pose PDBQT files.
         - ``pose_xyz_paths``: list of extracted pose XYZ files.
     """
+    # prepare_gpf4, autogrid4 and autodock4 run inside output_dir and are handed
+    # paths under it. Relative, each would look for docking/docking/<file>.
+    output_dir = Path(os.path.abspath(output_dir))
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Copy inputs to docking dir

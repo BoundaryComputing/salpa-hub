@@ -1,6 +1,6 @@
 [package]
 name = "metaldock-vwf"
-version = "0.4.2"
+version = "0.4.3"
 description = "Visual workflow nodes for metal-protein docking: the refactored MetalDock pipeline (protein prep, ligand prep, QM/ORCA CM5 charges, ligand PDBQT with metal-aware torsion tree, AutoDock4 docking, results analysis) wired as chainable Salpa nodes. Each node wraps one src/metaldock_modules function; molecular graphs are serialized to JSON between nodes."
 author = "BoundaryComputing / MetalDock"
 license = "LGPL-2.1 (non-commercial: MGLTools)"
@@ -75,6 +75,11 @@ tutorial = "TUTORIAL.md"
 # deliberately absent from `examples` so it does not ship as a Hub template
 # alongside a case that answers a real question; the site already excludes its
 # doc for the same reason.
+#
+# Each template's `estimated_time` is its longest measured run, rounded up to the
+# minute: three runs each on an Intel Mac with 0.4.2 took 148–155 s (HSA) and
+# 169–172 s (1JZI), as the two workflow documents record. The first run also
+# builds the environment, which the estimate does not count.
 examples = [
     "workflows/metaldock-hsa-ferrocene.json",
 ]

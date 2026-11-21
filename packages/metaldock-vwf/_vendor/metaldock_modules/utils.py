@@ -4,6 +4,7 @@ Graph serialization/deserialization, Lennard-Jones parameter sets,
 metal validation, and common helpers.
 """
 
+import inspect
 import json
 import logging
 from pathlib import Path
@@ -120,17 +121,48 @@ def _convert_for_json(obj: Any) -> Any:
     return obj
 
 
+# Node-link JSON keeps a graph's bonds under one key, and networkx has changed
+# both the key and the keyword that names it. Its default is "links" before 3.6
+# and "edges" from 3.6. The keyword is `link` from 2.8 to 3.3 and `edges` from
+# 3.4; 3.4 and 3.5 warn when it is left out, and 3.6 dropped `link`. A call that
+# names no key therefore writes files another networkx cannot read, and the demo
+# graphs this package ships use both keys. So every graph is written under
+# "links", as every graph was before networkx 3.6, and read under whichever key
+# it holds.
+_EDGE_KEY = "links"
+
+
+def _edge_key_keyword(function) -> str | None:
+    """The keyword a networkx node-link function takes for the edge key.
+
+    None for networkx before 2.8, which takes none and uses "links" only.
+    """
+    parameters = inspect.signature(function).parameters
+    for keyword in ("edges", "link"):  # networkx 3.4 and later; 2.8 to 3.3
+        if keyword in parameters:
+            return keyword
+    return None
+
+
 def graph_to_json(G: nx.Graph) -> str:
-    """Serialize a NetworkX molecular graph to a JSON string."""
-    data = nx.node_link_data(G)
+    """Serialize a NetworkX molecular graph to a JSON string, bonds under "links"."""
+    keyword = _edge_key_keyword(nx.node_link_data)
+    data = nx.node_link_data(G, **({keyword: _EDGE_KEY} if keyword else {}))
     data = _convert_for_json(data)
     return json.dumps(data, indent=2)
 
 
 def graph_from_json(json_str: str) -> nx.Graph:
-    """Deserialize a NetworkX molecular graph from a JSON string."""
+    """Deserialize a NetworkX molecular graph from a JSON string.
+
+    The bonds may be under "links" or "edges", whichever networkx wrote them.
+    """
     data = json.loads(json_str)
-    return nx.node_link_graph(data)
+    key = "edges" if "edges" in data and "links" not in data else "links"
+    keyword = _edge_key_keyword(nx.node_link_graph)
+    if keyword is None:
+        return nx.node_link_graph({**data, "links": data[key]})
+    return nx.node_link_graph(data, **{keyword: key})
 
 
 def save_graph(G: nx.Graph, path: str | Path) -> Path:

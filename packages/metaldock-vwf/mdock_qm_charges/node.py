@@ -78,6 +78,11 @@ DEMO_CONFIG = {
     "charge": 1,             # the Re complex is a cation
     "spin": 0.0,             # closed shell
     "ncpu": 4,
+    # Empty, as a user leaves them: the node then uses the xtb in its own
+    # environment. Left out, salpa smoke fills a folder parameter with its case
+    # directory, and the node looks for the xtb binary there.
+    "xtb_path": "",
+    "orca_path": "",
 }
 
 

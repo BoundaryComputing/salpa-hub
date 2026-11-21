@@ -132,6 +132,14 @@ DEMO_CONFIG = {
     # itself on the metal, which is nearly the same thing but not reproducible.
     "box_center": "1.65,-7.803,27.176",
     "box_size": "20,20,20",
+    # Empty, as a user leaves it: the node then finds MGLTools in its own
+    # environment. Left out, salpa smoke fills a folder parameter with its case
+    # directory, and the node looks for prepare_gpf4.py there.
+    "mgltools_dir": "",
+    # Empty, as a user leaves it: the node then uses the bundled metal_dock.dat.
+    # Left out, salpa smoke fills a file parameter with the first demo input, and
+    # the node reads the demo graph as its AutoDock4 parameters.
+    "parameter_file": "",
 }
 
 
@@ -206,6 +214,16 @@ class MdockAutodockRun(Node):
                 flow_vars["case_name"].get_value() or carried.get("case_name") or "complex"
             )
             output_dir = self.resolve_path(flow_vars["output_dir"].get_value())
+            if output_dir and not os.path.isabs(output_dir):
+                # A folder named without a prefix goes where the app puts
+                # rel:<folder>, in the run's working directory. Left relative it
+                # would land wherever the process runs: the environment's own
+                # folder in the app, the node's folder under salpa smoke.
+                in_working = self.resolve_path(f"rel:{output_dir}")
+                output_dir = (
+                    in_working if os.path.isabs(in_working)
+                    else os.path.abspath(output_dir)
+                )
             os.makedirs(output_dir, exist_ok=True)
 
             def _input(param_key, *carry_keys):
