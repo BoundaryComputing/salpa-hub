@@ -4,6 +4,43 @@ All notable changes to this package. The format follows [Keep a Changelog](https
 versions are the `[package].version` in `package.toml`, which is what the Marketplace's Updates tab
 compares against.
 
+## [1.2.12] — 2026-11-25
+
+The bundled template, `workflows/pdbmdauto-pipeline.json`, and the documents that describe it. No node code
+changed and the environment is unchanged, so nothing is rebuilt. A workflow made from the template now runs as the
+PDB entry it is given.
+
+### Changed
+- **The case and its folder follow the PDB ID.** The template kept the values it had been tested with: the case
+  name `e2e_4z8j` on all eleven steps and step 1's folder `pdbmdauto-e2e-full`, so a workflow made from it for
+  another entry still ran as `e2e_4z8j`. The case name is now empty on every step: step 1 names the case after the
+  PDB ID, in lower case, and each later step takes the case from the step before it. Step 1 writes under
+  `pdbmdauto/`, so the example's files are in `<working directory>/pdbmdauto/4z8j/`, and a workflow given 1L2Y
+  writes `pdbmdauto/1l2y/`. A local file's case is `protein`, unless step 1's *Case Name* names one.
+- **The template declares its PDB ID as its input.** `template_info.inputs` names step 1's *PDB ID*, of kind
+  `pdb_id`. An app that reads the declaration asks for the PDB ID when a workflow is made from the template and
+  writes it into step 1; an app that does not ignores it.
+- **Every step is stored as configured.** Nothing in the template needs setting before it runs, but every step was
+  stored as "unconfigured", so an app could show it as needing setup.
+- **The steps are laid out left to right, in rows of four**, 300 px apart and 100 px between rows, so no card lies
+  on another. They stood in a staircase 100 px apart, and the cards overlapped.
+- **The two relaxation steps are named apart:** step 8 is "GMX MD Relaxation (restrained)" and step 10 "GMX
+  Minimisation (solvated)", so a run that stops at one names which. Both are still the GMX MD Relaxation node.
+- **No card is stored as selected.** GROMACS MD Run (Local)'s card was, so an app that reads the flag drew it
+  selected when the workflow opened.
+- The template's description, the README, the tutorial, the walkthrough and the figure scripts name the new folder
+  and the steps' names, and the platform note says that any entry given is fetched from the RCSB PDB. The
+  walkthrough no longer says that step 1 takes the pH: step 6 does.
+- **A local file keeps a PDB ID beside it.** The tutorial, the walkthrough and the README say to leave a PDB ID in
+  step 1's *PDB ID* when *Input mode* is a local file, any one will do: the run reads only the file, and an app
+  that reads the template's input can refuse to run while that field is empty ("Needs input: PDB ID").
+
+### Added
+- `tests/test_template.py`, the template's own checks: the four copies of each setting agree; no value is left
+  from a test run; every step is stored as configured; the PDB ID is declared as the input; the case and its
+  folder follow the PDB ID; no two cards overlap, and they read in run order; nothing on the canvas is stored as
+  selected; every step's name is its own.
+
 ## [1.2.11] — 2026-11-10
 
 Installing pdbmdauto from the Hub gets this version. Nothing a node does changes, and the environment is

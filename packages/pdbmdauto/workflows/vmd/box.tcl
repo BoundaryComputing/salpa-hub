@@ -1,6 +1,6 @@
 # Figure 2 — the solvated, neutralised system: protein cartoon, water as faint lines,
 # Na+ / Cl- as spheres, the periodic box outlined.
-# Input: ion.gro, a copy of <working_dir>/pdbmdauto-e2e-full/e2e_4z8j/gmx/ion.gro
+# Input: ion.gro, a copy of <working_dir>/pdbmdauto/4z8j/gmx/ion.gro
 axes location off
 display resize 1000 800
 display projection orthographic

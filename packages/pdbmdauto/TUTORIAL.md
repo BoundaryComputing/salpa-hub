@@ -71,9 +71,9 @@ that decided.
 | 5 | Fix Missing Residues | Builds the missing residues and their sidechains | ProMod3 | A continuous protein, with no holes |
 | 6 | pKa + GROMACS EM | Decides charges for pH 7, adds hydrogens, writes the force-field topology, minimises in vacuum | PROPKA, PDB2PQR, GROMACS | The electrostatics of your simulation are decided here |
 | 7 | Original Atom Groups | Marks which atoms came from the experiment | GROMACS | So the next step can hold them still |
-| 8 | GMX MD Relaxation — in vacuum, restrained | Lets the rebuilt residues settle while the crystal's atoms are held | GROMACS | The built pieces adopt sensible positions without moving what was measured |
+| 8 | GMX MD Relaxation (restrained) | Lets the rebuilt residues settle in vacuum while the crystal's atoms are held | GROMACS | The built pieces adopt sensible positions without moving what was measured |
 | 9 | GMX Solvate & Ionize | Puts everything in a box of water with 0.15 M NaCl, neutral, at least 1 nm from the protein on every side | GROMACS | Proteins live in salt water, not vacuum |
-| 10 | GMX MD Relaxation — in water | Minimises the whole box | GROMACS | Water settles onto the protein before it moves |
+| 10 | GMX Minimisation (solvated) | Minimises the whole box, in water | GROMACS | Water settles onto the protein before it moves |
 | 11 | GROMACS MD Run (Local) | Runs 2 ps of molecular dynamics | GROMACS | Proves the prepared system runs; the trajectory is the starting point for real work |
 
 ## Try it: a worked example
@@ -86,8 +86,9 @@ them missing from the crystal.
 2. Pick **PDBmdAuto Full Pipeline** (under *molecular-dynamics*). Its walkthrough is one click
    away on the same screen — **Read the walkthrough** — with figures from a real run.
 3. Choose a working directory. This is the only thing you type. An empty folder is best.
-4. Press **Run**. Nothing else needs setting: the PDB code, the pH and the case name are in the
-   template.
+4. Press **Run**. Nothing else needs setting: the PDB code and the pH are in the template, and the
+   results are named after the PDB code. If Salpa asks for a PDB ID as you start, it holds 4Z8J
+   already.
 
 Watch the eleven steps go green in order. On a 2019 Intel laptop the whole thing took three to
 five and a half minutes across three runs; on an Apple Silicon Mac Mini, about two. (Measured on
@@ -106,8 +107,8 @@ and choose **View**. The tab opens on the step's structure by itself.
 - **GROMACS MD Run (Local)** shows `gmx/md.gro`, the final coordinates. Open **Files**, tick
   `md.trr` and press **Play** (▶) to watch the eleven frames of the test run.
 
-The files are also in the working directory, under `pdbmdauto-e2e-full/e2e_4z8j/`, for any other
-structure viewer.
+The files are also in the working directory, under `pdbmdauto/4z8j/`, for any other structure
+viewer.
 
 ## Reading the results
 
@@ -127,7 +128,7 @@ When something looks wrong:
 
 | You see | Likely cause | What to do |
 |---|---|---|
-| Step 1 fails immediately | No network — 4Z8J could not be fetched | Connect, or point *Input mode* at a local file |
+| Step 1 fails immediately | No network — 4Z8J could not be fetched | Connect, or point *Input mode* at a local file, keeping a PDB ID in its field (see *Your own protein*) |
 | Step 5 fails and names a chain | ProMod3 could not model that chain, so the run stops rather than go on without it | Check the Log Center for the reason; a chain that cannot be modelled needs a different preparation |
 | Step 5 fails with no chain named | ProMod3 or OpenMM problem in the environment | Check the Log Center; reinstalling the package rebuilds the environment |
 | A step stops at Solvate & Ionize | A working directory the tools could not use | Choose a plain, empty folder and rerun |
@@ -143,9 +144,13 @@ The same workflow prepares another protein. Do this for each one:
    until the package is installed.
 2. **Start a fresh workflow from the template, in a new, empty folder.** A folder that already holds
    a run keeps that run's files, and some steps pick up what they find there.
-3. **Choose the structure on the first step, PDB FASTA Parser.** Type the entry's code in *PDB ID*,
-   or set *Input mode* to *local file* and pick a `.pdb` file. Leave the case name as it is
-   (`e2e_4z8j`): it only names the results folder, and every step uses the same one.
+3. **Choose the structure.** If Salpa asks for a PDB ID as you start from the template, type the
+   entry's code there. Otherwise type it in *PDB ID* on the first step, PDB FASTA Parser, or set
+   *Input mode* to *local file* and pick a `.pdb` file. Leave *Case Name* empty on every step: the
+   results are then named after the entry (1AKI's go to `pdbmdauto/1aki/`), and every step uses
+   the same folder. A local file's results go to `pdbmdauto/protein/`, unless you give the first
+   step a case name. With a local file, keep a PDB ID in *PDB ID*, any one will do: the run reads
+   only your file. If that field is empty, Salpa can refuse to run with *Needs input: PDB ID*.
 4. **Set the pH on the sixth step, pKa + GROMACS EM**, if it matters for your protein. The template
    uses 7.
 5. **Press Run.** The water box sizes itself to your protein, with 1 nm of water on every side, so

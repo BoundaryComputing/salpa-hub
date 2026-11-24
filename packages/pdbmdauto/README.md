@@ -70,8 +70,9 @@ the same step to an HPC scheduler (SLURM) for extended simulation.
 ## Pipeline nodes
 
 The bundled workflow comprises eleven steps in the order below. The "GMX MD Relaxation" node is
-applied twice — once before solvation (on the reconstructed regions, under restraints, in vacuo)
-and once after solvation (on the full system, minimization only).
+applied twice, as two steps named apart: once before solvation (*GMX MD Relaxation (restrained)*,
+on the reconstructed regions, under restraints, in vacuo) and once after solvation (*GMX
+Minimisation (solvated)*, on the full system, minimization only).
 
 | # | Node | Function | Primary tool |
 |---|------|----------|--------------|
@@ -84,7 +85,7 @@ and once after solvation (on the full system, minimization only).
 | 7 | Original Atom Groups | Define index groups distinguishing experimental from reconstructed atoms | GROMACS |
 | 8 | GMX MD Relaxation (restrained) | Relax reconstructed regions under position restraints on experimental atoms | GROMACS |
 | 9 | GMX Solvate & Ionize | Cubic box, solvent, neutralizing counter-ions at 0.15 M | GROMACS |
-| 10 | GMX MD Relaxation (solvated) | Minimize the solvated system | GROMACS |
+| 10 | GMX Minimisation (solvated) | Minimize the solvated system | GROMACS |
 | 11 | GROMACS MD Run (Local) | Execute production molecular dynamics | GROMACS |
 
 Nodes included in the package but not part of the bundled workflow: a standalone **PDB2PQR** node
@@ -104,9 +105,14 @@ production trajectory. The counts vary a few percent from run to run.
 
 The workflow requires no manual configuration: the structure is retrieved from the RCSB PDB at run
 time (network access is required for this example), and the only input at load is a working
-directory. To prepare a different target, start a fresh workflow from the template in a new
-folder, set the PDB identifier (or a local file) on the first node and, if needed, the pH on the
-sixth (pKa + GROMACS EM), and execute; the tutorial's *Your own protein* section walks through it. Its walkthrough, `workflows/pdbmdauto-pipeline.md`, describes every
+directory. The template declares the PDB identifier as its input (`template_info.inputs`), so an
+application that reads the declaration asks for it when a workflow is made from the template. To
+prepare a different target, start a fresh workflow from the template in a new folder, give the PDB
+identifier (or set a local file on the first step, keeping a PDB identifier in its field, which an
+application that reads the declaration requires; the file alone is read, and the case is
+`protein`) and, if needed, the pH on the sixth (pKa + GROMACS EM), and execute; the case and its
+directory follow the identifier. The tutorial's *Your
+own protein* section walks through it. Its walkthrough, `workflows/pdbmdauto-pipeline.md`, describes every
 step's inputs, outputs and parameters, with figures from a reference run.
 
 ### Measured run times
@@ -126,8 +132,10 @@ twice the atoms, which lengthens the last two steps (on the same laptop, run out
 
 ## Outputs and interpretation
 
-All files are written under `<working directory>/pdbmdauto-e2e-full/e2e_4z8j/` for the bundled
-example (the directory is named after the workflow's case name). The files to examine, by stage:
+All files are written under `<working directory>/pdbmdauto/4z8j/` for the bundled example. The
+directory is named after the case, which step 1 takes from the PDB identifier, in lower case, when
+its case name is left empty, as the template leaves it on every step. The files to examine, by
+stage:
 
 - `4Z8J.pdb`, `chain_A.fasta`, `chain_B.fasta`, `missing_residues_chain_*.csv` — the retrieved
   structure, its sequences, and the unresolved residues (step 1).

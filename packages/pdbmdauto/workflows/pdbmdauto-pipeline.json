@@ -3,7 +3,7 @@
   "template_info": {
     "id": "pdbmdauto-pipeline",
     "name": "PDBmdAuto Full Pipeline",
-    "description": "Automated 11-node MD preparation pipeline: PDB fetch, homology modeling (ProMod3), pH-dependent protonation (PDB2PQR/PROPKA), GROMACS topology, restrained relaxation, solvation and ionization, solvated minimization and a short production MD. Demo: PDB 4Z8J (SNX27 PDZ domain + PTHR C-terminal peptide, 2 chains; six unresolved N-terminal residues are rebuilt). Fetches 4Z8J from RCSB, so it needs network access; the first run also builds the environment.",
+    "description": "Automated 11-step MD preparation pipeline: PDB fetch, homology modeling (ProMod3), pH-dependent protonation (PDB2PQR/PROPKA), GROMACS topology, restrained relaxation, solvation and ionization, solvated minimization and a short production MD. Example: PDB 4Z8J (SNX27 PDZ domain + PTHR C-terminal peptide, 2 chains; six unresolved N-terminal residues are rebuilt), written under pdbmdauto/4z8j/. To prepare another entry, give its PDB ID when you start, or change PDB ID in step 1: the case and its folder follow it. Fetches the entry from RCSB, so it needs network access; the first run also builds the environment.",
     "required_packages": [
       "pdbmdauto"
     ],
@@ -21,7 +21,15 @@
       "pdbmdauto"
     ],
     "author": "BoundaryComputing",
-    "estimated_time": "5 minutes"
+    "estimated_time": "5 minutes",
+    "inputs": [
+      {
+        "step": "09ea5049-bbb6-408f-b829-a10321d67906",
+        "option": "pdb_id",
+        "kind": "pdb_id",
+        "label": "PDB ID"
+      }
+    ]
   },
   "metadata": {
     "name": "PDBmdAuto Full Pipeline",
@@ -58,14 +66,14 @@
               {
                 "id": "b2817279-7109-4433-8ffe-34f251fb43fb",
                 "type": "point",
-                "x": 553.0965499999993,
+                "x": 253.09375,
                 "y": 105
               },
               {
                 "id": "3dceaac4-0496-45ea-9db8-c79d0e62f023",
                 "type": "point",
-                "x": 481.0027999999993,
-                "y": 145
+                "x": 381,
+                "y": 105
               }
             ],
             "labels": [],
@@ -86,14 +94,14 @@
               {
                 "id": "102dad1e-c84b-428d-bb46-ce400c2fc8de",
                 "type": "point",
-                "x": 667.2840499999993,
-                "y": 145
+                "x": 567.28125,
+                "y": 105
               },
               {
                 "id": "d8399dba-1b4c-4861-8460-5ff5ad41e922",
                 "type": "point",
-                "x": 581.0027999999993,
-                "y": 185
+                "x": 681,
+                "y": 105
               }
             ],
             "labels": [],
@@ -114,14 +122,14 @@
               {
                 "id": "09989d19-ba95-46dd-b496-f572c2ecdb00",
                 "type": "point",
-                "x": 777.0965499999993,
-                "y": 185
+                "x": 877.09375,
+                "y": 105
               },
               {
                 "id": "cc83a6b8-77f6-4cf9-9aef-a0345135c598",
                 "type": "point",
-                "x": 681.0027999999993,
-                "y": 225
+                "x": 981,
+                "y": 105
               }
             ],
             "labels": [],
@@ -142,14 +150,14 @@
               {
                 "id": "d2c307af-5690-4f42-92cb-455b0c790895",
                 "type": "point",
-                "x": 867.2840499999993,
-                "y": 225
+                "x": 1167.28125,
+                "y": 105
               },
               {
                 "id": "ca3552c6-2639-4322-89ca-901f1537147c",
                 "type": "point",
-                "x": 781.0027999999993,
-                "y": 265
+                "x": 81,
+                "y": 205
               }
             ],
             "labels": [],
@@ -170,14 +178,14 @@
               {
                 "id": "da1b8a19-4d4f-48f5-947d-ff63802d9ec3",
                 "type": "point",
-                "x": 968.0809249999993,
-                "y": 265
+                "x": 268.07812,
+                "y": 205
               },
               {
                 "id": "8137fa82-e866-449c-a524-83da1c1aa79e",
                 "type": "point",
-                "x": 881.0027999999993,
-                "y": 305
+                "x": 381,
+                "y": 205
               }
             ],
             "labels": [],
@@ -198,14 +206,14 @@
               {
                 "id": "7f8c79e9-8283-48c9-a4a7-1b550ade94b2",
                 "type": "point",
-                "x": 1067.3934249999995,
-                "y": 305
+                "x": 567.39063,
+                "y": 205
               },
               {
                 "id": "93a0ca89-d222-4b91-a3bb-b5af48556655",
                 "type": "point",
-                "x": 981.0027999999993,
-                "y": 345
+                "x": 681,
+                "y": 205
               }
             ],
             "labels": [],
@@ -226,14 +234,14 @@
               {
                 "id": "5ff1b8c8-b9f5-47fd-a440-57dd89d60210",
                 "type": "point",
-                "x": 1170.7684249999998,
-                "y": 345
+                "x": 870.76563,
+                "y": 205
               },
               {
                 "id": "a1f86aaf-c0bb-444d-9536-20abe4c74dcf",
                 "type": "point",
-                "x": 1081.0027999999998,
-                "y": 385
+                "x": 981,
+                "y": 205
               }
             ],
             "labels": [],
@@ -254,14 +262,14 @@
               {
                 "id": "8a2f28f4-a115-48d3-b114-bb7ba2146780",
                 "type": "point",
-                "x": 1261.9559249999998,
-                "y": 385
+                "x": 1161.95313,
+                "y": 205
               },
               {
                 "id": "88b5ead2-6055-4a44-8a21-e12f52427056",
                 "type": "point",
-                "x": 1181.0027999999998,
-                "y": 425
+                "x": 81,
+                "y": 305
               }
             ],
             "labels": [],
@@ -282,14 +290,14 @@
               {
                 "id": "e03000f9-a855-407a-873f-787bb86e4469",
                 "type": "point",
-                "x": 1370.4871749999998,
-                "y": 425
+                "x": 270.48438,
+                "y": 305
               },
               {
                 "id": "53c02a75-6c80-468b-be1d-0524e65421c4",
                 "type": "point",
-                "x": 1281.0027999999998,
-                "y": 465
+                "x": 381,
+                "y": 305
               }
             ],
             "labels": [],
@@ -310,14 +318,14 @@
               {
                 "id": "5e72a5c6-5166-40d2-836a-f54b9f086bd0",
                 "type": "point",
-                "x": 1461.9559249999998,
-                "y": 465
+                "x": 561.95313,
+                "y": 305
               },
               {
                 "id": "f0e4afbc-b545-44cd-92c7-1c13393dd96d",
                 "type": "point",
-                "x": 1381.0027999999998,
-                "y": 505
+                "x": 681,
+                "y": 305
               }
             ],
             "labels": [],
@@ -338,13 +346,13 @@
             "id": "09ea5049-bbb6-408f-b829-a10321d67906",
             "type": "custom-node",
             "selected": false,
-            "x": 380.0027999999993,
+            "x": 80,
             "y": 80,
             "ports": [
               {
                 "id": "e2a18911-18d4-419a-ac96-dabc85540694",
                 "type": "vp-port",
-                "x": 380.0027999999993,
+                "x": 80,
                 "y": 80,
                 "name": "flow-in",
                 "alignment": "left",
@@ -356,7 +364,7 @@
               {
                 "id": "326c551c-ab64-43dc-9e28-4195a2cb673a",
                 "type": "vp-port",
-                "x": 377.0027999999993,
+                "x": 77,
                 "y": 101,
                 "name": "in-0",
                 "alignment": "left",
@@ -368,7 +376,7 @@
               {
                 "id": "3548d9fd-c902-4fa1-977e-fd4c79a19fd9",
                 "type": "vp-port",
-                "x": 549.0965499999993,
+                "x": 249.09375,
                 "y": 101,
                 "name": "out-0",
                 "alignment": "right",
@@ -451,13 +459,13 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "e2e_4z8j",
+                  "value": "",
                   "docstring": "Identifier for this case. Falls back to PDB ID, predecessor data, or 'protein'."
                 },
                 "output_dir": {
                   "type": "folder",
                   "label": "Output Directory",
-                  "value": "rel:pdbmdauto-e2e-full",
+                  "value": "rel:pdbmdauto",
                   "docstring": "Directory where output files will be written."
                 },
                 "split_chains": {
@@ -491,14 +499,14 @@
               "default_timeout": null,
               "type": "custom-node",
               "node_id": "09ea5049-bbb6-408f-b829-a10321d67906",
-              "status": "unconfigured",
+              "status": "configured",
               "selected": false,
               "config": {
                 "input_mode": "pdb_id",
                 "pdb_id": "4Z8J",
                 "pdb_file": null,
-                "case_name": "e2e_4z8j",
-                "output_dir": "rel:pdbmdauto-e2e-full",
+                "case_name": "",
+                "output_dir": "rel:pdbmdauto",
                 "split_chains": true,
                 "include_hetatm": false,
                 "check_pdb_header": true,
@@ -509,8 +517,8 @@
               "input_mode": "pdb_id",
               "pdb_id": "4Z8J",
               "pdb_file": null,
-              "case_name": "e2e_4z8j",
-              "output_dir": "rel:pdbmdauto-e2e-full",
+              "case_name": "",
+              "output_dir": "rel:pdbmdauto",
               "split_chains": true,
               "include_hetatm": false,
               "check_pdb_header": true,
@@ -521,14 +529,14 @@
             "id": "c3d15483-d69a-49ba-a82d-ced245aa8349",
             "type": "custom-node",
             "selected": false,
-            "x": 480.0027999999993,
-            "y": 120,
+            "x": 380,
+            "y": 80,
             "ports": [
               {
                 "id": "f1b809dd-302b-48a4-98a4-6a1772ca6563",
                 "type": "vp-port",
-                "x": 480.0027999999993,
-                "y": 120,
+                "x": 380,
+                "y": 80,
                 "name": "flow-in",
                 "alignment": "left",
                 "parentNode": "c3d15483-d69a-49ba-a82d-ced245aa8349",
@@ -539,8 +547,8 @@
               {
                 "id": "42604a48-312b-468b-9280-e9f704401e97",
                 "type": "vp-port",
-                "x": 477.0027999999993,
-                "y": 141,
+                "x": 377,
+                "y": 101,
                 "name": "in-0",
                 "alignment": "left",
                 "parentNode": "c3d15483-d69a-49ba-a82d-ced245aa8349",
@@ -553,8 +561,8 @@
               {
                 "id": "d1f2a380-beba-4205-b182-207b55043ce2",
                 "type": "vp-port",
-                "x": 663.2840499999993,
-                "y": 141,
+                "x": 563.28125,
+                "y": 101,
                 "name": "out-0",
                 "alignment": "right",
                 "parentNode": "c3d15483-d69a-49ba-a82d-ced245aa8349",
@@ -605,7 +613,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "e2e_4z8j",
+                  "value": "",
                   "docstring": "Case identifier. Leave empty to use predecessor data."
                 },
                 "output_dir": {
@@ -633,17 +641,17 @@
               "default_timeout": null,
               "type": "custom-node",
               "node_id": "c3d15483-d69a-49ba-a82d-ced245aa8349",
-              "status": "unconfigured",
+              "status": "configured",
               "selected": false,
               "config": {
-                "case_name": "e2e_4z8j",
+                "case_name": "",
                 "output_dir": "",
                 "append_end_in_seq": true,
                 "force_to_run": false
               }
             },
             "config": {
-              "case_name": "e2e_4z8j",
+              "case_name": "",
               "output_dir": "",
               "append_end_in_seq": true,
               "force_to_run": false
@@ -653,14 +661,14 @@
             "id": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
             "type": "custom-node",
             "selected": false,
-            "x": 580.0027999999993,
-            "y": 160,
+            "x": 680,
+            "y": 80,
             "ports": [
               {
                 "id": "983a3326-4725-47d4-98f4-0c877d938266",
                 "type": "vp-port",
-                "x": 580.0027999999993,
-                "y": 160,
+                "x": 680,
+                "y": 80,
                 "name": "flow-in",
                 "alignment": "left",
                 "parentNode": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
@@ -671,8 +679,8 @@
               {
                 "id": "ca6d21ae-180b-45ae-88ea-94bd12ea43f1",
                 "type": "vp-port",
-                "x": 577.0027999999993,
-                "y": 181,
+                "x": 677,
+                "y": 101,
                 "name": "in-0",
                 "alignment": "left",
                 "parentNode": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
@@ -685,8 +693,8 @@
               {
                 "id": "6798df54-3ca6-4e15-b89a-696ff4664e36",
                 "type": "vp-port",
-                "x": 773.0965499999993,
-                "y": 181,
+                "x": 873.09375,
+                "y": 101,
                 "name": "out-0",
                 "alignment": "right",
                 "parentNode": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
@@ -736,7 +744,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "e2e_4z8j",
+                  "value": "",
                   "docstring": "Case identifier. Leave empty to use predecessor data."
                 },
                 "merge_folder_name": {
@@ -764,17 +772,17 @@
               "default_timeout": null,
               "type": "custom-node",
               "node_id": "2d6d9744-1e2c-437c-9097-5ca55a2bca60",
-              "status": "unconfigured",
+              "status": "configured",
               "selected": false,
               "config": {
-                "case_name": "e2e_4z8j",
+                "case_name": "",
                 "merge_folder_name": "Merge",
                 "selected_chain_ids": "all",
                 "force_to_run": false
               }
             },
             "config": {
-              "case_name": "e2e_4z8j",
+              "case_name": "",
               "merge_folder_name": "Merge",
               "selected_chain_ids": "all",
               "force_to_run": false
@@ -784,14 +792,14 @@
             "id": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
             "type": "custom-node",
             "selected": false,
-            "x": 680.0027999999993,
-            "y": 200,
+            "x": 980,
+            "y": 80,
             "ports": [
               {
                 "id": "3ec15f69-aabb-438e-b20c-4bf610053850",
                 "type": "vp-port",
-                "x": 680.0027999999993,
-                "y": 200,
+                "x": 980,
+                "y": 80,
                 "name": "flow-in",
                 "alignment": "left",
                 "parentNode": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
@@ -802,8 +810,8 @@
               {
                 "id": "8aae8125-3736-4014-96c8-e3093942cf89",
                 "type": "vp-port",
-                "x": 677.0027999999993,
-                "y": 221,
+                "x": 977,
+                "y": 101,
                 "name": "in-0",
                 "alignment": "left",
                 "parentNode": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
@@ -816,8 +824,8 @@
               {
                 "id": "243f679a-6a91-46b9-b63c-88b5428583b6",
                 "type": "vp-port",
-                "x": 863.2840499999993,
-                "y": 221,
+                "x": 1163.28125,
+                "y": 101,
                 "name": "out-0",
                 "alignment": "right",
                 "parentNode": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
@@ -867,7 +875,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "e2e_4z8j",
+                  "value": "",
                   "docstring": "Case identifier. Leave empty to use predecessor data."
                 },
                 "merge_folder_name": {
@@ -901,10 +909,10 @@
               "default_timeout": null,
               "type": "custom-node",
               "node_id": "c968b176-082f-4c76-a032-81cf4f6f5ccb",
-              "status": "unconfigured",
+              "status": "configured",
               "selected": false,
               "config": {
-                "case_name": "e2e_4z8j",
+                "case_name": "",
                 "merge_folder_name": "Merge",
                 "merge_file_name": "merge.pdb",
                 "selected_chain_ids": "all",
@@ -912,7 +920,7 @@
               }
             },
             "config": {
-              "case_name": "e2e_4z8j",
+              "case_name": "",
               "merge_folder_name": "Merge",
               "merge_file_name": "merge.pdb",
               "selected_chain_ids": "all",
@@ -923,14 +931,14 @@
             "id": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
             "type": "custom-node",
             "selected": false,
-            "x": 780.0027999999993,
-            "y": 240,
+            "x": 80,
+            "y": 180,
             "ports": [
               {
                 "id": "c020f108-f02e-4537-b08f-752b5e7295b3",
                 "type": "vp-port",
-                "x": 780.0027999999993,
-                "y": 240,
+                "x": 80,
+                "y": 180,
                 "name": "flow-in",
                 "alignment": "left",
                 "parentNode": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
@@ -941,8 +949,8 @@
               {
                 "id": "f869da8c-3167-411c-9a4e-3b3ff63ebdb3",
                 "type": "vp-port",
-                "x": 777.0027999999993,
-                "y": 261,
+                "x": 77,
+                "y": 201,
                 "name": "in-0",
                 "alignment": "left",
                 "parentNode": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
@@ -955,8 +963,8 @@
               {
                 "id": "553159aa-203b-4aba-89b0-f34c66b50820",
                 "type": "vp-port",
-                "x": 964.0809249999993,
-                "y": 261,
+                "x": 264.07812,
+                "y": 201,
                 "name": "out-0",
                 "alignment": "right",
                 "parentNode": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
@@ -1005,7 +1013,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "e2e_4z8j",
+                  "value": "",
                   "docstring": "Case identifier. Leave empty to use predecessor data."
                 },
                 "model_termini": {
@@ -1027,16 +1035,16 @@
               "default_timeout": 1800,
               "type": "custom-node",
               "node_id": "cbc4194f-fdb2-4656-a7ad-4befff3fb994",
-              "status": "unconfigured",
+              "status": "configured",
               "selected": false,
               "config": {
-                "case_name": "e2e_4z8j",
+                "case_name": "",
                 "model_termini": false,
                 "force_to_run": false
               }
             },
             "config": {
-              "case_name": "e2e_4z8j",
+              "case_name": "",
               "model_termini": false,
               "force_to_run": false
             }
@@ -1045,14 +1053,14 @@
             "id": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
             "type": "custom-node",
             "selected": false,
-            "x": 880.0027999999993,
-            "y": 280,
+            "x": 380,
+            "y": 180,
             "ports": [
               {
                 "id": "2dd037d5-6f13-4636-9c01-515fb2b2ba74",
                 "type": "vp-port",
-                "x": 880.0027999999993,
-                "y": 280,
+                "x": 380,
+                "y": 180,
                 "name": "flow-in",
                 "alignment": "left",
                 "parentNode": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
@@ -1063,8 +1071,8 @@
               {
                 "id": "6ee5bd51-b895-48d8-9257-b651cc5bb175",
                 "type": "vp-port",
-                "x": 877.0027999999993,
-                "y": 301,
+                "x": 377,
+                "y": 201,
                 "name": "in-0",
                 "alignment": "left",
                 "parentNode": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
@@ -1077,8 +1085,8 @@
               {
                 "id": "15f3c9f8-f7ba-4dea-a0f3-96320a6a8101",
                 "type": "vp-port",
-                "x": 1063.3934249999993,
-                "y": 301,
+                "x": 563.39062,
+                "y": 201,
                 "name": "out-0",
                 "alignment": "right",
                 "parentNode": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
@@ -1135,7 +1143,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "e2e_4z8j",
+                  "value": "",
                   "docstring": "Leave empty to use predecessor data."
                 },
                 "input_pdb": {
@@ -1212,10 +1220,10 @@
               "default_timeout": 1800,
               "type": "custom-node",
               "node_id": "3e4f3d51-bc97-461a-a45e-4187f5ba6fcb",
-              "status": "unconfigured",
+              "status": "configured",
               "selected": false,
               "config": {
-                "case_name": "e2e_4z8j",
+                "case_name": "",
                 "input_pdb": "",
                 "output_dir": "",
                 "force_field": "amber99sb",
@@ -1228,7 +1236,7 @@
               }
             },
             "config": {
-              "case_name": "e2e_4z8j",
+              "case_name": "",
               "input_pdb": "",
               "output_dir": "",
               "force_field": "amber99sb",
@@ -1244,14 +1252,14 @@
             "id": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
             "type": "custom-node",
             "selected": false,
-            "x": 980.0027999999993,
-            "y": 320,
+            "x": 680,
+            "y": 180,
             "ports": [
               {
                 "id": "dba814a4-be5e-47ea-af29-4664cac52804",
                 "type": "vp-port",
-                "x": 980.0027999999993,
-                "y": 320,
+                "x": 680,
+                "y": 180,
                 "name": "flow-in",
                 "alignment": "left",
                 "parentNode": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
@@ -1262,8 +1270,8 @@
               {
                 "id": "b9550024-bd43-4d4f-8aaa-f8bef20a32f6",
                 "type": "vp-port",
-                "x": 977.0027999999993,
-                "y": 341,
+                "x": 677,
+                "y": 201,
                 "name": "in-0",
                 "alignment": "left",
                 "parentNode": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
@@ -1276,8 +1284,8 @@
               {
                 "id": "5c9bb3c4-ec55-4ef2-ad75-fa34533b820e",
                 "type": "vp-port",
-                "x": 1166.7684249999995,
-                "y": 341,
+                "x": 866.76563,
+                "y": 201,
                 "name": "out-0",
                 "alignment": "right",
                 "parentNode": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
@@ -1326,7 +1334,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "e2e_4z8j",
+                  "value": "",
                   "docstring": "Leave empty to use predecessor data."
                 },
                 "input_structure": {
@@ -1349,16 +1357,16 @@
               "default_timeout": null,
               "type": "custom-node",
               "node_id": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1",
-              "status": "unconfigured",
+              "status": "configured",
               "selected": false,
               "config": {
-                "case_name": "e2e_4z8j",
+                "case_name": "",
                 "input_structure": "",
                 "force_to_run": false
               }
             },
             "config": {
-              "case_name": "e2e_4z8j",
+              "case_name": "",
               "input_structure": "",
               "force_to_run": false
             }
@@ -1367,14 +1375,14 @@
             "id": "151a78d1-1188-44a8-901a-8372acef3f70",
             "type": "custom-node",
             "selected": false,
-            "x": 1080.0027999999993,
-            "y": 360,
+            "x": 980,
+            "y": 180,
             "ports": [
               {
                 "id": "1e46ccfb-2482-418b-99e5-44fb600cf81a",
                 "type": "vp-port",
-                "x": 1080.0027999999995,
-                "y": 360,
+                "x": 980,
+                "y": 180,
                 "name": "flow-in",
                 "alignment": "left",
                 "parentNode": "151a78d1-1188-44a8-901a-8372acef3f70",
@@ -1385,8 +1393,8 @@
               {
                 "id": "38e4adb8-3b5f-4ec5-94b5-e317bad07c93",
                 "type": "vp-port",
-                "x": 1077.0027999999995,
-                "y": 381,
+                "x": 977,
+                "y": 201,
                 "name": "in-0",
                 "alignment": "left",
                 "parentNode": "151a78d1-1188-44a8-901a-8372acef3f70",
@@ -1399,8 +1407,8 @@
               {
                 "id": "49bba13f-7226-438d-9b28-b0e9c02eb14a",
                 "type": "vp-port",
-                "x": 1257.9559249999995,
-                "y": 381,
+                "x": 1157.95313,
+                "y": 201,
                 "name": "out-0",
                 "alignment": "right",
                 "parentNode": "151a78d1-1188-44a8-901a-8372acef3f70",
@@ -1414,7 +1422,7 @@
             "options": {
               "id": "151a78d1-1188-44a8-901a-8372acef3f70",
               "node_key": "GmxMdRelax",
-              "name": "GMX MD Relaxation",
+              "name": "GMX MD Relaxation (restrained)",
               "filename": "node",
               "node_type": "default",
               "description": "GROMACS multi-step relaxation — energy minimization and NVT equilibration",
@@ -1452,7 +1460,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "e2e_4z8j",
+                  "value": "",
                   "docstring": "Leave empty to use predecessor data."
                 },
                 "protocol": {
@@ -1507,10 +1515,10 @@
               "default_timeout": 3600,
               "type": "custom-node",
               "node_id": "151a78d1-1188-44a8-901a-8372acef3f70",
-              "status": "unconfigured",
+              "status": "configured",
               "selected": false,
               "config": {
-                "case_name": "e2e_4z8j",
+                "case_name": "",
                 "protocol": "full_4step",
                 "input_top_file": "",
                 "input_gro_file": "",
@@ -1520,7 +1528,7 @@
               }
             },
             "config": {
-              "case_name": "e2e_4z8j",
+              "case_name": "",
               "protocol": "full_4step",
               "input_top_file": "",
               "input_gro_file": "",
@@ -1533,14 +1541,14 @@
             "id": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
             "type": "custom-node",
             "selected": false,
-            "x": 1180.0027999999993,
-            "y": 400,
+            "x": 80,
+            "y": 280,
             "ports": [
               {
                 "id": "928d8f97-55b8-4f57-8102-956adbc374c2",
                 "type": "vp-port",
-                "x": 1180.0027999999995,
-                "y": 400,
+                "x": 80,
+                "y": 280,
                 "name": "flow-in",
                 "alignment": "left",
                 "parentNode": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
@@ -1551,8 +1559,8 @@
               {
                 "id": "e6de57bb-5625-4dd8-9eb1-2e0f4edbf29e",
                 "type": "vp-port",
-                "x": 1177.0027999999995,
-                "y": 421,
+                "x": 77,
+                "y": 301,
                 "name": "in-0",
                 "alignment": "left",
                 "parentNode": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
@@ -1565,8 +1573,8 @@
               {
                 "id": "be94b9a0-604f-41cb-b380-c66e81707328",
                 "type": "vp-port",
-                "x": 1366.4871749999995,
-                "y": 421,
+                "x": 266.48438,
+                "y": 301,
                 "name": "out-0",
                 "alignment": "right",
                 "parentNode": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
@@ -1622,7 +1630,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "e2e_4z8j",
+                  "value": "",
                   "docstring": "Leave empty to use predecessor data."
                 },
                 "run_label": {
@@ -1707,10 +1715,10 @@
               "default_timeout": null,
               "type": "custom-node",
               "node_id": "6ceea911-f34f-4b2e-aff5-49a1e5286446",
-              "status": "unconfigured",
+              "status": "configured",
               "selected": false,
               "config": {
-                "case_name": "e2e_4z8j",
+                "case_name": "",
                 "run_label": "md",
                 "force_field": "amber99sb",
                 "water_model": "tip3p",
@@ -1724,7 +1732,7 @@
               }
             },
             "config": {
-              "case_name": "e2e_4z8j",
+              "case_name": "",
               "run_label": "md",
               "force_field": "amber99sb",
               "water_model": "tip3p",
@@ -1741,14 +1749,14 @@
             "id": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
             "type": "custom-node",
             "selected": false,
-            "x": 1280.0027999999993,
-            "y": 440,
+            "x": 380,
+            "y": 280,
             "ports": [
               {
                 "id": "e29261c2-4e9b-4459-83d1-7c33c1aebb35",
                 "type": "vp-port",
-                "x": 1280.0027999999995,
-                "y": 440,
+                "x": 380,
+                "y": 280,
                 "name": "flow-in",
                 "alignment": "left",
                 "parentNode": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
@@ -1759,8 +1767,8 @@
               {
                 "id": "fed6d0f2-9cb5-4320-be4a-e358fe4d3f02",
                 "type": "vp-port",
-                "x": 1277.0027999999995,
-                "y": 461,
+                "x": 377,
+                "y": 301,
                 "name": "in-0",
                 "alignment": "left",
                 "parentNode": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
@@ -1773,8 +1781,8 @@
               {
                 "id": "28463f02-6860-418c-af24-fb980d320224",
                 "type": "vp-port",
-                "x": 1457.9559249999995,
-                "y": 461,
+                "x": 557.95313,
+                "y": 301,
                 "name": "out-0",
                 "alignment": "right",
                 "parentNode": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
@@ -1788,7 +1796,7 @@
             "options": {
               "id": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
               "node_key": "GmxMdRelax",
-              "name": "GMX MD Relaxation",
+              "name": "GMX Minimisation (solvated)",
               "filename": "node",
               "node_type": "default",
               "description": "GROMACS multi-step relaxation — energy minimization and NVT equilibration",
@@ -1826,7 +1834,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "e2e_4z8j",
+                  "value": "",
                   "docstring": "Leave empty to use predecessor data."
                 },
                 "protocol": {
@@ -1881,10 +1889,10 @@
               "default_timeout": 3600,
               "type": "custom-node",
               "node_id": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
-              "status": "unconfigured",
+              "status": "configured",
               "selected": false,
               "config": {
-                "case_name": "e2e_4z8j",
+                "case_name": "",
                 "protocol": "em_only",
                 "input_top_file": "",
                 "input_gro_file": "",
@@ -1894,7 +1902,7 @@
               }
             },
             "config": {
-              "case_name": "e2e_4z8j",
+              "case_name": "",
               "protocol": "em_only",
               "input_top_file": "",
               "input_gro_file": "",
@@ -1906,15 +1914,15 @@
           "21584ac2-1abf-4b25-8d3b-f44aee1c9b80": {
             "id": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
             "type": "custom-node",
-            "selected": true,
-            "x": 1380.0027999999993,
-            "y": 480,
+            "selected": false,
+            "x": 680,
+            "y": 280,
             "ports": [
               {
                 "id": "40cbc07b-2733-496d-ba74-c0b39be4ff34",
                 "type": "vp-port",
-                "x": 1380.0027999999995,
-                "y": 480,
+                "x": 680,
+                "y": 280,
                 "name": "flow-in",
                 "alignment": "left",
                 "parentNode": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
@@ -1925,8 +1933,8 @@
               {
                 "id": "7fc0faff-a97a-40e4-9e10-0435641a59a3",
                 "type": "vp-port",
-                "x": 1377.0027999999995,
-                "y": 501,
+                "x": 677,
+                "y": 301,
                 "name": "in-0",
                 "alignment": "left",
                 "parentNode": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
@@ -1939,8 +1947,8 @@
               {
                 "id": "34976916-0ccc-4342-9760-9f0bd9a55458",
                 "type": "vp-port",
-                "x": 1596.1590499999995,
-                "y": 501,
+                "x": 896.15625,
+                "y": 301,
                 "name": "out-0",
                 "alignment": "right",
                 "parentNode": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
@@ -2008,7 +2016,7 @@
                 "case_name": {
                   "type": "string",
                   "label": "Case Name",
-                  "value": "e2e_4z8j",
+                  "value": "",
                   "docstring": "Name for this simulation (optional)"
                 },
                 "run_label": {
@@ -2082,10 +2090,10 @@
               "default_timeout": 3600,
               "type": "custom-node",
               "node_id": "21584ac2-1abf-4b25-8d3b-f44aee1c9b80",
-              "status": "unconfigured",
-              "selected": true,
+              "status": "configured",
+              "selected": false,
               "config": {
-                "case_name": "e2e_4z8j",
+                "case_name": "",
                 "run_label": "md",
                 "input_top_file": "",
                 "input_gro_file": "",
@@ -2099,7 +2107,7 @@
               }
             },
             "config": {
-              "case_name": "e2e_4z8j",
+              "case_name": "",
               "run_label": "md",
               "input_top_file": "",
               "input_gro_file": "",
@@ -2134,8 +2142,8 @@
           "input_mode": "pdb_id",
           "pdb_id": "4Z8J",
           "pdb_file": null,
-          "case_name": "e2e_4z8j",
-          "output_dir": "rel:pdbmdauto-e2e-full",
+          "case_name": "",
+          "output_dir": "rel:pdbmdauto",
           "split_chains": true,
           "include_hetatm": false,
           "check_pdb_header": true,
@@ -2145,7 +2153,7 @@
         "from_registry": true,
         "data": null,
         "is_global": false,
-        "status": "unconfigured",
+        "status": "configured",
         "num_in": 1,
         "num_out": 1,
         "category": "io",
@@ -2182,7 +2190,7 @@
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "e2e_4z8j",
+          "case_name": "",
           "output_dir": "",
           "append_end_in_seq": true,
           "force_to_run": false
@@ -2191,7 +2199,7 @@
         "from_registry": true,
         "data": null,
         "is_global": false,
-        "status": "unconfigured",
+        "status": "configured",
         "num_in": 1,
         "num_out": 1,
         "category": "general",
@@ -2225,7 +2233,7 @@
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "e2e_4z8j",
+          "case_name": "",
           "merge_folder_name": "Merge",
           "selected_chain_ids": "all",
           "force_to_run": false
@@ -2234,7 +2242,7 @@
         "from_registry": true,
         "data": null,
         "is_global": false,
-        "status": "unconfigured",
+        "status": "configured",
         "num_in": 1,
         "num_out": 1,
         "category": "general",
@@ -2267,7 +2275,7 @@
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "e2e_4z8j",
+          "case_name": "",
           "merge_folder_name": "Merge",
           "merge_file_name": "merge.pdb",
           "selected_chain_ids": "all",
@@ -2277,7 +2285,7 @@
         "from_registry": true,
         "data": null,
         "is_global": false,
-        "status": "unconfigured",
+        "status": "configured",
         "num_in": 1,
         "num_out": 1,
         "category": "general",
@@ -2309,7 +2317,7 @@
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "e2e_4z8j",
+          "case_name": "",
           "model_termini": false,
           "force_to_run": false
         },
@@ -2317,7 +2325,7 @@
         "from_registry": true,
         "data": null,
         "is_global": false,
-        "status": "unconfigured",
+        "status": "configured",
         "num_in": 1,
         "num_out": 1,
         "category": "general",
@@ -2350,7 +2358,7 @@
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "e2e_4z8j",
+          "case_name": "",
           "input_pdb": "",
           "output_dir": "",
           "force_field": "amber99sb",
@@ -2365,7 +2373,7 @@
         "from_registry": true,
         "data": null,
         "is_global": false,
-        "status": "unconfigured",
+        "status": "configured",
         "num_in": 1,
         "num_out": 1,
         "category": "general",
@@ -2399,7 +2407,7 @@
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "e2e_4z8j",
+          "case_name": "",
           "input_structure": "",
           "force_to_run": false
         },
@@ -2407,7 +2415,7 @@
         "from_registry": true,
         "data": null,
         "is_global": false,
-        "status": "unconfigured",
+        "status": "configured",
         "num_in": 1,
         "num_out": 1,
         "category": "general",
@@ -2434,13 +2442,13 @@
         "id": "e0b50eb4-6b6e-4cac-9c5b-18cb6e48b8c1"
       },
       {
-        "name": "GMX MD Relaxation",
+        "name": "GMX MD Relaxation (restrained)",
         "node_id": "151a78d1-1188-44a8-901a-8372acef3f70",
         "node_key": "GmxMdRelax",
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "e2e_4z8j",
+          "case_name": "",
           "protocol": "full_4step",
           "input_top_file": "",
           "input_gro_file": "",
@@ -2452,7 +2460,7 @@
         "from_registry": true,
         "data": null,
         "is_global": false,
-        "status": "unconfigured",
+        "status": "configured",
         "num_in": 1,
         "num_out": 1,
         "category": "general",
@@ -2484,7 +2492,7 @@
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "e2e_4z8j",
+          "case_name": "",
           "run_label": "md",
           "force_field": "amber99sb",
           "water_model": "tip3p",
@@ -2500,7 +2508,7 @@
         "from_registry": true,
         "data": null,
         "is_global": false,
-        "status": "unconfigured",
+        "status": "configured",
         "num_in": 1,
         "num_out": 1,
         "category": "general",
@@ -2526,13 +2534,13 @@
         "id": "6ceea911-f34f-4b2e-aff5-49a1e5286446"
       },
       {
-        "name": "GMX MD Relaxation",
+        "name": "GMX Minimisation (solvated)",
         "node_id": "870ac5ec-e12e-4370-8397-a3f0c54d0caf",
         "node_key": "GmxMdRelax",
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "e2e_4z8j",
+          "case_name": "",
           "protocol": "em_only",
           "input_top_file": "",
           "input_gro_file": "",
@@ -2544,7 +2552,7 @@
         "from_registry": true,
         "data": null,
         "is_global": false,
-        "status": "unconfigured",
+        "status": "configured",
         "num_in": 1,
         "num_out": 1,
         "category": "general",
@@ -2576,7 +2584,7 @@
         "node_type": "default",
         "filename": "node",
         "options": {
-          "case_name": "e2e_4z8j",
+          "case_name": "",
           "run_label": "md",
           "input_top_file": "",
           "input_gro_file": "",
@@ -2592,7 +2600,7 @@
         "from_registry": true,
         "data": null,
         "is_global": false,
-        "status": "unconfigured",
+        "status": "configured",
         "num_in": 1,
         "num_out": 1,
         "category": "simulation",

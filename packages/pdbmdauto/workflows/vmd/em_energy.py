@@ -7,7 +7,7 @@ Run with the package environment's Python (it has matplotlib) after extracting t
     printf 'Potential\n0\n' | gmx energy -f em.edr        -o em_solvated.xvg
     python em_energy.py em_vacuum.xvg em_solvated.xvg energy.jpg
 
-Inputs are copies of <working_dir>/pdbmdauto-e2e-full/e2e_4z8j/gmx/{em_hbonds.edr,em.edr}.
+Inputs are copies of <working_dir>/pdbmdauto/4z8j/gmx/{em_hbonds.edr,em.edr}.
 """
 import sys
 

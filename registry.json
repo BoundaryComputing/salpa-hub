@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-11-21T18:18:14.926551+00:00",
+  "generated_at": "2026-11-25T05:04:15.290959+00:00",
   "source_name": "Salpa Hub",
   "packages": [
     {
@@ -579,7 +579,7 @@
     },
     {
       "name": "pdbmdauto",
-      "version": "1.2.11",
+      "version": "1.2.12",
       "description": "Automated protein structure preparation for molecular dynamics \u2014 homology modeling, solvation, relaxation",
       "category": "Molecular Dynamics",
       "hashtags": [
@@ -917,7 +917,7 @@
     {
       "id": "pdbmdauto-pipeline",
       "name": "PDBmdAuto Full Pipeline",
-      "description": "Automated 11-node MD preparation pipeline: PDB fetch, homology modeling (ProMod3), pH-dependent protonation (PDB2PQR/PROPKA), GROMACS topology, restrained relaxation, solvation and ionization, solvated minimization and a short production MD. Demo: PDB 4Z8J (SNX27 PDZ domain + PTHR C-terminal peptide, 2 chains; six unresolved N-terminal residues are rebuilt). Fetches 4Z8J from RCSB, so it needs network access; the first run also builds the environment.",
+      "description": "Automated 11-step MD preparation pipeline: PDB fetch, homology modeling (ProMod3), pH-dependent protonation (PDB2PQR/PROPKA), GROMACS topology, restrained relaxation, solvation and ionization, solvated minimization and a short production MD. Example: PDB 4Z8J (SNX27 PDZ domain + PTHR C-terminal peptide, 2 chains; six unresolved N-terminal residues are rebuilt), written under pdbmdauto/4z8j/. To prepare another entry, give its PDB ID when you start, or change PDB ID in step 1: the case and its folder follow it. Fetches the entry from RCSB, so it needs network access; the first run also builds the environment.",
       "category": "molecular-dynamics",
       "difficulty": "advanced",
       "estimated_time": "5 minutes",

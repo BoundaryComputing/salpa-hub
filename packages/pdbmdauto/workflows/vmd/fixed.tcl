@@ -1,6 +1,6 @@
 # Figure 1 — the model after Fix Missing Residues: what the experiment resolved (grey), the
 # bound peptide (teal), and the six residues ProMod3 rebuilt (orange).
-# Input: fixed.pdb, a copy of <working_dir>/pdbmdauto-e2e-full/e2e_4z8j/Merge/fixed.pdb
+# Input: fixed.pdb, a copy of <working_dir>/pdbmdauto/4z8j/Merge/fixed.pdb
 axes location off
 display resize 1000 800
 display projection orthographic

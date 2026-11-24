@@ -10,10 +10,10 @@ GMX=~/.bocoflow/pixi/environments/pdbmdauto/.pixi/envs/default/bin/gmx      # th
 PY=~/.bocoflow/pixi/environments/pdbmdauto/.pixi/envs/default/bin/python    # has matplotlib
 
 # copy the inputs beside these scripts (paths relative to the run's working directory)
-cp "<working_dir>/pdbmdauto-e2e-full/e2e_4z8j/Merge/fixed.pdb" fixed.pdb
-cp "<working_dir>/pdbmdauto-e2e-full/e2e_4z8j/gmx/ion.gro" ion.gro
-cp "<working_dir>/pdbmdauto-e2e-full/e2e_4z8j/gmx/em_hbonds.edr" .
-cp "<working_dir>/pdbmdauto-e2e-full/e2e_4z8j/gmx/em.edr" .
+cp "<working_dir>/pdbmdauto/4z8j/Merge/fixed.pdb" fixed.pdb
+cp "<working_dir>/pdbmdauto/4z8j/gmx/ion.gro" ion.gro
+cp "<working_dir>/pdbmdauto/4z8j/gmx/em_hbonds.edr" .
+cp "<working_dir>/pdbmdauto/4z8j/gmx/em.edr" .
 
 $VMD -dispdev text -e fixed.tcl      # -> fixed.tga
 $VMD -dispdev text -e box.tcl        # -> box.tga

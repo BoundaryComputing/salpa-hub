@@ -17,9 +17,16 @@ energy-relaxed system with a short test trajectory — every intermediate on dis
 
 ## Before you run
 
-- **Network.** Step 1 fetches 4Z8J from the RCSB PDB. Offline, set *Input mode* to a local file.
-- **A working directory.** Everything lands under `<working directory>/pdbmdauto-e2e-full/e2e_4z8j/`
-  (the case name comes from the template). Choose an empty folder.
+- **Network.** Step 1 fetches 4Z8J from the RCSB PDB. Offline, set *Input mode* to a local file,
+  and keep a PDB ID in *PDB ID*, any one will do: the run reads only your file, under
+  `pdbmdauto/protein/`. If that field is empty, Salpa can refuse to run with *Needs input: PDB
+  ID*.
+- **A working directory.** Everything lands under `<working directory>/pdbmdauto/4z8j/`: the case is
+  named after the PDB id, in lower case, since the template leaves every step's case name empty.
+  Choose an empty folder.
+- **Another entry.** The PDB id is the template's declared input: give it when Salpa asks as you
+  start, or change *PDB ID* on step 1. The case and its folder follow it, `pdbmdauto/1aki/` for
+  1AKI.
 - **The first install** builds a 3.1 GB environment once (GROMACS, ProMod3, OpenStructure, PDB2PQR,
   PROPKA, Biopython, OpenMM). On Windows Salpa sets that environment up inside WSL2 for you.
 
@@ -34,15 +41,15 @@ terminal extension has nothing to pack against — a reminder that a rebuilt res
 ## The pipeline
 
 Eleven nodes in a line. Each reads what the previous one wrote and adds its own files to the case
-directory. Paths below are relative to `pdbmdauto-e2e-full/e2e_4z8j/`.
+directory. Paths below are relative to `pdbmdauto/4z8j/`.
 
 ### 1 · PDB FASTA Parser — Biopython, RCSB PDB
 
 | | |
 |---|---|
-| takes | the PDB id `4Z8J`, pH 7, case name `e2e_4z8j` |
+| takes | the PDB id `4Z8J`; the case name is left empty, so the case is `4z8j` |
 | writes | `4Z8J.pdb`, `4Z8J_rcsb.fasta`, `chain_A.fasta`, `chain_B.fasta`, `missing_residues_chain_A.csv`, `missing_residues_chain_B.csv` |
-| set here | *Input mode* (PDB id or local file), *PDB id*, *pH* |
+| set here | *Input mode* (PDB id or local file), *PDB ID* |
 
 Downloads the entry, splits it by chain, and reads the header's `REMARK 465` records into one CSV
 per chain: which residues the sequence has and the coordinates do not. For 4Z8J that is five rows
@@ -149,7 +156,7 @@ six runs on one Mac gave 25,866 to 27,724 atoms in a 6.41 to 6.56 nm cube.
 
 ![The solvated system: protein cartoon, water as points, Na⁺ blue and Cl⁻ green, the box outlined. This figure is from 1.2.5's reference run, whose box was a fixed 5 nm cube](figures/pdbmdauto-pipeline-box.jpg)
 
-### 10 · GMX MD Relaxation (solvated) — GROMACS, protocol `em_only`
+### 10 · GMX Minimisation (solvated) — GROMACS, protocol `em_only`
 
 | | |
 |---|---|
@@ -191,7 +198,7 @@ window** keeps the view open beside the workflow. A step opens on its main struc
 | 6 · pKa + GROMACS EM | `gmx/em_hbonds.gro`; `gmx/protonated.pdb` and `gmx/propka.pqr` are under *Named in results* in **Files** |
 | 8 · GMX MD Relaxation (restrained) | `gmx/mm2.gro` |
 | 9 · GMX Solvate & Ionize | `gmx/ion.gro` |
-| 10 · GMX MD Relaxation (solvated) | `gmx/em.gro` |
+| 10 · GMX Minimisation (solvated) | `gmx/em.gro` |
 | 11 · GROMACS MD Run (Local) | `gmx/md.gro`; tick `md.trr` in **Files** and press **Play** (▶) for the eleven frames |
 
 Outside the app, the same files:
